@@ -1,0 +1,52 @@
+31 July
+=======
+
+Cline by RI or environment?
+
+Haplotype tree! Between two selected loci, or around a selected locus.
+
+Adaptive introgression shifts cline center?
+
+Joachim in space: how long until adaptive introgression can escape a bunch of linked deleterious stuff: calculate haplotype chunk length in the tail.  could happen in center, too, though?  Also: when are sweeps soft?
+
+Non-stationary: properties in terms of time since cline formed?
+
+
+SMBE
+====
+
+Scenario: Recent HZ can we detect selection, and distinguish it from neutral clines.
+	- migrant alleles may be too rare to be informative
+	- Deleterious migrant haploytpes should have long, rare haplotypes.
+	
+	- Perhaps have a cline under selection reach equilibrium really quickly, and then describe patterns conditioning on that cline.
+
+Fun things:
+	- Adaptive introgression, patterns of diversity.
+	- Cov. in ancestry at a neutral linked site.
+	- How much sharing should two blocks have?
+	
+Question:
+	- Can we tell if a HZ is in fact a tension zone?
+		- variance in cline width?
+		- find number of selected alleles?
+
+Ideas/patterns:
+	- Variance in covariances for a fixed distance (not clear if this was meant to be genetic or geographic space)
+	- Figure out s given genome-wide covariances?
+	- Parametrize a moving cline
+	- Covariance in ancestry between two geographically separate lineages
+	- BM with drift dynamics to determine transitions probability of background ancestry
+	
+	- 
+
+
+Potential datasets (not sure if data exists for all of these yet):
+	- Mouse
+	- Sparrow
+	- Rabbit
+	- Xiphophorus
+	- Poplars
+	- Yakuba-Santomea
+	- Bombina
+	- torts

@@ -1,0 +1,262 @@
+
+\documentclass[12pt]{article}
+\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\geometry{a4paper} % or letter or a5paper or ... etc
+% \geometry{landscape} % rotated page geometry
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb}
+% See the ``Article customise'' template for come common customisations
+\usepackage{color}
+\newcommand{\gc}[1]{{\em \color{blue} {Graham: #1} }}
+\newcommand{\as}[1]{{\em \color{red} {Alisa: #1}}}
+\newcommand{\yb}[1]{{\em \color{green} {Yaniv #1}}}
+
+\def\Var{\mathop{\rm Var}}
+\def\Cov{\mathop{\rm Cov}}
+
+\title{}
+\author{}
+\date{} % delete this line to display the current date
+
+%%% BEGIN DOCUMENT
+\begin{document}
+
+\maketitle
+%\tableofcontents
+
+
+This is the equation describing the distribution of allele frequency across geographic space (Slatkin 73, eq. 11):
+
+\begin{equation}
+A(\xi) = -2 + 3\tanh^2(\xi/2 + \tanh^{-1}(\sqrt{2/3}))
+\end{equation}
+where
+\begin{equation}
+\xi = x/l_c
+\end{equation}
+where 
+\begin{equation}
+l_c = \sigma/\sqrt{s}
+\end{equation}
+the characteristic length.
+
+$$A = p-q = p - 1+p = 2p-1$$
+
+Which means:
+
+\begin{equation}
+p(\xi) = \frac{A(\xi)+1}{2}
+\end{equation}
+
+
+If $x$ is negative:
+
+\begin{equation}
+p = \frac{3}{2}(1-\tanh^2(-\xi/2 + \tanh^{-1}(\sqrt{2/3})))
+\end{equation}
+
+
+\subsubsection{Approximations of movement and recom. probs in tails}
+Furthermore, if $x$ (or $\xi$) is really negative:
+
+\begin{equation}
+p = \frac{3}{2}(1-\tanh^2( -\xi/2))
+\end{equation}
+
+Let $-\xi/2 = z$:
+
+\begin{equation}
+\tanh(z) = \frac{\exp(z) - \exp(-z)}{\exp(-z) + \exp(z)}
+\end{equation}
+
+Divide through by $\exp(z)$:
+\begin{eqnarray}
+= &\frac{1 - \exp(-2z)}{\exp(-2z) + 1}\\
+ = &\frac{1}{\exp(-2z) +1} - \frac{\exp(-2z)}{\exp(-2z) +1}
+\end{eqnarray}
+
+Since $-z$ is actually positive, the denominator is approximately $\exp(-2z)$. So:
+\begin{eqnarray}
+& = \frac{1}{\exp(-2z) } - \frac{\exp(-2z)}{\exp(-2z) }\\
+ &= \frac{1}{\exp(-2z) } -1 \\
+& = {\exp(2z) } -1 \\
+\tanh(z) & \approx \exp(2z) - 1
+\end{eqnarray}
+
+Which means that:
+\begin{equation}
+\tanh^2(z) \approx 1 - 2\exp(2z) + \exp(4z) \approx 1 - 2\exp(2z)
+\end{equation}
+since $\exp(4z)$ goes to $0$ faster than  $\exp(2z)$\\
+
+Sub into equation for $p$:
+\begin{eqnarray}
+ p &\approx 3/2(1-  1 + 2\exp(2z)) = 3\exp(2z)
+ p &\approx  6\exp(2z)/2 = 3\exp(2z)\\
+\end{eqnarray}
+Which makes the derivative:
+\begin{equation}
+\frac{dp}{dz} = 6\exp(2z)
+\end{equation}
+Making
+\begin{equation}
+\frac{dp}{dz}/p = 2 \label{scaled_speed}
+\end{equation}
+A constant drift to the right in the tail.
+
+So that in unscaled units the `drift' towards the right-side of the
+hybrid zone in the tails  is
+\begin{equation}
+c= 2/l_c   \label{unscaled_speed}
+\end{equation}
+%\gc{Do I have the $l_c$ right way up?}\as{I think you do}
+That means that in the tails the change in position per generation is
+distributed as:
+\begin{equation}
+N(c,\sigma)
+\end{equation}
+%\gc{need to check we aren't missing some factor here, e.g. check there is no $\delta t$ needed}
+\paragraph{An approximate probability of the probability we've not  recombined off}
+Assuming that we can ignore the variance $c \gg \sigma$ (?) then if we are on the wrong background we move right at constant rare give\eqref{unscaled_speed} (at least in the tail). Assuming that if we recombine before we make it to thecenter of the hybrid zone, that we automatically recombine onto the good background. We sample a lineage a geographic distance $L$ away form the hybrid zone, at a locus a genetic distance $r$ from selected locus. Then if $\tau$ is the time that the zone establishes, the probability that our lineage stays on the wrong background is
+\begin{eqnarray}
+\approx \exp( - L r / c ), ~\textrm{for~}  L/c <\tau\\
+0,~ \textrm{otherwise}\\
+\end{eqnarray}
+%\gc{need to think about the meaning of the too far from the hybrid  zone cutoff here, do we need $\exp(-r\tau)$ there instead. This  could reflect the fact that our lineage might not make it to the  zone on it's own but will be sucked back up if it survives without recombining back to time $\tau$} \paragraph{Perhaps a route to a better approximation?}
+
+Taken from Barton and Etheridge spatial hitchhiking paper page 25-26:
+
+\emph{The probability that the time for a Brownian motion with drift −c hits
+zero for the first time at time $t$ starting from $x$ is}
+\begin{equation}
+\phi(t,x) = \frac{x}{\sigma\sqrt{(2\pi t^3)}} \exp
+\left(-\frac{(x-ct)^2}{2\sigma^2 t} \right)
+\end{equation}
+\emph{see e.g. Cox and Miller (1977) p.221, Equation 74}
+\href{http://books.google.com/books?hl=en&lr=&id=76QOAAAAQAAJ&oi=fnd&pg=PR9&dq=The+Theory+of+Stochastic+Processes+cox&ots=cBTJktzRam&sig=kc_3OsLxXMyVRXx9lIUJCCAEys4#v=onepage&q=The%20Theory%20of%20Stochastic%20Processes%20cox&f=false}{link}
+.\emph{ Notice that, at
+least if $x \gg \sigma$, this is essentially a Gaussian density, centred on $t =
+x/c$, the time since the wave was at the current location of the
+lineage, with standard deviation $\sigma/c$.}
+
+In combination with the approx. linear drift \ref{unscaled_speed} we
+could use this to obtain an approximate distribution on the time it
+takes to reach the cline center. 
+We could try to approximate prob of not recombining off bad background 
+before we reach hybrid zone center. Assuming that if we recombine,
+that we'll fall off the bad background.
+ The probability that we are
+still on the bad background by the time we reach hybrid zone center,
+over a time $\tau$, is
+\begin{equation}
+\approx \int_0^\tau \phi(x,t) e^{-rt} dt
+\end{equation}
+
+\subsection{Covariance between ancestry in neutral non-equib. zone}
+
+The probability of recombining at time $t$ is:
+$$re^{-rt}$$
+After which point the two lineages are independent with variance (and covariance) of positions after time $\tau-t$ is:
+$$ (\tau-t)\sigma^2$$
+We can take the integral over $t$ to get:
+
+$$ \Var(X) = \int (\tau-t)re^{-rt} \,dt $$
+Where X is the position of a lineage at time $\tau$.
+
+Now suppose that a lineage sampled at time $0$ recombines at time $t$ when the lineage is at position $Z$. At time $\tau$ the two lineages after recombination are at positions $x + Z$ and $y + Z$, where $x$ and $y$ are the displacement during time $(\tau-t)$.
+$$\Cov(x+Z,y+Z)=\Cov(x,Z)+\Cov(y,Z)+\Cov(x,y)+\Cov(Z,Z)$$
+which comes down to:
+	$$\Cov(Z,Z) = \Var(Z,Z) = \sigma^2 t$$
+We then integrate across $t$ to get:
+	$$\int \sigma^2tre^{-rt} \,dt$$
+Which gives us: 
+$$\sigma^2(\tau - \frac{1-e^{-r\tau}}{r})$$
+
+We now consider the case in which recombination does not occur in time $\tau$. This happens with probability $e^{-r\tau}$. Since under this scenario, $X=Y$, $\Cov(X,Y) = \Var(X) = \sigma\tau$. This gives us a covariance of:
+$$\sigma\tau e^{-r\tau} + \sigma^2(\tau - \frac{1-e^{-r\tau}}{r})$$
+
+Now, let us take a look at the covariance between $X$ and $Y$, where $H_X$ and $H_Y$ are indicator variables such that  $H_X = 1$ if $X$ is on the RHS of the HZ, and $H_X = 0$ if $X$ is on the LHS of the HZ. Suppose that we start with a lineage sampled on the LHS of the HZ, a distance $L$ to the left of position 0 ($-L$. Under this scenario:
+
+$$\Cov(H_X,H_Y) = 	\mathbb{E}[H_XH_Y] - \mathbb{E}[H_X][H_Y]$$
+$$= \Pr(H_X = 1, H_Y=1) - \mathbb{E}[H_X]^2$$
+Since $\mathbb{E}[H_X] = \mathbb{E}[H_Y]$.
+$$\mathbb{E}[H_X] = \Pr(H_X = 1) = \int_L^\infty \! x\sim\mathcal{N}(0,\sigma\sqrt{t}) \,dx$$
+where $x$ is the distance moved from starting point $L$. If recombination happens at time $t$ at position $-L+z$ (i.e. lineage has moved distance $z$ when recombination occurs)
+$$\Pr(H_X = 1, H_Y=1) $$
+$$= \int_0^\tau  re^{-rt}\int_{-\infty}^\infty z\sim\mathcal{N}(0,\sigma\sqrt{t})  \iint \limits_{L-z}^\infty   (x\sim\mathcal{N}(0,\sigma\sqrt{\tau - t}))  (y\sim\mathcal{N}(0,\sigma\sqrt{\tau - t}))                             \,dxdy  \, dz \, dt$$
+
+
+%\gc{So I'll lay out here how  started to think about this, and then  let you work it through the remains of the way. I think this helps  with both cases. We imagine we start out at location zero, and that the  geographic location of our lineages at our two genomic locations at time  $\tau$ are X and Y. With prob. $e^{-r\tau}$ $X=Y$. Then let's consider case where we recombine at time $t$ (which occurs  with prob. $re^{rt}$), at a location Z (which occurs with prob. $Z  \sim N(0,\sigma^2 t)$). What is $E(XY | t,Z)$?  Then we can integrate out over t and Z }
+
+%\gc{I see where you are going with this but I think there is a slip  over where Z is in the above example}
+
+This integral doesn't converge numerically in R or mathematica. We can simplify the expression to a single integral by expressing the normal distributions as a bivariate normal with vac-cov matrix:
+
+\[\left (\begin{array}{cc}
+\tau\sigma^2 & t\sigma^2\\
+t\sigma^2 & \tau\sigma^2\end{array}\right)\]
+
+This reduces the quadruple integral to:
+\begin{equation}
+\int_0^\tau r\tau e^{-r\tau \frac{t}{\tau}}\int_{L}^\infty \int_L^\infty f_t(x,y) \,dxdy \,dt
+\end{equation}
+
+Where 
+$$
+f(x,y)= \frac{1}{2\pi\tau\sigma^2\sqrt{1-(\frac{t}{\tau})^2}}\exp\left(-\frac{x^2-2\frac{t}{\tau}xy-y^2}{2\tau\sigma^2(1-(\frac{t}{\tau})^2)}\right)$$
+
+Equation 26 is then
+%\[\begin{array}{rcl}
+\begin{equation}
+ e^{-r t}\int_L^\infty\int_L^\infty f_t(x,y)\,dxdy|_{t=0}^{t=\tau} + \int_0^\tau e^{-r\tau t}\int_L^\infty\int_L^\infty\frac{\partial f_t}{\partial t} \,dydx \,dt
+ \end{equation}
+%\end{array}\]
+
+We can calculated the double integral in the first term of equation 27 by interpreting that $t=0$ means that recombination has happened at time $0$ and the probabilities of  both lineages moving $L$ units are independent. Similarly, when $t=1$, recombination does not happen until time $\tau$ and so we only need the probability that one lineage has moved $L$ units. This gives us.
+\begin{equation}
+\left(1-\Phi\left(\frac{L}{\sqrt{\tau}\sigma}\right)\right)^2 - e^{-r\tau}\left(1-\Phi\left( \frac{L}{\sqrt{\tau}\sigma}\right)\right)
+\end{equation}
+
+
+
+To solve the second term of equation 27, we use the fact that 
+$$\frac{\partial f_t}{\partial t} = \frac{\partial^2f_t}{\partial x \partial y}$$
+
+Which gives us 
+\[\begin{array}{rcl}
+&&\int_0^\tau e^{-rt}f_t(L,L) \,dt\\
+&&\\
+&=& \int_0^\tau e^{-rt}\frac{1}{2\pi\tau\sigma^2\sqrt{1-(\frac{t}{\tau})^2}}\exp\left(-\frac{L^2(\frac{t}{\tau}-1)}{\tau\sigma^2(1-(\frac{t}{\tau})^2)}\right) \,dt
+\end{array}\]
+This integral converges with no trouble in R. Finally, since:
+
+$$\Cov(X,Y) = (1-e^{-r\tau})\mathbb{E}[XY|\textrm{no rec.}] - (1-e^{-r\tau})\mathbb{E}[X| \textrm{no rec.}]^2 + e^{-r\tau}\Cov(X,X|\textrm{rec.})$$
+
+We assemble all components of this to get:
+\[\begin{array}{rl}
+\Cov(X,Y)  = &  \int_0^\tau e^{-rt}\frac{1}{2\pi\tau\sigma^2\sqrt{1-(\frac{t}{\tau})^2}}\exp\left(-\frac{L^2(\frac{t}{\tau}-1)}{\tau\sigma^2(1-(\frac{t}{\tau})^2)}\right) \,dt \\
+& + \left(1-\Phi\left(\frac{L}{\sqrt{\tau}\sigma}\right)\right)^2 - e^{-r\tau}\left(1-\Phi\left( \frac{L}{\sqrt{\tau}\sigma}\right)\right)\\
+& - (1-e^{-r\tau})\left( 1 - \Phi(\frac{L}{\sigma\sqrt{\tau}})\right)\\
+& + e^{-r\tau}\left( 1 - \Phi\left(\frac{L}{\sigma\sqrt{\tau}}\right)\right)\Phi\left(\frac{L}{\sigma\sqrt{\tau}}\right)
+\end{array}\]
+
+
+\subsection{With selection:}
+
+Now consider two linked loci on a 'bad' background. If recomb. occurs on the LHS, one of the loci will end up on the 'correct' background, and the other will stay on the 'bad' one (remember factor of 2!). If, on the other hand, recomb happens on the RHS, both loci will be on what is now the 'correct' background.
+
+On a stable cline, the distance traveled in time $t$ becomes
+
+$$L_t \sim \mathcal{N}(tc,t\sigma^2)$$
+
+If recombination occurs on the LHS and locus 1($y_1$) recombines onto the 'good' bg, then the distribution of locus $y_1$ is $\mathcal{N}(-tc,t\sigma^2)$ and the distribution of $y_2$ is $\mathcal{N}(tc,t\sigma^2)$
+
+Not quite sure about how to get to a covariance with conditioning here....
+
+Similar logic can be applied to the binary scenario. Is this on the right track??
+
+
+
+
+
+\end{document}
