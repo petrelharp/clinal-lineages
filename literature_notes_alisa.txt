@@ -1,0 +1,75 @@
+Gene flow past a cline:
+
+- Expressions for disequilibrium (D) between neutral locus and selected locus
+	- Solved for extreme cases of tight or loose linkage. 
+	du/dt = m/2u" + s(x)D
+	dD/dt = -rD + m/2D" - s(x)D(p-q) + mp'u'
+	
+Loose linkage (r>>s)
+	 D ~ mp'u'/r (<<1)
+	 
+	 Finds equilibrium solution. Small step in allele frequency of order mu'/rW (W=width)
+	 
+Tight linkage (r<<s)
+	Strength of barrier = ratio of step size:external gradient
+	
+Q: how long does it take for a linked allele to spread past selection barrier and become established on other side?
+
+	A: Neutral allele
+		t = bar{s}/r^2 (bar{s} = m/W^2)
+		
+	A: Advantageous allele (linked to deleterious allele, advantage << disadvantage)
+		calculates delay from fixation on one size to fixation on other
+		
+
+
+Dynamics of hybrid zones: (This one is dense! I didn't manage to make it through most of the math)
+
+- Heterozygote disadvantage
+
+- Equilibrium solution: p = 1/2(1+ tanh(sqrt(2/2m)(x-x0))) (x0 is center of cline)
+
+- Suggestion for inhomogeneous density
+
+- Moving cline (selective advantage of one allele): Moves at a speed S/3sqrt(2m/s) (S is advantage from allele A)
+
+- Moving cline (inconsistent density)
+
+- Two dimensions:
+	non-straight zones
+	
+- Stochastic effects (response to perturbation, displcement, population structure)
+
+
+Barrier to genetic exchange between hybridizing populations:
+
+Rod model:
+	marker gene is situated among selected loci. alphar is the distance between marker and nearest selected locus
+	barrier strength can be calculated from harmonic mean of rec. distances when selection is weak.
+	
+	ratio between total strength : total map length explains much of the barrier strength
+	
+Distribution of selected loci
+
+Selection needs to be strong, and at numerous loci for substantial barrier to gene flow.
+
+I think they are explicitly modeling underdominance, but it is set up so that every migrant allele will be present in the 'wrong' background, so it is effectively an environmental step cline.
+
+
+MEETING NOTES, MONDAY 10th:
+
+Underdominance (Barton) vs. Ecotone (Slatkin) model (heterozygote has reduced fitness)
+
+-Check for timing of cline establishment
+
+Our potential contribution:
+	Backwards in time framework, with coalescence (as opposed to fwd in time)
+	Non-stationary finite time, as a function of tau
+	
+Cline vs. Hybrid Zone:
+	Fisher's diffusion is the same, but selection term is different. 
+	
+
+Things to think about:
+	Reverse-time barrier strength (how to calculate? see Barton 1983 for definition.)
+	How much bouncing around of foreign allele around center of cline 
