@@ -1,0 +1,88 @@
+---
+title: "Brownian local times"
+date: "`r date()`"
+---
+
+$
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+$
+
+It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that 
+if $\tau(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
+i.e.,
+$
+\begin{align*}
+    \tau(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+        \text{measure}\{t \,:\, x \le B_t \le x+\epsilon, \, 0 \le t \le 1\}
+\end{align*}
+$
+then
+$
+\begin{align*}
+    \P\{ \tau(x) \le u \} = 2 \Phi(|x|+u)-1,
+\end{align*}
+$
+where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
+
+Let's check this:
+```{r sim_rw}
+nwalks <- 1e4
+ntimes <- 1e4
+# want total time to be 1, so:
+eps <- 1/sqrt(ntimes)
+rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
+rws <- rbind(0,apply(rws,2,cumsum))
+matplot(rws[,1:20],type='l', ylab='position')
+```
+Here we've simulated `r nwalks` random walks for a total of `r ntimes` steps,
+and scaled steps to have this be a total Brownian time of 1.
+Let's check:
+```{r final_dist}
+xh <- hist(rws[ntimes,],breaks=50)
+lines( xh$mids, sum(xh$counts)*diff(pnorm(xh$breaks)) )
+```
+
+Now, let's check on the local time formula.
+The number of steps the random walk spends at position $k$ on a grid with spacing $\epsilon$
+and a time step of \gamma
+should be $\epsilon \times \tau(k\epsilon) / \gamma$.
+First, the local time at 0:
+```{r local_times_0}
+xh <- hist(colSums(abs(rws)<=eps)/ntimes/(2*eps),main="local time at 0", breaks=30)
+lines( xh$mids, sum(xh$counts)*diff( 2*pnorm(xh$breaks)-1 ), col='red' )
+```
+What about the local time at 1/2?
+Note there is an atom at 0, now:
+```{r local_times}
+layout(matrix(1:4,nrow=2))
+for (loc in c(0.1, 0.2, 0.4, 0.6)) {
+    lts <- colSums(abs(rws-loc)<=eps)/ntimes/(2*eps)
+    zeros <- (lts==0)
+    pred.zero <- 2*pnorm(abs(loc))-1
+    xh <- hist(lts[!zeros],main=paste("local time at",loc), breaks=30, ylim=c(0,pred.zero*nwalks))
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc)+xh$breaks)-1 ), col='red' )
+    points(c(0,0), c(sum(zeros),pred.zero*nwalks), col=1:2, pch=20, cex=2)
+}
+```
+
+Its Laplace transform
+=====================
+
+Now suppose that something happens at rate $r$ relative to the local time at $x$
+(e.g., recombination to the other background).
+Then the chance that this has not happened by time 1 is
+$\begin{align*}
+\E\left[ e^{-r\tau(x)} \right]
+&=
+\int_0^\infty e^{-rt} 2 \phi(x+t) dt \\
+&=
+e^{rx} \int_x^\infty e^{-rt} 2 \phi(t) dt \\
+&=
+2 e^{rx} \int_x^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - rt - t^2/2 \right) dt \\
+&=
+2 e^{rx+r^2/2} \int_x^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - (t+r)^2/2 \right) dt \\
+&=
+2 e^{rx+r^2/2} 2 \left( 1-\Phi(x+r) \right) .
+\end{align*}$
+
