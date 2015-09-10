@@ -33,6 +33,14 @@ $$
 \end{align*}
 $$
 where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
+Differentiating this, $\P\{\tau \in du\} = \partial_u \P\{\tau \le u\}$, so
+$$
+\begin{align*}
+    \P\{ \tau(x) = 0 \} &= 2 \Phi(|x|)-1 \\
+    \P\{ \tau(x) \in du \} &= 2 \phi(|x|+u) ,
+\end{align*}
+$$
+where $\phi$ is the Gaussian density.
 
 Let's check this:
 ```{r sim_rw, cache=TRUE}
@@ -93,46 +101,51 @@ $$
 \begin{align*}
 \E\left[ e^{-r\tau(x)} \right]
 &=
+2\Phi(|x|)-1 + 
 \int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
 &=
+2\Phi(|x|)-1 + 
 e^{r|x|} \int_{|x|}^\infty e^{-rt} 2 \phi(t) dt \\
 &=
+2\Phi(|x|)-1 + 
 2 e^{r|x|} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - rt - t^2/2 \right) dt \\
 &=
+2\Phi(|x|)-1 + 
 2 e^{r|x|+r^2/2} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - (t+r)^2/2 \right) dt \\
 &=
+2\Phi(|x|)-1 + 
 2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
 \end{align*}
 $$
-At $r=0$ this should equal 1, since it's the chance that nothing happens.
-Same for $|x| \to \infty$.
-Note that at $x=r=0$ this is equal to 1, as it should be.
-Also, for large $x$, since $1-\Phi(x) \sim e^{-x^2/2}/\sqrt{2\pi}x$,
+At $r=0$ this equals 1, as it should, since it's the chance that nothing happens.
+For large $x$, since $1-\Phi(x) \sim e^{-x^2/2}/\sqrt{2\pi}x$,
 this is approximately 
-$2 \exp( (r+1)|x|+r^2/2 )/\sqrt{2\pi}(|x|+r}$,
-and, of course, goes to zero.
+$1 + 2 \exp( r|x| + r^2/2 - (|x|+r)^2/2 )$,
+which goes to 1, as it should.
 
 
 Let's check that, too: why not?
 ```{r killing, cache=TRUE, depends="sim_rw"}
 loc <- 0.1
+zeta <- function (x,r) {
+    2*pnorm(abs(x)) - 1 + 2 * exp( r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE) )
+}
 compare.rates <- as.data.frame( t( sapply( c(0.25,0.5,1,1.5,2,2.5,3), function (rate) {
         visits <- colSums(abs(rws-loc)<=1.5*eps)
-        killed <- ( rbinom(ncol(rws),size=visits,prob=rate/ntimes/(3*eps)) > 0 )
+        killed <- ( rbinom(ncol(rws),size=visits,prob=rate/ntimes/(3*eps)) == 0 )
         c( 
           rate=rate,
           simulation=mean(killed), 
-          theory=1-2 * exp(rate*loc+rate^2/2) * pnorm(loc+rate,lower.tail=FALSE),
+          theory=zeta(loc,rate),
           SE=sqrt(mean(killed)*(1-mean(killed))/nwalks)
           )
     } ) ) )
 with(compare.rates, {
-         plot( rate, theory, type='l', xlab="recomb rate", ylab="prob of recomb", col='red', ylim=range(c(simulation,theory)) ) 
+         plot( rate, theory, type='l', xlab="recomb rate", ylab="prob of recomb", col='red', ylim=range(c(simulation,theory)), ylim=c(0,1) ) 
          points( rate, simulation, pch=20 )
          arrows( x0=rate, y0=simulation-2*SE, y1=simulation+2*SE, angle=90, code=3 )
     } )
 ```
-Hm, again, something probably in the discretization is throwing us off a bit.
 
 
 What this says about clines
@@ -158,9 +171,18 @@ $$
     &=
     \zeta(x,r\tau,1,\sqrt{\tau}\sigma) \\
     &=
-    \zeta(x/\sqrt{\tau\sigma^2},r\tau,1,1) \\
+    \zeta(x/\sqrt{\tau\sigma^2},r\tau,1,1) ,
+    % &=
+    % 2 \exp\left(r\tau\left(\frac{|x|}{\sqrt{\tau}\sigma}+\frac{r\tau}{2}\right)\right) \left( 1-\Phi\left(\frac{|x|}{\sqrt{\tau\sigma^2}}+r\tau \right) \right) .
+\end{align*}
+$$
+and
+$$
+\begin{align*}
+    \zeta(x,r,1,1)
     &=
-    2 \exp\left(r\tau\left(\frac{|x|}{\sqrt{\tau}\sigma}+\frac{r\tau}{2}\right)\right) \left( 1-\Phi\left(\frac{|x|}{\sqrt{\tau\sigma^2}}+r\tau \right) \right) .
+    2\Phi(|x|)-1 + 
+    2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
 \end{align*}
 $$
 
@@ -182,9 +204,6 @@ $$
 
 Does this actually make a cline?
 ```{r show_cline}
-zeta <- function (x,r,tau=1,sigma=1) {
-    sign(x)*2 * exp(r*tau*(abs(x)/sqrt(tau*sigma)+r*tau/2) + pnorm(abs(x)/sqrt(tau*sigma^2)+r*tau,lower.tail=FALSE,log.p=TRUE))
-}
 pcline <- function (...) {
     (1/2)*( 1 - zeta(...) )
 }
