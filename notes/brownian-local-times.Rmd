@@ -3,32 +3,41 @@ title: "Brownian local times"
 date: "`r date()`"
 ---
 
-$
+$$
 \newcommand{\E}{\mathbb{E}}
 \renewcommand{\P}{\mathbb{P}}
-$
+\DeclareMathOperator{\sgn}{sgn}
+$$
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.align='center')
+```
+
+Killing at Brownian local times
+===============================
 
 It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that 
 if $\tau(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
 i.e.,
-$
+$$
 \begin{align*}
     \tau(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
         \text{measure}\{t \,:\, x \le B_t \le x+\epsilon, \, 0 \le t \le 1\}
 \end{align*}
-$
+$$
 then
-$
+$$
 \begin{align*}
     \P\{ \tau(x) \le u \} = 2 \Phi(|x|+u)-1,
 \end{align*}
-$
+$$
 where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
 
 Let's check this:
-```{r sim_rw}
+```{r sim_rw, cache=TRUE}
 nwalks <- 1e4
-ntimes <- 1e4
+ntimes <- 1e3
 # want total time to be 1, so:
 eps <- 1/sqrt(ntimes)
 rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
@@ -48,23 +57,31 @@ The number of steps the random walk spends at position $k$ on a grid with spacin
 and a time step of \gamma
 should be $\epsilon \times \tau(k\epsilon) / \gamma$.
 First, the local time at 0:
-```{r local_times_0}
-xh <- hist(colSums(abs(rws)<=eps)/ntimes/(2*eps),main="local time at 0", breaks=30)
+```{r local_times_0, cache=TRUE, depends="sim_rw"}
+xh <- hist(colSums(abs(rws)<=1.5*eps)/ntimes/(3*eps),main="local time at 0", breaks=30)
 lines( xh$mids, sum(xh$counts)*diff( 2*pnorm(xh$breaks)-1 ), col='red' )
 ```
-What about the local time at 1/2?
-Note there is an atom at 0, now:
-```{r local_times}
+What about the local time at other locations?
+Note there is an atom at 0, now,
+and that the discretization could trip us up;
+the colors (red/green/blue) use the (mid/upper/lower) points of the interval that we count in.
+```{r local_times, cache=TRUE, depends="sim_rw"}
 layout(matrix(1:4,nrow=2))
 for (loc in c(0.1, 0.2, 0.4, 0.6)) {
-    lts <- colSums(abs(rws-loc)<=eps)/ntimes/(2*eps)
+    lts <- colSums(abs(rws-loc)<=1.5*eps)/ntimes/(3*eps)
     zeros <- (lts==0)
-    pred.zero <- 2*pnorm(abs(loc))-1
-    xh <- hist(lts[!zeros],main=paste("local time at",loc), breaks=30, ylim=c(0,pred.zero*nwalks))
+    pred.zero <- 2*pnorm(abs(loc)+c(0,1.5*eps,-1.5*eps))-1
+    xh <- hist(lts[!zeros],main=paste("local time at",loc), breaks=30, ylim=range(c(0,pred.zero*nwalks)))
     lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc)+xh$breaks)-1 ), col='red' )
-    points(c(0,0), c(sum(zeros),pred.zero*nwalks), col=1:2, pch=20, cex=2)
+    points(rep(0,4), c(sum(zeros),pred.zero*nwalks), col=1:4, pch=20, cex=2)
+    # lower bound
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc+1.5*eps)+xh$breaks)-1 ), col=3 )
+    # upper bound
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc-1.5*eps)+xh$breaks)-1 ), col=4 )
 }
 ```
+Clearly, the discretization is still tripping us up a bit,
+but it's pretty good.
 
 Its Laplace transform
 =====================
@@ -72,17 +89,105 @@ Its Laplace transform
 Now suppose that something happens at rate $r$ relative to the local time at $x$
 (e.g., recombination to the other background).
 Then the chance that this has not happened by time 1 is
-$\begin{align*}
+$$
+\begin{align*}
 \E\left[ e^{-r\tau(x)} \right]
 &=
-\int_0^\infty e^{-rt} 2 \phi(x+t) dt \\
+\int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
 &=
-e^{rx} \int_x^\infty e^{-rt} 2 \phi(t) dt \\
+e^{r|x|} \int_{|x|}^\infty e^{-rt} 2 \phi(t) dt \\
 &=
-2 e^{rx} \int_x^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - rt - t^2/2 \right) dt \\
+2 e^{r|x|} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - rt - t^2/2 \right) dt \\
 &=
-2 e^{rx+r^2/2} \int_x^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - (t+r)^2/2 \right) dt \\
+2 e^{r|x|+r^2/2} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - (t+r)^2/2 \right) dt \\
 &=
-2 e^{rx+r^2/2} 2 \left( 1-\Phi(x+r) \right) .
-\end{align*}$
+2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
+\end{align*}
+$$
+At $r=0$ this should equal 1, since it's the chance that nothing happens.
+Same for $|x| \to \infty$.
+Note that at $x=r=0$ this is equal to 1, as it should be.
+Also, for large $x$, since $1-\Phi(x) \sim e^{-x^2/2}/\sqrt{2\pi}x$,
+this is approximately 
+$2 \exp( (r+1)|x|+r^2/2 )/\sqrt{2\pi}(|x|+r}$,
+and, of course, goes to zero.
 
+
+Let's check that, too: why not?
+```{r killing, cache=TRUE, depends="sim_rw"}
+loc <- 0.1
+compare.rates <- as.data.frame( t( sapply( c(0.25,0.5,1,1.5,2,2.5,3), function (rate) {
+        visits <- colSums(abs(rws-loc)<=1.5*eps)
+        killed <- ( rbinom(ncol(rws),size=visits,prob=rate/ntimes/(3*eps)) > 0 )
+        c( 
+          rate=rate,
+          simulation=mean(killed), 
+          theory=1-2 * exp(rate*loc+rate^2/2) * pnorm(loc+rate,lower.tail=FALSE),
+          SE=sqrt(mean(killed)*(1-mean(killed))/nwalks)
+          )
+    } ) ) )
+with(compare.rates, {
+         plot( rate, theory, type='l', xlab="recomb rate", ylab="prob of recomb", col='red', ylim=range(c(simulation,theory)) ) 
+         points( rate, simulation, pch=20 )
+         arrows( x0=rate, y0=simulation-2*SE, y1=simulation+2*SE, angle=90, code=3 )
+    } )
+```
+Hm, again, something probably in the discretization is throwing us off a bit.
+
+
+What this says about clines
+===========================
+
+The above restricted to standard Brownian motion on one unit of time.
+Really, we will want to use this across $\tau$ generations,
+modeling a random walk with variance $\sigma^2$ per generation.
+
+The key quantity we want is the probability that a Brownian motion with variance $\sigma^2$ killed at rate $r$
+with respect to its local time at $x$ was still alive at time $\tau$.
+Denote this by
+$$
+\begin{align*}
+    \zeta(x,r,\tau,\sigma).
+\end{align*}
+$$
+By Brownian scaling,
+since $B_{ct}$ has the same distribution as $\sqrt{c}B_t$,
+$$
+\begin{align*}
+    \zeta(x,r,\tau,\sigma) 
+    &=
+    \zeta(x,r\tau,1,\sqrt{\tau}\sigma) \\
+    &=
+    \zeta(x/\sqrt{\tau\sigma^2},r\tau,1,1) \\
+    &=
+    2 \exp\left(r\tau\left(\frac{|x|}{\sqrt{\tau}\sigma}+\frac{r\tau}{2}\right)\right) \left( 1-\Phi\left(\frac{|x|}{\sqrt{\tau\sigma^2}}+r\tau \right) \right) .
+\end{align*}
+$$
+
+Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
+at a location at recombination distance $r$ from the selected site
+inherits from the left-hand side of the barrier
+(i.e., an ancestor on $(-\infty,0)$)
+$\tau$ generations ago
+is the probability no recombination at the barrier has occurred
+plus one-half the probability recombination has occurred.
+This is
+$$
+\begin{align*}
+    p(x,r,\tau,A) = % \zeta 1_{x\le0} + (1-\zeta)/2 = (1-(1-2*1_{x\le0})\zeta)/2
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+    % \frac{1}{2}\left\{ 1 - \sgn(x) 2 \exp\left(r\tau\left(\frac{x}{\sqrt{\tau}\sigma}+\frac{r\tau}{2}\right)\right) \left( 1-\Phi\left(\frac{x}{\sqrt{\tau\sigma^2}}+r\tau \right) \right) \right\}
+\end{align*}
+$$
+
+Does this actually make a cline?
+```{r show_cline}
+zeta <- function (x,r,tau=1,sigma=1) {
+    sign(x)*2 * exp(r*tau*(abs(x)/sqrt(tau*sigma)+r*tau/2) + pnorm(abs(x)/sqrt(tau*sigma^2)+r*tau,lower.tail=FALSE,log.p=TRUE))
+}
+pcline <- function (...) {
+    (1/2)*( 1 - zeta(...) )
+}
+xx <- seq(-5,5,length.out=500)
+plot(xx, pcline(xx,r=1), type='l' )
+```
