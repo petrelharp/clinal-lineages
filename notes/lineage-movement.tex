@@ -7,7 +7,7 @@
 \newcommand{\E}{\mathbb{E}}
 \renewcommand{\P}{\mathbb{P}}
 \newcommand{\deriv}[1]{\frac{d}{d#1}}
-\newcommand{\dderiv}[1]{\frac{d^2}{d^2#1}}
+\newcommand{\dderiv}[1]{\frac{d^2}{d#1^2}}
 \newcommand{\given}{\;\vert\;}
 
 \begin{document}
@@ -92,7 +92,7 @@ If we let $M_r(y) = s_B(y) \left(1 - r (1-p(y)) \right)$, then
 \section{Diffusion limit}
 
 Now suppose that $m(x,y)$ is symmetric, and depends on a parameter $\sigma$ so that as $\sigma \to 0$,
-the associate random walk converges to Brownian motion, so that
+the associated random walk converges to Brownian motion, so that
 \begin{align}
     \lim_{\sigma \to 0} \sum_y \frac{ m(x,y) ( f(y) - f(x) ) }{\sigma^2} = \frac{1}{2} \dderiv{x} f(x) .
 \end{align}
