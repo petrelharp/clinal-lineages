@@ -1,0 +1,48 @@
+---
+title: "Lineages around a narrow hybrid zone"
+date: "`r date()`"
+---
+
+$$
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\DeclareMathOperator{\sgn}{sgn}
+$$
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.align='center')
+```
+
+
+Suppose that heterozygotes have fitness $(1-s)$;
+we know that allele frequencies around a hybrid zone behave as
+$$
+\begin{align} \label{eqn:pfreq}
+    \partial_t p(t,x) &= \frac{\sigma^2}{2} \partial_x^2 p(t,x) - s p(t,x) (1-p(t,x)) (1-2p(t,x)) ,
+\end{align}
+$$
+and from `lineage-movement.tex`,
+if $A$ is the allele whose frequency is $p$,
+an $A$-lineage follows a diffusion with generator 
+$$
+\begin{align*}
+    G_A f(x)
+    &= 
+    \frac{\sigma^2}{2} (1-s(1-p(x))) \partial_x^2 f(x)
+    + (2sp(x) + (1-s)) ( \partial_x \log p(x) ) \partial_x f(x) ,
+\end{align*}
+$$
+i.e., with diffusion speed $\sigma^2 (1-s(1-p))$
+and drift $(2sp(x) + (1-s)) ( \partial_x \log p(x) )$.
+
+If we move a large distance in the direction where the $A$ allele is disadvantageous,
+the $p \to 0$,
+and the equation \eqref{eqn:pfreq}
+becomes 
+$$
+\begin{align*}
+    \partial_t p(t,x) &= \frac{\sigma^2}{2} \partial_x^2 p(t,x) - s p(t,x) .
+\end{align*}
+$$
+In other words, lineages are moving by heat flow with drift.
