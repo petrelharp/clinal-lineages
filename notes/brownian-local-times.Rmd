@@ -18,26 +18,26 @@ Killing at Brownian local times
 ===============================
 
 It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that 
-if $\tau(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
+if $\ell(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
 i.e.,
 $$
 \begin{align*}
-    \tau(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+    \ell(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
         \text{measure}\{t \,:\, x \le B_t \le x+\epsilon, \, 0 \le t \le 1\}
 \end{align*}
 $$
 then
 $$
 \begin{align*}
-    \P\{ \tau(x) \le u \} = 2 \Phi(|x|+u)-1,
+    \P\{ \ell(x) \le u \} = 2 \Phi(|x|+u)-1,
 \end{align*}
 $$
 where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
-Differentiating this, $\P\{\tau \in du\} = \partial_u \P\{\tau \le u\}$, so
+Differentiating this, $\P\{\ell \in du\} = \partial_u \P\{\ell \le u\}$, so
 $$
 \begin{align*}
-    \P\{ \tau(x) = 0 \} &= 2 \Phi(|x|)-1 \\
-    \P\{ \tau(x) \in du \} &= 2 \phi(|x|+u) ,
+    \P\{ \ell(x) = 0 \} &= 2 \Phi(|x|)-1 \\
+    \P\{ \ell(x) \in du \} &= 2 \phi(|x|+u) ,
 \end{align*}
 $$
 where $\phi$ is the Gaussian density.
@@ -63,7 +63,7 @@ lines( xh$mids, sum(xh$counts)*diff(pnorm(xh$breaks)) )
 Now, let's check on the local time formula.
 The number of steps the random walk spends at position $k$ on a grid with spacing $\epsilon$
 and a time step of \gamma
-should be $\epsilon \times \tau(k\epsilon) / \gamma$.
+should be $\epsilon \times \ell(k\epsilon) / \gamma$.
 First, the local time at 0:
 ```{r local_times_0, cache=TRUE, depends="sim_rw"}
 xh <- hist(colSums(abs(rws)<=1.5*eps)/ntimes/(3*eps),main="local time at 0", breaks=30)
@@ -99,7 +99,7 @@ Now suppose that something happens at rate $r$ relative to the local time at $x$
 Then the chance that this has not happened by time 1 is
 $$
 \begin{align*}
-\E\left[ e^{-r\tau(x)} \right]
+\E\left[ e^{-r\ell(x)} \right]
 &=
 2\Phi(|x|)-1 + 
 \int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
@@ -202,6 +202,12 @@ $$
 \end{align*}
 $$
 
+Also note that for large $|x|$, by the asymptotics for $1-\Phi(x)$,
+$$
+\begin{align*}
+    \zeta(x,r) = 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) .
+\end{align*}
+$$
 
 What this says about clines
 ===========================
@@ -226,50 +232,78 @@ $$
     &=
     \zeta(x,r\tau,1,\sqrt{\tau}\sigma) \\
     &=
-    \zeta(x/\sqrt{\tau\sigma^2},r\tau,1,1) ,
-    % &=
-    % 2 \exp\left(r\tau\left(\frac{|x|}{\sqrt{\tau}\sigma}+\frac{r\tau}{2}\right)\right) \left( 1-\Phi\left(\frac{|x|}{\sqrt{\tau\sigma^2}}+r\tau \right) \right) .
+    \zeta(x/\sqrt{\tau\sigma^2},r\tau) ,
 \end{align*}
 $$
-and
+where
 $$
 \begin{align*}
-    \zeta(x,r,1,1)
+    \zeta(x,r)
     &=
     1 - 2(1-\Phi(|x|)) + 
     2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
 \end{align*}
 $$
 
+**Cline flattening:**
+immediately, this tells us how a cline gets wider as time progresses:
+for a fixed $r$, the width grows as $\sqrt{\tau}$.
+It also tells us that clines with the same $r\tau$ have the same shape,
+after rescaling the width by $\sqrt{\tau}$.
+Also, this tells us we only have a cline for $r$ of order at least $1/\tau$:
+for smaller $r$, the locus is still completely linked to the selected locus,
+and hence a step function.
+
+More generally, here's what $\zeta$ looks like:
+```{r plot_zeta, fig.height=2*fig.dim}
+layout(1:2)
+xvals <- seq(0,5,length.out=150)
+rvals <- seq(0,10,length.out=100)
+zetavals <- outer( xvals, rvals, zeta )
+matplot(xvals,zetavals,type='l',xlab="x",ylab=expression(zeta),col=rainbow(length(rvals)))
+lrvals <- seq(1,length(rvals),length.out=6)
+legend("bottomright",lty=1,col=rainbow(length(rvals))[lrvals],legend=paste("r=",round(rvals[lrvals],digits=2)))
+matplot(rvals,t(zetavals),type='l',xlab="r",ylab=expression(zeta),col=rainbow(length(xvals)))
+lxvals <- seq(1,length(xvals),length.out=6)
+legend("bottomright",lty=1,col=rainbow(length(xvals))[lxvals],legend=paste("x=",round(xvals[lxvals],digits=2)),bg='white')
+```
+
 Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
 at a location at recombination distance $r$ from the selected site
 inherits from the left-hand side of the barrier
 (i.e., an ancestor on $(-\infty,0)$)
 $\tau$ generations ago.
+Let $p_H$ denote the density of heterozygotes in the cline
+-- this should be $p_H = (1-s)/2$).
 For an individual to the left of the barrier ($x<0$),
-this is the probability no recombination at the barrier has occurred
-plus one-half the probability recombination has occurred,
-i.e., $\zeta+(1-\zeta)/2=(1+\zeta)/2$.
-If $x>0$ this is the one-half times probability a recombination has occurred,
-i.e., $(1-\zeta)/2$.
+the probability of inheriting from the left of the barrier at $\tau$
+is the probabiltiy that no recombination at the barrier has occurred,
+plus one-half the probability that recombination in a heterozygote has occurred,
+i.e., $\zeta p_H +(1-\zeta p_H)/2=(1+\zeta p_H)/2$.
+If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
+i.e., $(1-\zeta p_H)/2$.
 Combining these,
 the probability of ending up on the left-hand side is
 $$
 \begin{align*}
     p(x,r,\tau,A) = 
-    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) p_H \right\} .
 \end{align*}
 $$
 
 Does this actually make a cline?
 ```{r show_cline}
-pcline <- function (x,r,tau=1,sigma=1) {
-    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
+pcline <- function (x,r,tau=1,sigma=1,pH=1/2) {
+    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau)*pH )
 }
-xx <- seq(-5,5,length.out=500)
-plot(xx, pcline(xx,r=1), type='l', xlab="distance from cline center", ylab="prob of inherited from the left" )
-rr <- seq(0,2,length.out=11)
-pp <- sapply( rr, function (r) { pcline(xx,r=r) } )
-matplot(xx,pp,type='l',lty=1,col=rainbow(length(rr)),add=TRUE)
-legend("topright",lty=1,col=rainbow(length(rr)),legend=paste("r=",rr))
+xx <- seq(-15,15,length.out=500)
+for (tau in c(5,50)) {
+    plot(xx, pcline(xx,r=1), type='n', 
+            xlab="distance from cline center", ylab="prob of inherited from the left", 
+            main=as.expression(substitute(tau==mytau,list(mytau=tau))) )
+    rr <- seq(0,0.2,length.out=11)
+    pp <- sapply( rr, function (r) { pcline(xx,r=r,tau=tau) } )
+    matplot(xx,pp,type='l',lty=1,col=rainbow(length(rr)),add=TRUE)
+    legend("topright",lty=1,col=rainbow(length(rr)),legend=paste("r=",rr))
+}
 ```
