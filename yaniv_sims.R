@@ -198,14 +198,46 @@ sims.sums = lapply(sims.s0.1,spBreaks)
 
 
 
-#####
-#set total range width to -7SIGMA,7SIGMA
-#NEW MIGRATION KERNEL: Sample from gaussian, rnorm(ninds,0.5,2.5)
+
+loci = seq(0.5,1,0.1)
+
+#MAKE file.snp
+    info = data.frame(cbind(1,round(loci*1000000),0,loci))
+    colnames(info) = NULL
+    #write.csv(info,row.names=F,file="file.snp")
 
 
-#sim1.5 = forqs(n=100, sp.ids = rep(c("A","B"),each=50),deme = rep(1:10,each=10),n.chr=1,n.gen=5, QTL = qtl ,mig = MIG)
-#sim1.sum.100 = spBreaks(sim1.100)
-#save(sim1, file = "5gen.Robj")
+#GENOTYPE  [ASSUMES A ONE CHR GENOME WHERE WE HAVE PHASED DIPLOID DATA]
+    genoInd = function(IND,loci){sapply(IND[[1]],function(CHR){as.numeric(CHR$sp2[as.numeric(cut(loci,c(CHR$starts,1)))])})}
 
-mig1=pnorm(-c(0.5,1,1.5,2))
-mig2 = pnorm(-c(1,1.5,2,Inf))
+#GENOTYPE ALL MY INDS
+my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.ancest, genoInd, loci)))})
+   #   colnames(my.genos) = NULL
+
+#MAKE OUR FILE [NOTE THIS TAKES A LONG TIME AND IT MIGHT BE SMARTER TO WRITE THE THING ABOVE TO FILE ONE LINE AT A TIME]
+   # write.table(my.genos, file = "file.geno",row.names = FALSE,sep="")
+
+
+genotypes = lapply(my.genos,function(Z){(Z[,seq(1,ncol(Z),2)]+ Z[,seq(2,ncol(Z),2)])/2})
+
+inds.per.deme = 10
+freqs = lapply(genotypes,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X),breaks=seq(0,ncol(X),inds.per.deme)),mean)})})
+
+######COMPARE TO THEORY:
+
+xx <- seq(-5,5,length.out=500)
+plot(-xx, pcline(xx,r=1), type='l', xlab="distance from cline center", ylab="prob of inherited from the left" )
+rr=(loci-0.5)*SIGMA/sqrt(0.1)
+#rr <- seq(0,2,length.out=11)
+# pp <- lapply(c(5,10,50),function(T){sapply( rr, function (r) { pcline(xx,r=r,sigma=2.5,tau=T) } )})
+
+SIGMA = sqrt(sum(MIG*(1:length(MIG))^2))
+xx <- (1:ndemes)-0.5-ndemes/2
+pp <- pcline(xx,r=rr,tau=50,sigma=SIGMA)
+
+par(mfrow=c(1,3))
+
+for(TIME in 1:3){
+matplot(-xx,pp[[TIME]],type='l',lty=1,col=rainbow(length(rr)))
+matpoints(freqs[[TIME]],x=(-100:99)+0.5,lty=2,col=rainbow(length(rr)),type="l")
+}
