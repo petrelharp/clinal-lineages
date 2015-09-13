@@ -6,6 +6,7 @@ date: "`r date()`"
 ```{r doc_setup, include=FALSE}
 fig.dim <- 5
 knitr::opts_chunk$set(fig.height=fig.dim,fig.width=2*fig.dim,fig.align='center')
+source("sim-fns.R")
 ```
 
 Setting up the simulation
@@ -39,10 +40,11 @@ so we'll take our zone to be four times that,
 and measure distance in units of $\sigma$:
 ```{r setup_pop}
 zone.width <- ceiling(4/sqrt(qtl[[1]]$s))  # in real units
-nind <- 1000
-ndeme <- 50
+n.ind <- 1000
+n.deme <- 50
 sigma <- 1 # in real units
-deme.spacing <- zone.width/ndeme
+deme.spacing <- zone.width/n.deme
+deme.locs <- (seq_len(n.deme)-0.5-(n.deme/2))*deme.spacing
 sigma.demes <- sigma/deme.spacing # in units of demes
 ```
 The discretized dispersal kernel moves as $\lfloor Z+1/2 \rfloor$,
@@ -52,12 +54,60 @@ let's check this has SD close to $\sigma$:
 zz <- floor( rnorm( 1e6, mean=1/2, sd=sigma.demes ) )*deme.spacing
 sd(zz)
 ```
-That's pretty good.
+That's pretty close.
 
 
 
 Running a simulation
 --------------------
 
-To run the simulation,
+The simulation doesn't know how we're measuring things in real units,
+so the sigma we pass needs to be in units of demes.
+It returns all the information about the individuals,
+but then we use `spBreaks()` to extract which individual is which ancestry.
+```{r run_quick_sim}
+sim <- sim.zone( n.ind=n.ind, n.deme=n.deme, n.gen=10, sigma=sigma.demes, quiet=TRUE )
+sim.sums <- spBreaks(sim)
+```
 
+OK, now let's genotype these individuals at some loci:
+```{r genotype_sim, fig.width=3*fig.dim, fig.height=1.5*fig.dim}
+loci <- seq(0,1,0.05)
+loci.cols <- rainbow(12)[cut(abs(loci-0.5),breaks=min((length(loci)-1)/2,8))]
+info <- data.frame(
+               chr=1,
+               bp=floor(loci*1e6),
+               pos=loci
+           )
+genotypes <- geno.pop( sim.sums$ind.ancest, list(chr1=loci) )
+```
+
+Now, let's
+compute ancestry frequencies,
+and plot the resulting clines:
+```{r genotype_freqs, fig.width=3*fig.dim, fig.height=1.5*fig.dim}
+freqs <- do.call( cbind, tapply( 1:ncol(genotypes), sim$deme, function (kk) {
+                    rowMeans(genotypes[,kk])
+                } ) )
+matplot(deme.locs, t(freqs), type='l', col=loci.cols, xlab="spatial position", ylab="ancestry frequency")
+legend("topleft",lty=1,legend=loci,col=loci.cols,title="locus position")
+```
+
+We can also look at the local frequencies of the diploid genotypes at each locus:
+```{r diploid_freqs}
+diploid.freqs <- lapply( seq_along(loci), function (locus) {
+                do.call( rbind, tapply( 1:ncol(genotypes), sim$deme, function (kk) {
+                    as.vector( tabulate( 1+genotypes[locus,kk], nbins=3 ) )
+                } ) )
+           } )
+# one end
+matplot(diploid.freqs[[1]],type='l',main=paste("locus at",loci[1]),lty=1,col=c('red','black','green'))
+legend('topright',lty=1,col=c('red','black','green'),legend=c("homozygote","heterozygote","homozygote"))
+# the selected locus
+sel.locus <- match( qtl$chr1$pos, loci )
+matplot(diploid.freqs[[sel.locus]],type='l',main=paste("selected locus at",loci[sel.locus]),lty=1,col=c('red','black','green'))
+legend('topright',lty=1,col=c('red','black','green'),legend=c("homozygote","heterozygote","homozygote"))
+# the other end
+matplot(diploid.freqs[[length(loci)]],type='l',main=paste("locus at",loci[length(loci)]),lty=1,col=c('red','black','green'))
+legend('topright',lty=1,col=c('red','black','green'),legend=c("homozygote","heterozygote","homozygote"))
+```

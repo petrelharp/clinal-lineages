@@ -11,7 +11,7 @@ qtl=list(chr1=data.frame(traits=c("underdominant"), s = c(0.1),pos=c(0.5)))
 
 #sigma = n*sqrt(s)/2/sqrt(tau). Define the width of the range by the number of demes. sigma/sqrt(s) is the width of the cline. sqrt(tau) is rate at which cline width is increasing (should also depend on rqtl=list(data.frame(traits=c("underdominant"), s = c(0.1),pos=c(0.5)))
 
-sims.s0.1 = lapply(c(50),sim.zone,nind=2000,ndeme=200,sigma=2.5)
+sims.s0.1 = lapply(c(50),sim.zone,n.ind=2000,n.deme=200,sigma=2.5)
 
 sims.sums = lapply(sims.s0.1,spBreaks)
 #save(sims.sums,file="~/Projects/HybridZones/ClineProjects/sims_sums_s0.1.Robj")
@@ -27,11 +27,8 @@ loci = seq(0.5,1,0.1)
     #write.csv(info,row.names=F,file="file.snp")
 
 
-#GENOTYPE  [ASSUMES A ONE CHR GENOME WHERE WE HAVE PHASED DIPLOID DATA]
-    genoInd = function(IND,loci){sapply(IND[[1]],function(CHR){as.numeric(CHR$sp2[as.numeric(cut(loci,c(CHR$starts,1)))])})}
-
 #GENOTYPE ALL MY INDS
-my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.ancest, genoInd, loci)))})
+my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.ancest, geno.ind, loci)))})
    #   colnames(my.genos) = NULL
 
 #MAKE OUR FILE [NOTE THIS TAKES A LONG TIME AND IT MIGHT BE SMARTER TO WRITE THE THING ABOVE TO FILE ONE LINE AT A TIME]

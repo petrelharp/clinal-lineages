@@ -17,16 +17,20 @@ namesList = function(these.names){
 
 #get breaks between species' ancestry
 spBreaks = function(sim){
-    ind.ancest = lapply( sim$inds,function(IND){ lapply(IND,function(CHR){lapply(CHR,function(PAR){
-            if(nrow(PAR)==1){return(data.frame(starts=0,stops=1,sp2 = PAR$ancest > length(sim[[1]])))}
-            sp1 = getRuns(as.numeric( PAR$ancest <= length(sim[[1]])))
-            sp2 = getRuns(as.numeric( PAR$ancest > length(sim[[1]])))
-            tmp = rbind(data.frame(sp1,sp2=rep(F,nrow(sp1))),data.frame(sp2,sp2=rep(T,nrow(sp2))))
-            tmp = tmp[order(tmp$starts),]
-            tmp$starts = PAR$pos[tmp$starts]
-            tmp$stops = c(PAR$pos[-1],1)[tmp$stops]
-            return(tmp)
-    })})})
+    ind.ancest = lapply( sim$inds,function(IND){ 
+            lapply(IND,function(CHR){
+               lapply(CHR,function(PAR){
+                    if(nrow(PAR)==1){return(data.frame(starts=0,stops=1,sp2 = PAR$ancest > length(sim[[1]])))}
+                    sp1 = getRuns(as.numeric( PAR$ancest <= length(sim[[1]])))
+                    sp2 = getRuns(as.numeric( PAR$ancest > length(sim[[1]])))
+                    tmp = rbind(data.frame(sp1,sp2=rep(F,nrow(sp1))),data.frame(sp2,sp2=rep(T,nrow(sp2))))
+                    tmp = tmp[order(tmp$starts),]
+                    tmp$starts = PAR$pos[tmp$starts]
+                    tmp$stops = c(PAR$pos[-1],1)[tmp$stops]
+                    return(tmp)
+                })
+            })
+        })
     ancest.prop = t(sapply(ind.ancest,function(IND){
         tmp = t(sapply(IND,function(CHR){ c(X1=with(CHR$X1,sum(sp2*(stops-starts))), X2 = with(CHR$X2,sum(sp2*(stops-starts))))  }))
         return(colSums(tmp)/nrow(tmp))
@@ -107,20 +111,10 @@ makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),m
     if(is.null(QTL)){ w_abs = rep(1,length(inds)) }
     rel.w = w_abs/mean(w_abs)
     inds.df = data.frame(w=rel.w,deme=demes,edge=ifelse(demes%in%range(demes),2,1))
-    ##Determine if an individual moves up/down a deme by binomial sampling. 
-    ##The prob vector in the first rbinom determines whether an individual is in an edge deme or not. This is done because an individual in the leftmost deme cannot be sent left, and vice versa.
-    ##The first rbinom gives the probability of moving right, if a move is made. The sign then just indicates which direction the move occurs. The second rbinom determines whether or not an individual moves.
-    #move = sign(rbinom(nrow(inds.df),1,prob=with(inds.df,ifelse(deme==min(deme),1,ifelse(deme!=max(deme),1/2,0))))-.5) * with(inds.df, rbinom(nrow(inds.df),1, c(mig/edge)))
-        #MOD (Alisa): Change migration so that we can give a vector or migration probabilities e.g. c(+1 deme, +2 demes)
-        #Decide whether you stay or move n steps (MAKE SURE mig vector DOES NOT include probability that you stay!)
-        #JUMP_SIZE = apply(inds.df,1,function(X){sample(0:(length(mig)),1,prob=c(1-sum(mig/as.numeric(X[3])),mig/as.numeric(X[3])))})
-        #move = sign(rbinom(nrow(inds.df),1,prob=with(inds.df,ifelse(deme==min(deme),1,ifelse(deme!=max(deme),1/2,0))))-.5) * JUMP_SIZE
-
-        #NEW JUMP_SIZE: sample from Gaussian, send to closest deme. 
-        sample_move = floor(rnorm(NROW(inds.df),0.5,sigma))
-        
-    #new locations of individuals
-    inds.df$new.deme = pmin(max.deme, pmax(min.deme, inds.df$deme + move ) )
+    # sample the displacements of individuals
+    sample_move = floor(rnorm(NROW(inds.df),0.5,sigma))
+    # new locations of individuals
+    inds.df$new.deme = pmin(max.deme, pmax(min.deme, inds.df$deme + sample_move ) )
     inds.df$id = seq_along(inds.df$new.deme)
     new.inds.df = do.call(rbind,lapply(  unique(inds.df$deme)  , function(d){			
         #find parents
@@ -150,7 +144,18 @@ getAlphas = function(inds,sp.ids){
     }))
 }
 
-sim.gens = function(n,sp.ids,deme,n.gen,n.chr,QTL, sigma,SAVE=NULL,RETURN=TRUE){
+sim.gens = function(
+                    n,
+                    sp.ids,
+                    deme,
+                    n.gen,
+                    n.chr,
+                    QTL, 
+                    sigma,
+                    SAVE=NULL,
+                    RETURN=TRUE,
+                    quiet=FALSE
+            ){
     initial.inds.df = data.frame(matrix(1:(2*(n)),ncol=2,byrow=TRUE),sp.ids=sp.ids,deme=deme)
     initial.inds = initializeInds(arr=initial.inds.df,n.chr=n.chr)
     inds = initial.inds
@@ -158,9 +163,9 @@ sim.gens = function(n,sp.ids,deme,n.gen,n.chr,QTL, sigma,SAVE=NULL,RETURN=TRUE){
     for(i in 1:n.gen){
         inds = makeNewGen(inds,QTL=qtl,sp.ids=sp.ids,demes=inds.demes,sigma=sigma)  # add in selection and assortative mating
         #plot(getAlphas(inds,sp.ids)[,1])
-        print(c(i,date()))
+        if (!quiet) { print(c(i,date())) }
         if(!is.null(SAVE)){ if(i%in%SAVE$gen){  
-                sim = list(inds=inds, sp.ids=sp.ids,deme=deme,pars = c(n.gen=n.gen),QTL=QTL )
+                sim = list(inds=inds, sp.ids=sp.ids,deme=deme,pars = c(sigma=sigma,n.gen=n.gen),QTL=QTL )
                 save(sim,file=sprintf("%s_t%i_g%i.Robj",SAVE$name,SAVE$try,i))
         }}
     }
@@ -170,10 +175,31 @@ sim.gens = function(n,sp.ids,deme,n.gen,n.chr,QTL, sigma,SAVE=NULL,RETURN=TRUE){
 
 
 # Simulate a hybrid zone with a total of nind individuals
-# across ndemes, for ngens,
+# across n.demes, for ngens,
 # with the left half called 'A' and the right half called 'B'.
-sim.zone <- function (nind, ndeme, ngens,sigma) {
-	nind <- ceiling(nind/ndeme)*ndeme
-	sim.gens( n=nind, sp.ids = rep(c("A","B"),each=nind/2),deme = rep(1:ndeme,each=floor(nind/ndeme)),n.chr=1,n.gen=ngens, QTL = qtl,sigma=sigma)
+sim.zone <- function (n.ind, n.deme, ...) {
+	n.ind <- ceiling(n.ind/n.deme)*n.deme
+	sim.gens( n=n.ind, 
+             sp.ids = rep(c("A","B"),each=n.ind/2), 
+             deme=rep(1:n.deme,each=floor(n.ind/n.deme)),
+             n.chr=1,
+             QTL = qtl,...)
 }
 
+
+#GENOTYPE  [ASSUMES A ONE CHR GENOME WHERE WE HAVE PHASED DIPLOID DATA]
+geno.pop <- function (ind.ancest, loci) { 
+    sapply(ind.ancest, geno.ind, loci) 
+}
+
+geno.ind <- function(IND,loci) {
+    # Each individual is a list of chromosomes; each chromosome is a two-column data frame of starts, stops, and ancestral identities
+    # Returns diploid genotypes;
+    #  as a vector, with all chromosomes squooshed together
+    if (length(IND)!=length(loci)) { stop("Number of chromsomes not matching.") }
+    unlist( lapply( seq_along(IND), function (CHR) {
+            rowSums( sapply(IND[[CHR]],function(HAP){
+                   HAP$sp2[ findInterval( loci[[CHR]], c(HAP$starts,1), rightmost.closed=TRUE ) ]
+              }) )
+        }) )
+}
