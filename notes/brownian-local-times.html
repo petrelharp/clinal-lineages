@@ -67,7 +67,7 @@ img {
 
 <div id="header">
 <h1 class="title">Brownian local times</h1>
-<h4 class="date"><em>Mon Oct 5 10:19:29 2015</em></h4>
+<h4 class="date"><em>Mon Oct 5 10:53:30 2015</em></h4>
 </div>
 
 
@@ -128,7 +128,8 @@ for (loc in c(0.1, 0.2, 0.4, 0.6)) {
 <h1>Its Laplace transform</h1>
 <p>Now suppose that something happens at rate <span class="math inline">\(r\)</span> relative to the local time at <span class="math inline">\(x\)</span> (e.g., recombination to the other background). Then the chance that this has not happened by time 1 is <span class="math display">\[
 \begin{aligned}
-\E\left[ e^{-r\ell(x)} \right]
+\zeta(x,r) &amp;:=
+\E\left[ e^{-r\ell(x)} \right] \\
 &amp;=
 2\Phi(|x|)-1 + 
 \int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\

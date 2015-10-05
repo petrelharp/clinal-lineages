@@ -99,7 +99,8 @@ Now suppose that something happens at rate $r$ relative to the local time at $x$
 Then the chance that this has not happened by time 1 is
 $$
 \begin{aligned}
-\E\left[ e^{-r\ell(x)} \right]
+\zeta(x,r) &:=
+\E\left[ e^{-r\ell(x)} \right] \\
 &=
 2\Phi(|x|)-1 + 
 \int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
