@@ -25,20 +25,20 @@ A narrow hybrid zone
 Suppose that heterozygotes have fitness $(1-s)$;
 we know that allele frequencies around a hybrid zone behave as
 $$
-\begin{align}
+\begin{aligned}
     \partial_t p(t,x) &= \frac{1}{2} \partial_x^2 p(t,x) - s p(t,x) (1-p(t,x)) (1-2p(t,x)) ,
-\end{align}
+\end{aligned}
 $$
 and from `lineage-movement.tex`,
 if $A$ is the allele whose frequency is $p$,
 an $A$-lineage follows a diffusion with generator 
 $$
-\begin{align*}
+\begin{aligned}
     G_A f(x)
     &= 
     \frac{1}{2} (1-s(1-p(x))) \partial_x^2 f(x)
     + (2sp(x) + (1-s)) ( \partial_x \log p(x) ) \partial_x f(x) ,
-\end{align*}
+\end{aligned}
 $$
 i.e., with diffusion speed $(1-s(1-p))$
 and drift $(2sp(x) + (1-s)) ( \partial_x \log p(x) )$.
@@ -47,40 +47,40 @@ If we move a large distance in the direction where the $A$ allele is disadvantag
 then $p \to 0$,
 and the equation for $p$ becomes 
 $$
-\begin{align*}
+\begin{aligned}
     \partial_t p(t,x) &= \frac{1}{2} \partial_x^2 p(t,x) - s p(t,x) .
-\end{align*}
+\end{aligned}
 $$
 At stationarity, so the left side is zero,
 along with the boundary condition $\lim_{x \to \infty} p(x) = 0$,
 this is solved by
 $$
-\begin{align*}
+\begin{aligned}
     p(x) \simeq C \exp\left( - x \sqrt{2s} \right) ,
-\end{align*}
+\end{aligned}
 $$
 and so for $x$ where $p$ is small,
 $$
-\begin{align*}
+\begin{aligned}
     \partial_x \log p(x) = - \sqrt{2s}
-\end{align*}
+\end{aligned}
 $$
 and so the diffusion has generator
 $$
-\begin{align*}
+\begin{aligned}
     \tilde G_A f(x)
     &= 
     \frac{1}{2} (1-s) \partial_x^2 f(x)
     - (1-s) \sqrt{2s} \partial_x f(x) .
-\end{align*}
+\end{aligned}
 $$
 
 Let $B_t$ be a standard Brownian motion
 and let
 $$
-\begin{align*}
+\begin{aligned}
 X_t = x + B_{(1-s)t} - (1-s) \sqrt{2s} t
-\end{align*}
+\end{aligned}
 $$
 be the diffusion whose generator is $\tilde G_A$.
 We'd like to know the length of the haplotype carried with the lineage,
@@ -94,30 +94,30 @@ and killed at rate $\lambda$
 ever hits $x/(\sqrt{1-s})$,
 where
 $$
-\begin{align*}
+\begin{aligned}
     c 
     &=
     (1-s) \sqrt{2s} \times \frac{1}{ \sqrt{(1-s)} } \\
     &=
     \sqrt{2s(1-s)} .
-\end{align*}
+\end{aligned}
 $$
 and
 $$
-\begin{align*}
+\begin{aligned}
     \lambda
     &=
     \frac{ r }{ (1-s) } .
-\end{align*}
+\end{aligned}
 $$
 By Borodin \& Salminen 2.1.1.2,
 for a Brownian motion $W^{(c)}$ with drift $c$ and independent Exponential($\lambda$) time $\tau$,
 $$
-\begin{align*}
+\begin{aligned}
     \P\{ \sup_{0\le t\le \tau} W^{(c)}_t \ge x \}
     &=
     \exp\left( - x \left( \sqrt{2\lambda+c^2} - c \right) \right) .
-\end{align*}
+\end{aligned}
 $$
 
 Haplotype length around a rare migrant selected allele
@@ -126,21 +126,21 @@ Haplotype length around a rare migrant selected allele
 Let $L$ be the **length of the haplotype** carried by the migrant lineage.
 The above tells us that
 $$
-\begin{align*}
+\begin{aligned}
     \P^x\{ L > r \}
     &= 
     \exp\left( - x \left( \sqrt{2r+2s(1-s)} - \sqrt{2s(1-s)} \right) \right) .
-\end{align*}
+\end{aligned}
 $$
 Rearranging,
 $$
-\begin{align*}
+\begin{aligned}
     \P^x\{ L > (u/x\sqrt{2}+\sqrt{s(1-s)})^2-s(1-s) \}
     &= 
     \P^x\{ x\sqrt{2}\left(\sqrt{L+s(1-s)}-\sqrt{s(1-s)}\right) > u \} \\
     &= 
     \exp\left( - u \right) .
-\end{align*}
+\end{aligned}
 $$
 In other words,
 if $Y$ is an Exponential with rate $x \sqrt{2}$,
@@ -148,11 +148,11 @@ then $L$ and $(Y+\sqrt{s(1-s)})^2-s(1-s)$ have the same distribution.
 (This is a shifted Weibull.)
 Therefore,
 $$
-\begin{align*}
+\begin{aligned}
     \E[L] 
     &= 
     \frac{1}{2x} + \frac{\sqrt{2s(1-s)}}{x} 
-\end{align*}
+\end{aligned}
 $$
 and we can work out the variance also.
 
@@ -191,15 +191,15 @@ If there has been, then we need to condition on where and when it occurred.
 Taking from [this document](brownian-local-times.html),
 define ($h=1-\zeta$)
 $$
-\begin{align*}
+\begin{aligned}
     h(x,r,\tau) 
     &:= \P^x\{ I_1 = B \} \\
     &= 2(1-\Phi(|x|/\sqrt{\tau})) - 2 e^{r\tau|x|+r^2\tau^2/2} (1-\Phi(|x|/\sqrt{\tau}+r\tau)) .
-\end{align*}
+\end{aligned}
 $$
 Then
 $$
-\begin{align*}
+\begin{aligned}
     \P\{ I_2 = B \given I_1 = B \}
     &=
     e^{-r\tau}
@@ -209,13 +209,13 @@ $$
     \given
     I_1=B
     \right] ,
-\end{align*}
+\end{aligned}
 $$
 where $X_t$ is the location of the $g_1$-lineage (then conditioned on $I_1=B$).
 If we let $q_t(x,y)$ be the probability density of $X$ conditioned on $I_1=B$,
 then
 $$
-\begin{align*}
+\begin{aligned}
     \P\{ I_2 = B \given I_1 = B \}
     &=
     e^{-r\tau}
@@ -226,7 +226,7 @@ $$
     \ell e^{-\ell t} h(y,r+\ell,\tau-t) 
     dy
     dt .
-\end{align*}
+\end{aligned}
 $$
 What is the motion of $X$ given $I_1=B$?
 $X$ moves as a Brownian motion that is sometimes reflected at zero.
