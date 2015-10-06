@@ -21,24 +21,24 @@ It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that
 if $\ell(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
 i.e.,
 $$
-\begin{align*}
+\begin{aligned}
     \ell(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
         \text{measure}\{t \,:\, x \le B_t \le x+\epsilon, \, 0 \le t \le 1\}
-\end{align*}
+\end{aligned}
 $$
 then
 $$
-\begin{align*}
+\begin{aligned}
     \P\{ \ell(x) \le u \} = 2 \Phi(|x|+u)-1,
-\end{align*}
+\end{aligned}
 $$
 where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
 Differentiating this, $\P\{\ell \in du\} = \partial_u \P\{\ell \le u\}$, so
 $$
-\begin{align*}
+\begin{aligned}
     \P\{ \ell(x) = 0 \} &= 2 \Phi(|x|)-1 \\
     \P\{ \ell(x) \in du \} &= 2 \phi(|x|+u) ,
-\end{align*}
+\end{aligned}
 $$
 where $\phi$ is the Gaussian density.
 
@@ -98,8 +98,9 @@ Now suppose that something happens at rate $r$ relative to the local time at $x$
 (e.g., recombination to the other background).
 Then the chance that this has not happened by time 1 is
 $$
-\begin{align*}
-\E\left[ e^{-r\ell(x)} \right]
+\begin{aligned}
+\zeta(x,r) &:=
+\E\left[ e^{-r\ell(x)} \right] \\
 &=
 2\Phi(|x|)-1 + 
 \int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
@@ -115,7 +116,7 @@ e^{r|x|} \int_{|x|}^\infty e^{-rt} 2 \phi(t) dt \\
 &=
 2\Phi(|x|)-1 + 
 2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
-\end{align*}
+\end{aligned}
 $$
 At $r=0$ this equals 1, as it should, since it's the chance that nothing happens.
 For large $x$, since $1-\Phi(x) \sim e^{-x^2/2}/\sqrt{2\pi}x$,
@@ -150,15 +151,15 @@ with(compare.rates, {
 This is very steep at $x=0$.
 Notice that as $x$ goes to 0,
 $$
-\begin{align*}
+\begin{aligned}
     \lim_{x \to 0} \zeta(x,r) 
     &= 2 e^{r^2/2} (1-\Phi(r)) \\
     &= \frac{2}{r\sqrt{2\pi}} + O(r^{-3}) .
-\end{align*}
+\end{aligned}
 $$
 so that the difference in the left and right limits is
 $$
-\begin{align*}
+\begin{aligned}
     \lim_{x \to 0-} p(x,r) 
     -\lim_{x \to 0+} p(x,r) 
     &= 
@@ -168,13 +169,13 @@ $$
     &=
     \frac{4}{r\sqrt{2\pi}}
       +O(r^{-3}) 
-\end{align*}
+\end{aligned}
 $$
 
 Let's also look at the slope of $p$ at $x=0$.
 Since $\partial_x |x| = \sgn(x)$,
 $$
-\begin{align*}
+\begin{aligned}
     \partial_x \zeta(x,r)
     &=
     2 \sgn(x) \left(
@@ -182,11 +183,11 @@ $$
     + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
     - e^{r|x|+r^2/2} \phi(|x|+r)
       \right)
-\end{align*}
+\end{aligned}
 $$
 and so
 $$
-\begin{align*}
+\begin{aligned}
     -\partial_x p(x)
     &=
     \phi(|x|)
@@ -199,14 +200,14 @@ $$
     r e^{r^2/2} (1-\Phi(r)) \\
     &=
     \frac{1}{\sqrt{2\pi}} + O(\frac{1}{r}) .
-\end{align*}
+\end{aligned}
 $$
 
 Also note that for large $|x|$, by the asymptotics for $1-\Phi(x)$,
 $$
-\begin{align*}
+\begin{aligned}
     \zeta(x,r) = 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) .
-\end{align*}
+\end{aligned}
 $$
 
 What this says about clines
@@ -220,29 +221,29 @@ The key quantity we want is the probability that a Brownian motion with variance
 with respect to its local time at $x$ was still alive at time $\tau$.
 Denote this by
 $$
-\begin{align*}
+\begin{aligned}
     \zeta(x,r,\tau,\sigma).
-\end{align*}
+\end{aligned}
 $$
 By Brownian scaling,
 since $B_{ct}$ has the same distribution as $\sqrt{c}B_t$,
 $$
-\begin{align*}
+\begin{aligned}
     \zeta(x,r,\tau,\sigma) 
     &=
     \zeta(x,r\tau,1,\sqrt{\tau}\sigma) \\
     &=
     \zeta(x/\sqrt{\tau\sigma^2},r\tau) ,
-\end{align*}
+\end{aligned}
 $$
 where
 $$
-\begin{align*}
+\begin{aligned}
     \zeta(x,r)
     &=
     1 - 2(1-\Phi(|x|)) + 
     2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
-\end{align*}
+\end{aligned}
 $$
 
 **Cline flattening:**
@@ -285,10 +286,10 @@ i.e., $(1-\zeta)/2$.
 Combining these,
 the probability of ending up on the left-hand side is
 $$
-\begin{align*}
+\begin{aligned}
     p(x,r,\tau,A) = 
     \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
-\end{align*}
+\end{aligned}
 $$
 
 Here's the cline shape:
