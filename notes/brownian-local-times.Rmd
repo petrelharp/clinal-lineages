@@ -14,6 +14,16 @@ fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.align='center')
 ```
 
+*Useful functions used below:*
+```{r setup_fns}
+tanh_cline <- function (x,s,sigma=1) {
+    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+}
+pcline <- function (x,r,tau=1,sigma=1) {
+    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
+}
+```
+
 Killing at Brownian local times
 ===============================
 
@@ -294,9 +304,7 @@ $$
 
 Here's the cline shape:
 ```{r show_cline}
-pcline <- function (x,r,tau=1,sigma=1) {
-    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
-}
+pcline
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, pcline(xx,r=1), type='n', 
@@ -346,9 +354,7 @@ p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
 $$
 Here's what that looks like:
 ```{r tanh_cline}
-tanh_cline <- function (x,s,sigma=1) {
-    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
-}
+tanh_cline
 plot(xx, tanh_cline(xx,s=0.04) )
 ```
 
@@ -370,6 +376,7 @@ drift <- function (x,s,sigma=1) {
 nwalks <- 1e4
 ntimes <- 1e3
 s <- 0.1
+xx <- seq(-15,15,length.out=500)
 # want total time to be 1, so:
 eps <- 1/sqrt(ntimes)
 rws <- rbind(0,matrix( rnorm(nwalks*(ntimes-1))*eps, nrow=(ntimes-1), ncol=nwalks ))
