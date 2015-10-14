@@ -203,10 +203,10 @@ $$
 \end{aligned}
 $$
 
-Also note that for large $|x|$, by the asymptotics for $1-\Phi(x)$,
+Also note that by the asymptotics for $1-\Phi(x)$,
 $$
 \begin{aligned}
-    \zeta(x,r) = 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) .
+    \zeta(x,r) \approx 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) \qquad \text{for large }|x| .
 \end{aligned}
 $$
 
