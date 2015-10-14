@@ -71,5 +71,10 @@ Cline vs. Hybrid Zone:
 	
 
 Things to think about:
-	Reverse-time barrier strength (how to calculate? see Barton 1983 for definition.)
+	Reverse-time barrier strength (how to calculate? see Barton + Bengtsson for definition.)
 	How much bouncing around of foreign allele around center of cline 
+	
+	
+	
+BARTON 2008:
+
