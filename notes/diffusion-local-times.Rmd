@@ -11,7 +11,7 @@ $$
 
 ```{r doc_setup, include=FALSE}
 fig.dim <- 5
-knitr::opts_chunk$set(fig.width=2*fig.dim,fig.align='center')
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 ```
 
 *Useful functions used below:*
@@ -43,6 +43,9 @@ sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
     }
     attr(rws,"dt") <- dt
     return(rws)
+}
+weighted_time <- function (rws, weight.fn, ...) {
+    colSums( weight.fn(rws,...) ) * attr(rws,"dt")
 }
 ```
 
@@ -122,8 +125,8 @@ p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
 $$
 Here's what that looks like:
 ```{r tanh_cline}
-s <- 0.1
 tanh_cline
+s <- 0.1
 xx <- seq(-15,15,length.out=500)
 plot(xx, (-1)*tanh_drift(xx,s=s), type='l', col='red', xlab="space", ylab='proportion or drift')
 lines(xx, tanh_cline(xx,s=s), col='black')
@@ -188,41 +191,120 @@ hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="his
 Comparison, by simulation
 =========================
 
-```{r sim_general, fig.height=3*fig.dim}
-weighted_time <- function (rws, weight.fn, ...) {
-    colSums( weight.fn(rws,...) ) * attr(rws,"dt")
-}
+Here are distributions of $T=\int_0^{`r tau`} f_H(X_t) dt$
+for two different starting points: $x=0$ and $x=-3$,
+and five different models:
+
+- **tanh:** the ``correct'' model;
+- **reflected:** a Brownian motion reflected at zero and counting one-half time in a neighborhood of size $\sigma/\sqrt{s}$;
+- **reflected tanh:** a Brownian motion reflected at zero and counting time weighted by the $\tanh$ cline;
+- **pushed:** a Brownian motion pushed back at rate $4\sigma\sqrt{s}$ above zero and counting time above zero;
+- **pushed tanh:** a Brownian motion pushed back at rate $4\sigma\sqrt{s}$ above zero and counting time weighted by the $\tanh$ cline.
+
+```{r sim_general, fig.height=3*fig.dim, cache=TRUE}
 nwalks <- 1e4
 ntimes <- 1e3
 s <- 0.1
 tau <- 10
-lt.comparison <- list(
+initvals <- c(0,-3)
+lt.comparison <- lapply( initvals, function (xinit) { list(
         tanh=weighted_time( 
-               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s ),
+               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s, xinit=xinit ),
                tanh_het, s=s
            ),
         reflected=weighted_time(
-                sim_diffusion( function(...){0}, tau, nwalks, ntimes ),
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
                 function (x,s) { ifelse(abs(x)<1/(2*sqrt(s)), 1/2, 0) }, s=s
             ),
         reflected_tanh=weighted_time(
-                sim_diffusion( function(...){0}, tau, nwalks, ntimes ),
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
                 tanh_het, s=s
             ),
         pushed=weighted_time(
-                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s ),
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
                 function (x) { x>0 }
             ),
         pushed_tanh=weighted_time(
-                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s ),
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
                 tanh_het, s=s
             )
-        )
-layout(seq_along(lt.comparison))
+        ) } )
+layout(matrix(1:(length(lt.comparison)*length(lt.comparison[[1]])),ncol=2))
 for (k in seq_along(lt.comparison)) {
-    hist(lt.comparison[[k]],xlim=range(lt.comparison),main=names(lt.comparison)[k],breaks=50,xlab="time in hets")
+    for (j in seq_along(lt.comparison[[k]])) {
+        hist(lt.comparison[[k]][[j]],xlim=range(lt.comparison),main=names(lt.comparison[[k]])[j],breaks=seq(0,tau,length.out=50),xlab="time in hets")
+    }
 }
 ```
+
+Of course, we aren't actually trying to estimate the distribution of $T$ itself,
+but rather the probabilities of recombination (the Laplace transform).
+Here are these probabilities, as a function of $r$
+(the second plots are on a log-log scale):
+```{r recomb_prob_comparisons, cache=TRUE, depends="sim_general"}
+rvals <- exp(seq(log(.001),log(0.5),length.out=400))
+precombs <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) sapply( rvals, function (r) { mean((-1)*expm1(-r*lt)) } ) )
+    } )
+layout(t(1:2))
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), log='xy', main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1  )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+```
+
+Here's the same thing for a much longer time:
+```{r sim_general_longer, fig.height=3*fig.dim, cache=TRUE}
+nwalks <- 1e3
+ntimes <- 1e4
+s <- 0.1
+tau <- 100
+initvals <- c(0,-3)
+lt.comparison <- lapply( initvals, function (xinit) { list(
+        tanh=weighted_time( 
+               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s, xinit=xinit ),
+               tanh_het, s=s
+           ),
+        reflected=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                function (x,s) { ifelse(abs(x)<1/(2*sqrt(s)), 1/2, 0) }, s=s
+            ),
+        reflected_tanh=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                tanh_het, s=s
+            ),
+        pushed=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                function (x) { x>0 }
+            ),
+        pushed_tanh=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                tanh_het, s=s
+            )
+        ) } )
+tbreaks <- seq(0,tau,length.out=50)
+Tdists <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) tabulate(findInterval(lt,tbreaks),nbins=length(tbreaks)-1) )
+    } )
+rvals <- exp(seq(log(.001),log(0.5),length.out=400))
+precombs <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) sapply( rvals, function (r) { mean((-1)*expm1(-r*lt)) } ) )
+    } )
+layout(t(1:2))
+for (k in seq_along(precombs)) {
+    matplot( tbreaks[-1]-diff(tbreaks)/2, Tdists[[k]], type='l', col=1:ncol(Tdists[[k]]), main=paste("x =",initvals[k]), ylim=range(Tdists), xlab="time in hets", lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+```
+
 
 
 
