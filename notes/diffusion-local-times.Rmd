@@ -1,5 +1,5 @@
 ---
-title: "Brownian local times"
+title: "Diffusion local times and the time until recombination"
 date: "`r date()`"
 ---
 
@@ -14,8 +14,162 @@ fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.align='center')
 ```
 
+*Useful functions used below:*
+```{r setup_fns}
+pcline <- function (x,r,tau=1,sigma=1) {
+    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
+}
+tanh_cline <- function (x,s,sigma=1) {
+    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+}
+tanh_drift <- function (x,s,sigma=1) {
+    # log-derivative of tanh_cline
+    -(2*sqrt(s)/sigma) * (1-tanh(-2*x*sqrt(s)/sigma)^2) / (1+tanh(-2*x*sqrt(s)/sigma))
+}
+tanh_het <- function (x,s,sigma=1) {
+    # prob of being in a het = (1-s)(1-p)/(1-s(1-p))
+    pp <- tanh_cline(x,s,sigma=sigma)
+    (1-s)*(1-pp)/(1-s*(1-pp))
+}
+```
+Approximations, generally
+=========================
+
+We have a function $p(x)$ (the local proportion of $A$ alleles),
+and another function $f_H(x)$ (the local probability an $A$ is in a heterozygote),
+which happens to equal $(1-s)(1-p(x))/(1-s(1-p(x)))$ but we might not want to use that fact;
+then $p$ defines a diffusion $X$ by $dX_t = \log(p(x))' dt + dB_t$
+and then we define $H_t = \int_0^t f_H(X_s) ds$.
+We want to know $\E^x[\exp(-r H_t)]$ as a function of $x$, $r$, and $t$.
+
+More concretely,
+we want the distribution of the time to first recombination in a heterozygote;
+denote this by $T$, so that
+$$
+\begin{aligned}
+\P\{ T > t \} 
+&= \exp\left\{ - \int_0^t r f_H(X_s) ds \right\} \\
+&= \exp\left\{ - \int_{-\infty}^{\infty} r f_H(x) \ell_t(x) dx \right\}  ,
+\end{aligned}
+$$
+where $\ell$ is the local time density for $X$.
+This is the Laplace transform of 
+the heterozygote-weighted local time, $H_t = \int f_H(x) \ell_t(x) dx$,
+so it means that we want to come up with a reasonable approximation to this quantity.
+
+This suggests two possible approximations:
+
+1. A lineage doesn't go past the hybrid zone,
+   and only recombines when it's in the hybrid zone,
+   which has width something,
+   and where the probability of being in a heterozygote is 1/2.
+
+2. A lineage spends little time in the hybrid zone,
+   and recombines when it's past the hybrid zone,
+   where it's type is rare,
+   thus replacing both the drift $\partial_x \log(p(x))$
+   and the probability of being in a heterozygote $f_H(x)$ with step functions.
+
+The first one seems more natural,
+but it requires two parameters: 
+what the width should be and where the barrier should be.
+
+
+The right model
+===============
+
+When the lineage is at $x$, 
+the lineage recombines to the other background
+in a given generation
+with probability equal to the recombination rate 
+multiplied by the probability of being found in a heterozygote.
+If $p_{AB}(x)$ is the local fraction of heterozygotes,
+and heterozygotes have relative fecundity $1-s$,
+then the probability of being in a heterozygote is
+$(1-s)p_{AB}(x)/((1-s)p_{AB}(x)+2p_{AA}(x))$;
+if diploid genotypes are assorted randomly,
+then $p_{AB} = 2p(1-p)$ and $p_{AA}=p^2$, so the probability that an $A$ lineage
+passes through a heterozygote in a given generation is
+$$
+\begin{align*}
+f_H(x) 
+&= 
+\frac{ (1-s)p(x)(1-p(x)) }{ p(x)^2 + (1-s) p(x) (1-p(x)) }
+&= 
+\frac{ (1-s)(1-p(x)) }{ p(x) + (1-s) (1-p(x)) } \\
+&= 
+\frac{ (1-s)(1-p(x)) }{ 1 - s (1-p(x)) } .
+\end{align*}
+$$
+
+Bazykin's approximation to a cline is
+$$
+p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
+$$
+Here's what that looks like:
+```{r tanh_cline}
+s <- 0.1
+tanh_cline
+xx <- seq(-15,15,length.out=500)
+plot(xx, (-1)*tanh_drift(xx,s=s), type='l', col='red', xlab="space", ylab='proportion or drift')
+lines(xx, tanh_cline(xx,s=s), col='black')
+lines(xx, 2*tanh_cline(xx,s=s)*(1-tanh_cline(xx,s=s)), col='blue')
+lines(xx, tanh_het(xx,s=s), col='green')
+legend("topleft",lty=1,col=c("black","red","blue","green"),
+        legend=c("p(x)","-log(p(x))'","2p(1-p)","prob of het"))
+```
+
+A lineage does something a bit more complicated,
+but let's just run a random walk with drift equal to the logarithmic derivative of $p(x)$,
+i.e.,
+$$
+\begin{align*}
+    \partial_x \log(p(x)) 
+    &= -\frac{2\sqrt{s}}{\sigma} 
+        \frac{1-\tanh^2(-2x\sqrt{s}/σ)}{1+\tanh(-2x\sqrt{s}/σ)} .
+\end{align*}
+$$
+(Really, the drift should be the logarithmic derivative of $p(x)(1-sf_H(x))$.)
+
+```{r sim_lineage,cache=TRUE}
+tanh_drift
+nwalks <- 1e4
+ntimes <- 1e3
+s <- 0.1
+tau <- 10
+xx <- seq(-15,15,length.out=500)
+# want total time to be 1, so:
+dt <- tau/ntimes
+tt <- seq(0,tau,length.out=ntimes)
+rws <- rbind(0,matrix( rnorm(nwalks*(ntimes-1))*sqrt(dt), nrow=(ntimes-1), ncol=nwalks ))
+for (k in 2:ntimes) {
+    rws[k,] <- rws[k-1,]+rws[k,]+dt*tanh_drift(rws[k-1,],s)
+}
+layout( t(1:2), widths=c(3,1) )
+matplot(tt, rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
+plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
+lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+
+Now let's get local times for those walks.
+```{r lineage_local_times,cache=TRUE,depends="sim_lineage"}
+xx <- seq( min(rws), max(rws), length.out=200 )
+xmids <- xx[-1]-diff(xx)/2
+lts <- dt*apply( matrix(findInterval(rws,xx),nrow=nrow(rws)), 2, tabulate, nbins=length(xx)-1 )
+layout( t(1:2), widths=c(3,1) )
+matplot(lts[,1:30],xmids,type='l',xlab="local time", ylab="space")
+plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
+lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+
+
+
+
+
 Killing at Brownian local times
 ===============================
+
+Now, let's look at the analytics for the first approximation.
 
 It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that 
 if $\ell(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
@@ -205,12 +359,14 @@ $$
 \end{aligned}
 $$
 
-Also note that for large $|x|$, by the asymptotics for $1-\Phi(x)$,
+Also note that by the asymptotics for $1-\Phi(x)$,
 $$
 \begin{aligned}
-    \zeta(x,r) = 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) .
+    \zeta(x,r) \approx 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) \qquad \text{for large }|x| .
 \end{aligned}
 $$
+
+
 
 What this says about clines
 ===========================
@@ -295,10 +451,15 @@ $$
 $$
 
 Here's the cline shape:
+<<<<<<< HEAD:notes/brownian-local-times.Rmd
 ```{r show_cline, cache=TRUE}
 pcline <- function (x,r,tau=1,sigma=1) {
     (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
 }
+=======
+```{r show_cline}
+pcline
+>>>>>>> github/master:notes/diffusion-local-times.Rmd
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, pcline(xx,r=1), type='n', 
@@ -311,6 +472,7 @@ for (tau in c(5,50)) {
 }
 ```
 
+<<<<<<< HEAD:notes/brownian-local-times.Rmd
 
 Adjusting for cline width
 =========================
@@ -505,3 +667,5 @@ p_t(x,z)
 $$
 Also, $p_t(x,z;\theta)=p_t(-x,-z;-\theta)$ gets the same expressions for $x<0$.
 
+=======
+>>>>>>> github/master:notes/diffusion-local-times.Rmd
