@@ -31,7 +31,21 @@ tanh_het <- function (x,s,sigma=1) {
     pp <- tanh_cline(x,s,sigma=sigma)
     (1-s)*(1-pp)/(1-s*(1-pp))
 }
+sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
+    # want total time to be tau, so:
+    dt <- tau/ntimes
+    # put the noise in rws
+    rws <- matrix( c( rep_len(xinit,nwalks), # initial conditions
+                 rnorm(nwalks*(ntimes-1)) ), nrow=ntimes, ncol=nwalks, byrow=TRUE )
+    # and then integrate over it
+    for (k in 2:ntimes) {
+        rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],...)
+    }
+    attr(rws,"dt") <- dt
+    return(rws)
+}
 ```
+
 Approximations, generally
 =========================
 
@@ -138,24 +152,23 @@ ntimes <- 1e3
 s <- 0.1
 tau <- 10
 xx <- seq(-15,15,length.out=500)
-# want total time to be 1, so:
-dt <- tau/ntimes
 tt <- seq(0,tau,length.out=ntimes)
-rws <- rbind(0,matrix( rnorm(nwalks*(ntimes-1))*sqrt(dt), nrow=(ntimes-1), ncol=nwalks ))
-for (k in 2:ntimes) {
-    rws[k,] <- rws[k-1,]+rws[k,]+dt*tanh_drift(rws[k-1,],s)
-}
+rws <- sim_diffusion( tanh_drift, tau, nwalks, ntimes, s=s, xinit=rnorm(nwalks) )
 layout( t(1:2), widths=c(3,1) )
 matplot(tt, rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
-plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
+legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
+plot( (-1)*tanh_drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
+lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
 lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
 ```
+The cline is in green and the local probability of being in a heterozygote is in black;
+the drift (multiplied by $-1$) is in red.
 
 Now let's get local times for those walks.
 ```{r lineage_local_times,cache=TRUE,depends="sim_lineage"}
 xx <- seq( min(rws), max(rws), length.out=200 )
 xmids <- xx[-1]-diff(xx)/2
-lts <- dt*apply( matrix(findInterval(rws,xx),nrow=nrow(rws)), 2, tabulate, nbins=length(xx)-1 )
+lts <- attr(rws,"dt")*apply( matrix(findInterval(rws,xx),nrow=nrow(rws)), 2, tabulate, nbins=length(xx)-1 )
 layout( t(1:2), widths=c(3,1) )
 matplot(lts[,1:30],xmids,type='l',xlab="local time", ylab="space")
 plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
@@ -163,6 +176,53 @@ lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
 ```
 
 
+Here is the distribution of $T=\int_0^{`r tau`} f_H(X_t) dt$:
+```{r dist_het_time, cache=TRUE, depends="sim_het_time"}
+het.time <- weighted_time( rws, tanh_het, s=s )
+layout(1:2)
+hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
+hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="histogram of log(T)") 
+```
+
+
+Comparison, by simulation
+=========================
+
+```{r sim_general, fig.height=3*fig.dim}
+weighted_time <- function (rws, weight.fn, ...) {
+    colSums( weight.fn(rws,...) ) * attr(rws,"dt")
+}
+nwalks <- 1e4
+ntimes <- 1e3
+s <- 0.1
+tau <- 10
+lt.comparison <- list(
+        tanh=weighted_time( 
+               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s ),
+               tanh_het, s=s
+           ),
+        reflected=weighted_time(
+                sim_diffusion( function(...){0}, tau, nwalks, ntimes ),
+                function (x,s) { ifelse(abs(x)<1/(2*sqrt(s)), 1/2, 0) }, s=s
+            ),
+        reflected_tanh=weighted_time(
+                sim_diffusion( function(...){0}, tau, nwalks, ntimes ),
+                tanh_het, s=s
+            ),
+        pushed=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s ),
+                function (x) { x>0 }
+            ),
+        pushed_tanh=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s ),
+                tanh_het, s=s
+            )
+        )
+layout(seq_along(lt.comparison))
+for (k in seq_along(lt.comparison)) {
+    hist(lt.comparison[[k]],xlim=range(lt.comparison),main=names(lt.comparison)[k],breaks=50,xlab="time in hets")
+}
+```
 
 
 
@@ -200,7 +260,7 @@ Let's check this:
 ```{r sim_rw, cache=TRUE}
 nwalks <- 1e4
 ntimes <- 1e3
-# want total time to be 1, so:
+# want total time to be tau, so:
 eps <- 1/sqrt(ntimes)
 rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
 rws <- rbind(0,apply(rws,2,cumsum))
@@ -451,15 +511,8 @@ $$
 $$
 
 Here's the cline shape:
-<<<<<<< HEAD:notes/brownian-local-times.Rmd
 ```{r show_cline, cache=TRUE}
-pcline <- function (x,r,tau=1,sigma=1) {
-    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
-}
-=======
-```{r show_cline}
 pcline
->>>>>>> github/master:notes/diffusion-local-times.Rmd
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, pcline(xx,r=1), type='n', 
@@ -472,135 +525,6 @@ for (tau in c(5,50)) {
 }
 ```
 
-<<<<<<< HEAD:notes/brownian-local-times.Rmd
-
-Adjusting for cline width
-=========================
-
-Above, we were approximating the time that a reflecting lineage
-spends in a small interval near zero
-by the local time at zero multiplied by the width of the interval.
-In fact, when the lineage is at $x$, 
-the lineage recombines to the other background
-in a given generation
-with probability equal to the recombination rate 
-multiplied by the probability of being found in a heterozygote.
-If $p_{AB}(x)$ is the local fraction of heterozygotes,
-and heterozygotes have relative fecundity $1-s$,
-then the probability of being in a heterozygote is
-$(1-s)p_{AB}(x)/((1-s)p_{AB}(x)+2p_{AA}(x))$;
-if diploid genotypes are assorted randomly,
-then $p_{AB} = 2p(1-p)$ and $p_{AA}=p^2$, so the probability that an $A$ lineage
-passes through a heterozygote in a given generation is
-$$
-\begin{align*}
-f_H(x) 
-&= 
-\frac{ (1-s)p(x)(1-p(x)) }{ p(x)^2 + (1-s) p(x) (1-p(x)) }
-&= 
-\frac{ (1-s)(1-p(x)) }{ p(x) + (1-s) (1-p(x)) } \\
-&= 
-\frac{ (1-s)(1-p(x)) }{ 1 - s (1-p(x)) } .
-\end{align*}
-$$
-
-Bazykin's approximation to a cline is
-$$
-p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
-$$
-Here's what that looks like:
-```{r tanh_cline, cache=TRUE}
-tanh_cline <- function (x,s,sigma=1) {
-    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
-}
-fH <- function (x,s,pfn=tanh_cline,...) {
-    px <- pfn(x,s=s,...)
-    ( (1-s)*(1-px) )/( 1 - s*(1-px) )
-}
-plot(xx, tanh_cline(xx,s=0.04), type='l' )
-```
-
-A lineage does something a bit more complicated,
-but let's just run a random walk with drift equal to the logarithmic derivative of $p(x)$,
-i.e.,
-$$
-\begin{align*}
-    \partial_x \log(p(x)) 
-    &= -\frac{2\sqrt{s}}{\sigma} 
-        \frac{1-\tanh^2(-2x\sqrt{s}/σ)}{1+\tanh(-2x\sqrt{s}/σ)} .
-\end{align*}
-$$
-
-```{r sim_lineage, cache=TRUE, depends=c("tanh_cline","show_cline","killing")}
-drift <- function (x,s,sigma=1) {
-    -(2*sqrt(s)/sigma) * (1-tanh(-2*x*sqrt(s)/sigma)^2) / (1+tanh(-2*x*sqrt(s)/sigma))
-}
-nwalks <- 1e4
-ntimes <- 3e3
-total.time <- 10
-s <- 0.1
-dt <- total.time/ntimes
-# put the noise in rws
-rws <- rbind( rnorm(nwalks), # initial conditions
-             matrix( rnorm(nwalks*(ntimes-1)), nrow=(ntimes-1), ncol=nwalks ) )
-# and then integrate over it
-for (k in 2:ntimes) {
-    rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],s)
-}
-layout( t(1:2), widths=c(3,1) )
-matplot(seq(0,total.time,length.out=ntimes),rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
-legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
-plot( (-1)*drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
-lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
-lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
-```
-The cline is in green and the local probability of being in a heterozygote is in black;
-the drift (multiplied by $-1$) is in red.
-
-Let's just check that's doing the right thing:
-```{r sim_lineage_check, cache=TRUE, depends="sim_lineage"}
-xbreaks <- seq(-3,3,length.out=100)
-xmids <- xbreaks[-1]-diff(xbreaks)/2
-dX <- apply(rws,2,diff)
-Xmeans <- tapply( dX, cut(rws[-nrow(rws),],breaks=xbreaks), mean )
-Xvar <- tapply( dX, cut(rws[-nrow(rws),],breaks=xbreaks), var )
-layout(1:2)
-plot(xmids,Xmeans/dt,ylab="mean dX")
-lines(xmids, drift(xmids,s), col='red', lwd=2)
-plot(xmids,Xvar/dt,ylab="variance dX")
-abline(h=1,col='red',lwd=2)
-```
-
-**Comparison to zero-width cline:**
-Let's start a bunch of random walks sorta far from the cline center,
-and look at the distribution of the time spend in heterozygotes.
-```{r sim_het_time, cache=TRUE, depends="sim_lineage"}
-nwalks <- 1e4
-ntimes <- 3e3
-total.time <- 100
-s <- 0.1
-dt <- total.time/ntimes
-# put the noise in rws
-rws <- rbind( -10, # initial conditions
-             matrix( rnorm(nwalks*(ntimes-1)), nrow=(ntimes-1), ncol=nwalks ) )
-# and then integrate over it
-for (k in 2:ntimes) {
-    rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],s)
-}
-layout( t(1:2), widths=c(3,1) )
-matplot(seq(0,total.time,length.out=ntimes),rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
-legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
-plot( (-1)*drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
-lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
-lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
-```
-Here is the distribution of $T=\int_0^{`r total.time`} f_H(X_t) dt$:
-```{r dist_het_time, cache=TRUE, depends="sim_het_time"}
-het.time <- dt*colSums( fH(rws,s=s) )
-layout(1:2)
-hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
-hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="histogram of log(T)") 
-```
 
 
 Brownian motion with drift above zero
@@ -666,6 +590,3 @@ p_t(x,z)
 \end{aligned}
 $$
 Also, $p_t(x,z;\theta)=p_t(-x,-z;-\theta)$ gets the same expressions for $x<0$.
-
-=======
->>>>>>> github/master:notes/diffusion-local-times.Rmd
