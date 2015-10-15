@@ -50,13 +50,14 @@ ntimes <- 1e3
 eps <- 1/sqrt(ntimes)
 rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
 rws <- rbind(0,apply(rws,2,cumsum))
-matplot(rws[,1:20],type='l', ylab='position')
+matplot(seq(0,1,length.out=ntimes),rws[,1:20],type='l', ylab='position')
 ```
 Here we've simulated `r nwalks` random walks for a total of `r ntimes` steps,
 and scaled steps to have this be a total Brownian time of 1.
-Let's check:
+Let's check;
+this should just be a standard Gaussian:
 ```{r final_dist}
-xh <- hist(rws[ntimes,],breaks=50)
+xh <- hist(rws[ntimes,],breaks=50,main="final position")
 lines( xh$mids, sum(xh$counts)*diff(pnorm(xh$breaks)) )
 ```
 
@@ -70,7 +71,8 @@ xh <- hist(colSums(abs(rws)<=1.5*eps)/ntimes/(3*eps),main="local time at 0", bre
 lines( xh$mids, sum(xh$counts)*diff( 2*pnorm(xh$breaks)-1 ), col='red' )
 ```
 What about the local time at other locations?
-Note there is an atom at 0, now,
+Note there is an atom at 0 now
+(that is depicted by the dots in the figures below),
 and that the discretization could trip us up;
 the colors (red/green/blue) use the (mid/upper/lower) points of the interval that we count in.
 ```{r local_times, cache=TRUE, depends="sim_rw"}
@@ -293,7 +295,7 @@ $$
 $$
 
 Here's the cline shape:
-```{r show_cline}
+```{r show_cline, cache=TRUE}
 pcline <- function (x,r,tau=1,sigma=1) {
     (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
 }
@@ -326,7 +328,7 @@ and heterozygotes have relative fecundity $1-s$,
 then the probability of being in a heterozygote is
 $(1-s)p_{AB}(x)/((1-s)p_{AB}(x)+2p_{AA}(x))$;
 if diploid genotypes are assorted randomly,
-then $p_{AB} = 2p(1-p)$ and $p_AA=p^2$, so the probability that an $A$ lineage
+then $p_{AB} = 2p(1-p)$ and $p_{AA}=p^2$, so the probability that an $A$ lineage
 passes through a heterozygote in a given generation is
 $$
 \begin{align*}
@@ -345,11 +347,15 @@ $$
 p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
 $$
 Here's what that looks like:
-```{r tanh_cline}
+```{r tanh_cline, cache=TRUE}
 tanh_cline <- function (x,s,sigma=1) {
     (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
 }
-plot(xx, tanh_cline(xx,s=0.04) )
+fH <- function (x,s,pfn=tanh_cline,...) {
+    px <- pfn(x,s=s,...)
+    ( (1-s)*(1-px) )/( 1 - s*(1-px) )
+}
+plot(xx, tanh_cline(xx,s=0.04), type='l' )
 ```
 
 A lineage does something a bit more complicated,
@@ -363,24 +369,139 @@ $$
 \end{align*}
 $$
 
-```{r sim_lineage}
+```{r sim_lineage, cache=TRUE, depends=c("tanh_cline","show_cline","killing")}
 drift <- function (x,s,sigma=1) {
     -(2*sqrt(s)/sigma) * (1-tanh(-2*x*sqrt(s)/sigma)^2) / (1+tanh(-2*x*sqrt(s)/sigma))
 }
 nwalks <- 1e4
-ntimes <- 1e3
+ntimes <- 3e3
+total.time <- 10
 s <- 0.1
-# want total time to be 1, so:
-eps <- 1/sqrt(ntimes)
-rws <- rbind(0,matrix( rnorm(nwalks*(ntimes-1))*eps, nrow=(ntimes-1), ncol=nwalks ))
+dt <- total.time/ntimes
+# put the noise in rws
+rws <- rbind( rnorm(nwalks), # initial conditions
+             matrix( rnorm(nwalks*(ntimes-1)), nrow=(ntimes-1), ncol=nwalks ) )
+# and then integrate over it
 for (k in 2:ntimes) {
-    rws[k,] <- rws[k-1,]+rws[k,]+drift(rws[k-1,],s)
+    rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],s)
 }
 layout( t(1:2), widths=c(3,1) )
-matplot(rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
-plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
+matplot(seq(0,total.time,length.out=ntimes),rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
+legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
+plot( (-1)*drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
+lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
 lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+The cline is in green and the local probability of being in a heterozygote is in black;
+the drift (multiplied by $-1$) is in red.
+
+Let's just check that's doing the right thing:
+```{r sim_lineage_check, cache=TRUE, depends="sim_lineage"}
+xbreaks <- seq(-3,3,length.out=100)
+xmids <- xbreaks[-1]-diff(xbreaks)/2
+dX <- apply(rws,2,diff)
+Xmeans <- tapply( dX, cut(rws[-nrow(rws),],breaks=xbreaks), mean )
+Xvar <- tapply( dX, cut(rws[-nrow(rws),],breaks=xbreaks), var )
+layout(1:2)
+plot(xmids,Xmeans/dt,ylab="mean dX")
+lines(xmids, drift(xmids,s), col='red', lwd=2)
+plot(xmids,Xvar/dt,ylab="variance dX")
+abline(h=1,col='red',lwd=2)
+```
+
+**Comparison to zero-width cline:**
+Let's start a bunch of random walks sorta far from the cline center,
+and look at the distribution of the time spend in heterozygotes.
+```{r sim_het_time, cache=TRUE, depends="sim_lineage"}
+nwalks <- 1e4
+ntimes <- 3e3
+total.time <- 100
+s <- 0.1
+dt <- total.time/ntimes
+# put the noise in rws
+rws <- rbind( -10, # initial conditions
+             matrix( rnorm(nwalks*(ntimes-1)), nrow=(ntimes-1), ncol=nwalks ) )
+# and then integrate over it
+for (k in 2:ntimes) {
+    rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],s)
+}
+layout( t(1:2), widths=c(3,1) )
+matplot(seq(0,total.time,length.out=ntimes),rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
+legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
+plot( (-1)*drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
+lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
+lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+Here is the distribution of $T=\int_0^{`r total.time`} f_H(X_t) dt$:
+```{r dist_het_time, cache=TRUE, depends="sim_het_time"}
+het.time <- dt*colSums( fH(rws,s=s) )
+layout(1:2)
+hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
+hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="histogram of log(T)") 
 ```
 
 
+Brownian motion with drift above zero
+=====================================
+
+A better model for the process might be Brownian motion
+that, when above zero, has negative drift,
+and is killed at some rate.
+In other words, 
+if $dX_t = -\theta(X_t) dt + dB_t$,
+where $\theta(x)=\theta$ for $x \ge 0$, then
+we want to know
+$$\begin{aligned}
+    u(x;\lambda,\theta):=\E^x \left[ \exp\left( - \lambda \int_0^\infty X_t dt \right) \right] .
+\end{aligned}$$
+(*Small problem:*  this isn't guarenteed to be on the correct size of zero when we want it to.)
+Well, by Girsanov's theorem, we know that
+$\E[f(X_t)] = \E[f(B_t)\zeta(t)]$
+where
+$$\begin{aligned}
+\zeta(t) = \exp\left[ \int_0^t \theta(B_u) dB_t - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+\end{aligned}$$
+and since by Tanaka's formula,
+$$\begin{aligned}
+\theta \max(0,B_t) - \max(0,B_0) = \int_0^t \theta(B_u) du + \theta \ell_t(0) ,
+\end{aligned}$$
+thus
+$$\begin{aligned}
+\zeta(t) = \exp\left[ \theta \max(0,B_t) - \theta \max(0,B_0) - \theta \ell_t(0) - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+\end{aligned}$$
+
+
+More than we need to know
+-------------------------
+
+According to Karatzas & Shreve (1984)
+(with their $\delta=\theta_1=0$),
+if $dX_t = -\theta(X_t) dt + dB_t$,
+where $\theta(x)=\theta$ for $x \ge 0$, then
+if we define
+$$
+\begin{aligned}
+h(s;x,\mu) = \frac{|x|}{\sqrt{2\pi s^3}} \exp\left[-\frac{(x+\mu s)^2}{2s}\right] \qquad x>0 ,
+\end{aligned}
+$$
+(this is the density of the first time a BM with drift $\mu$ started at $x$ hits 0),
+then
+$$
+\begin{aligned}
+p_t(x,z) 
+&= \P\{ X_t = z \mid X_0 = x \}\\
+&= \begin{cases}
+    2 \int_0^\infty \int_0^t h(t-\tau;b-z,0) h(\tau;x+b,\theta) d\tau db
+        & \qquad x \ge 0, \quad z\le 0 \\
+    2 \int_0^\infty \int_0^t e^{2\theta z} h(t-\tau;b,0) h(\tau;x+b,\theta) d\tau db & \\
+    \qquad {} + \frac{1}{\sqrt{2\pi t}} 
+        \left\{ 
+            \exp\left[ -\frac{ (x-z+\theta t)^2 }{2t} \right]
+            +\exp\left[ -\frac{ (x+z-\theta t)^2 }{2t} - 2 \theta x \right]
+        \right\}
+        & \qquad x \ge 0, \quad z > 0 .
+\end{cases}
+\end{aligned}
+$$
+Also, $p_t(x,z;\theta)=p_t(-x,-z;-\theta)$ gets the same expressions for $x<0$.
 
