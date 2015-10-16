@@ -12,6 +12,8 @@ $$
 ```{r doc_setup, include=FALSE}
 fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
+library(ReacTran)
+library(deSolve)
 ```
 
 *Useful functions used below:*
@@ -185,6 +187,30 @@ het.time <- weighted_time( rws, tanh_het, s=s )
 layout(1:2)
 hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
 hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="histogram of log(T)") 
+```
+
+The exact solution
+------------------
+
+Let
+$$
+\zeta(x,t,r) = \P\{ T_r > t \} .
+$$
+Then the Kolmogorov forward equation tells us that $\zeta$ solves the following differential equation:
+$$\begin{aligned}
+    \frac{d}{dt} \zeta(x,t,r) 
+    &= 
+    \frac{\sigma^2}{2} \frac{d^2}{dx^2} \zeta(x,t,r) + \frac{d}{dx} \log(p(x)) \frac{d}{dx} \zeta(x,t,r)  - r f_H(x) \zeta(x,t,r)  \\
+    \zeta(x,0,r) = 0 .
+\end{aligned}$$
+
+So, let's solve that, numerically.
+We'll use the `ReacTran` library:
+```{r solve_pde}
+thegrid <- setup.grid.1D(x.up=-10, x.down=10, N = 1000)
+driftfn <- setup.prop.1D(grid=thegrid, func=tanh_drift, s=s)
+hetfn <- setup.prop.1D(grid=thegrid, func=tanh_het, s=s)
+# ode.1D( )
 ```
 
 
