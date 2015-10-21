@@ -7,6 +7,7 @@ $$
 \newcommand{\E}{\mathbb{E}}
 \renewcommand{\P}{\mathbb{P}}
 \DeclareMathOperator{\sgn}{sgn}
+\newcommand{\grad}{\nabla}
 $$
 
 ```{r doc_setup, include=FALSE}
@@ -46,8 +47,8 @@ sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
     attr(rws,"dt") <- dt
     return(rws)
 }
-weighted_time <- function (rws, weight.fn, ...) {
-    colSums( weight.fn(rws,...) ) * attr(rws,"dt")
+weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
+    colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
 }
 ```
 
@@ -198,20 +199,66 @@ $$
 $$
 Then the Kolmogorov forward equation tells us that $\zeta$ solves the following differential equation:
 $$\begin{aligned}
-    \frac{d}{dt} \zeta(x,t,r) 
+    \frac{\partial}{\partial t} \zeta(x,t,r) 
     &= 
-    \frac{\sigma^2}{2} \frac{d^2}{dx^2} \zeta(x,t,r) + \frac{d}{dx} \log(p(x)) \frac{d}{dx} \zeta(x,t,r)  - r f_H(x) \zeta(x,t,r)  \\
-    \zeta(x,0,r) = 0 .
+    \frac{\sigma^2}{2} \frac{\partial^2}{\partial x^2} \zeta(x,t,r) + \frac{\partial }{\partial x} \log(p(x)) \frac{\partial }{\partial x} \zeta(x,t,r)  - r f_H(x) \zeta(x,t,r)  \\
+    \zeta(x,0,r) = 1 .
 \end{aligned}$$
 
 So, let's solve that, numerically.
-We'll use the `ReacTran` library:
-```{r solve_pde}
-thegrid <- setup.grid.1D(x.up=-10, x.down=10, N = 1000)
-driftfn <- setup.prop.1D(grid=thegrid, func=tanh_drift, s=s)
+We'll use the `ReacTran` library,
+which in 1D solves equations of the form
+$$\begin{aligned}
+   \frac{\partial C}{\partial t} 
+   &= 
+   \frac{1}{A} \grad \cdot A \left( D \grad C - v C \right) \\
+   &= 
+   \left( \frac{1}{A} \grad AD - v \right) \cdot \grad C 
+   - \frac{1}{A} \grad A \cdot v C 
+   + D \Delta C \\
+\end{aligned}$$
+which is the same as what we have if we let $D=\sigma^2/2$ and $A=p$ and $v=0$.
+```{r solve_pde, cache=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 1000)
+clinefn <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
 hetfn <- setup.prop.1D(grid=thegrid, func=tanh_het, s=s)
-# ode.1D( )
+xx <- seq(-15,15,length.out=500)
+pde.fn <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+    list( tran - r * hetfn$mid * y )
+}
+yinit <- rep(1.0,thegrid$N)
+tt <- seq(0,100,length.out=500)
+r <- 1
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
+image(pde.soln,legend=TRUE,main="prob of no recomb by t", yaxt='n', ylab='space')
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
+
+It's reassuring the solution is between 0 and 1.
+Let's spot check that with the simulation.
+Here it is at $t=`r tau`$:
+```{r check_pde_soln, cache=TRUE}
+check.t <- function (alpha) {
+    t.tau <- which.min(abs(tt-alpha*tau))
+    probs <- exp( - weighted_time( rws, tanh_het, s=s, use.t=1:floor(nrow(rws)*alpha) ) )
+    plot(rws[1,],probs,xlab='initial location', ylab=paste('probability of no recomb by t=',alpha*tau),ylim=c(0,1))
+    lines(lowess(rws[1,],probs,f=0.05),col='red',lwd=2)
+    lines(thegrid$x.int,pde.soln[t.tau,],col='green',lwd=2)
+    legend("topright",lwd=2,col=c("red","green"),legend=c("mean","numerical solution"))
+}
+check.t(1)
+```
+and, at other values of $t$:
+```{r check_pde_soln_2, cache=TRUE, depends="check_pde_soln"}
+layout(t(1:2))
+check.t(0.05)
+check.t(0.1)
+check.t(0.25)
+check.t(0.5)
+```
+**Looks pretty good.**
+
 
 
 Comparison, by simulation
@@ -221,7 +268,7 @@ Here are distributions of $T=\int_0^{`r tau`} f_H(X_t) dt$
 for two different starting points: $x=0$ and $x=-3$,
 and five different models:
 
-- **tanh:** the ``correct'' model;
+- **tanh:** the "correct" model;
 - **reflected:** a Brownian motion reflected at zero and counting one-half time in a neighborhood of size $\sigma/\sqrt{s}$;
 - **reflected tanh:** a Brownian motion reflected at zero and counting time weighted by the $\tanh$ cline;
 - **pushed:** a Brownian motion pushed back at rate $4\sigma\sqrt{s}$ above zero and counting time above zero;
