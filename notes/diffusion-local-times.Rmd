@@ -52,6 +52,45 @@ weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
 }
 ```
 
+The goal
+========
+
+The key quantity we compute with diffusion theory 
+is the probability that a lineage, 
+begun at location $x$ and killed at rate $r$ when in heterozygotes,
+is still alive at time $\tau$.
+Denote this by
+$$
+\begin{aligned}
+    \zeta(x,r,\tau,\sigma).
+\end{aligned}
+$$
+
+Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
+at a location at recombination distance $r$ from the selected site
+inherits from the left-hand side of the barrier
+(i.e., an ancestor on $(-\infty,0)$)
+$\tau$ generations ago.
+(Note that $r$ should be scaled by the density and fecundity of heterozygotes in the cline --
+see below.)
+For an individual to the left of the barrier ($x<0$),
+the probability of inheriting from the left of the barrier at $\tau$
+is the probability that no recombination at the barrier has occurred,
+plus one-half the probability that recombination in a heterozygote has occurred,
+i.e., $\zeta +(1-\zeta)/2=(1+\zeta)/2$.
+If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
+i.e., $(1-\zeta)/2$.
+Combining these,
+the probability of ending up on the left-hand side is
+$$
+\begin{aligned}
+    p(x,r,\tau,A) = 
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+\end{aligned}
+$$
+
+
+
 Approximations, generally
 =========================
 
@@ -154,9 +193,9 @@ $$
 ```{r sim_lineage,cache=TRUE}
 tanh_drift
 nwalks <- 1e4
-ntimes <- 1e3
+ntimes <- 4e3
 s <- 0.1
-tau <- 10
+tau <- 5
 xx <- seq(-15,15,length.out=500)
 tt <- seq(0,tau,length.out=ntimes)
 rws <- sim_diffusion( tanh_drift, tau, nwalks, ntimes, s=s, xinit=rnorm(nwalks) )
@@ -207,7 +246,7 @@ $$\begin{aligned}
 
 So, let's solve that, numerically.
 We'll use the `ReacTran` library,
-which in 1D solves equations of the form
+which in 1D solves equations with advection-diffusion parts of the form:
 $$\begin{aligned}
    \frac{\partial C}{\partial t} 
    &= 
@@ -218,18 +257,47 @@ $$\begin{aligned}
    + D \Delta C \\
 \end{aligned}$$
 which is the same as what we have if we let $D=\sigma^2/2$ and $A=p$ and $v=0$.
-```{r solve_pde, cache=TRUE}
-thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 1000)
+Here is the setup:
+```{r solve_pde_setup, cache=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
 clinefn <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
 hetfn <- setup.prop.1D(grid=thegrid, func=tanh_het, s=s)
-xx <- seq(-15,15,length.out=500)
+yinit <- rep(1.0,thegrid$N)
+tt <- seq(0,tau,length.out=100)
+r <- 1
+```
+
+First, two quick checks: First, by setting $f_H=1$,
+we should have the solution $u(x,t,r) = \exp(-tr)$.
+Then, by setting $\sigma$ to be very small, the solution at $x$ should be $\exp(-trf_H(x))$.
+```{r solve_pde_check, cache=TRUE, depends="solve_pde_setup"}
+layout(t(1:2))
+test.hetfn <- setup.prop.1D(grid=thegrid, func=function(x){rep(1,length(x))})
+pde.fn <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+    list( tran - r * test.hetfn$mid * y )
+}
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
+matplot(pde.soln,type='l',ylab="probability of no recomb", col='black',log='y')
+lines(tt,exp(-r*tt),lwd=2,lty=2,col='red')
+## no diffusion
+pde.fn <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, A=clinefn, D=1e-6, dx=thegrid)$dC
+    list( tran - r * hetfn$mid * y )
+}
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
+plot.x <- sort(match(sample(thegrid$x.mid[thegrid$x.mid>-5 & thegrid$x.mid<5],12),thegrid$x.mid))
+matplot(pde.soln[,plot.x],type='l',ylab="probability of no recomb", col=rainbow(length(plot.x)), lty=1 )
+matpoints( exp(outer( tt, -r*hetfn$mid[plot.x], "*" )), lty=4, col=rainbow(length(plot.x)), pch=20 )
+```
+**Looks good.**
+
+Now, to solve the real problem:
+```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
 pde.fn <- function (t,y,parms,...) {
     tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
     list( tran - r * hetfn$mid * y )
 }
-yinit <- rep(1.0,thegrid$N)
-tt <- seq(0,100,length.out=500)
-r <- 1
 pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
 image(pde.soln,legend=TRUE,main="prob of no recomb by t", yaxt='n', ylab='space')
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
@@ -252,10 +320,10 @@ check.t(1)
 and, at other values of $t$:
 ```{r check_pde_soln_2, cache=TRUE, depends="check_pde_soln"}
 layout(t(1:2))
-check.t(0.05)
 check.t(0.1)
-check.t(0.25)
-check.t(0.5)
+check.t(0.2)
+check.t(0.4)
+check.t(0.8)
 ```
 **Looks pretty good.**
 
@@ -322,16 +390,16 @@ precombs <- lapply( lt.comparison, function (lts) {
 layout(t(1:2))
 for (k in seq_along(precombs)) {
     matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
-    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+    legend("topright",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
 }
 for (k in seq_along(precombs)) {
     matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), log='xy', main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1  )
-    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+    legend("bottomright",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
 }
 ```
 
 Here's the same thing for a much longer time:
-```{r sim_general_longer, fig.height=3*fig.dim, cache=TRUE}
+```{r sim_general_longer, fig.height=fig.dim, cache=TRUE}
 nwalks <- 1e3
 ntimes <- 1e4
 s <- 0.1
