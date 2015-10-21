@@ -7,6 +7,8 @@ else
 endif
 PANDOC_OPTS =  --to html --from markdown-implicit_figures --self-contained --standalone --section-divs --template $(THIS_DIR)/rmarkdown-template.html --variable 'theme:bootstrap' --include-in-header $(THIS_DIR)/resources/header-scripts.html --mathjax --variable 'mathjax-url:$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML' --no-highlight --variable highlightjs=$(THIS_DIR)/resources/highlight 
 
+.PHONY : test
+
 %.md : %.Rmd
 	cd $(dir $<) && Rscript -e 'knitr::knit(basename("$<"),output=basename("$@"))'
 
@@ -26,3 +28,5 @@ PANDOC_OPTS =  --to html --from markdown-implicit_figures --self-contained --sta
 %.png : %.pdf
 	convert -density 300 $< -flatten $@
 
+test : 
+	echo "Directory of this makefile: $(THIS_DIR) ."
