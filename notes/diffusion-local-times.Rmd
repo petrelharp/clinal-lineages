@@ -1,0 +1,747 @@
+---
+title: "Diffusion local times and the time until recombination"
+date: "`r date()`"
+---
+
+$$
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\grad}{\nabla}
+$$
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
+library(ReacTran)
+library(deSolve)
+```
+
+*Useful functions used below:*
+```{r setup_fns}
+pcline <- function (x,r,tau=1,sigma=1) {
+    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
+}
+tanh_cline <- function (x,s,sigma=1) {
+    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+}
+tanh_drift <- function (x,s,sigma=1) {
+    # log-derivative of tanh_cline
+    -(2*sqrt(s)/sigma) * (1-tanh(-2*x*sqrt(s)/sigma)^2) / (1+tanh(-2*x*sqrt(s)/sigma))
+}
+tanh_het <- function (x,s,sigma=1) {
+    # prob of being in a het = (1-s)(1-p)/(1-s(1-p))
+    pp <- tanh_cline(x,s,sigma=sigma)
+    (1-s)*(1-pp)/(1-s*(1-pp))
+}
+sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
+    # want total time to be tau, so:
+    dt <- tau/ntimes
+    # put the noise in rws
+    rws <- matrix( c( rep_len(xinit,nwalks), # initial conditions
+                 rnorm(nwalks*(ntimes-1)) ), nrow=ntimes, ncol=nwalks, byrow=TRUE )
+    # and then integrate over it
+    for (k in 2:ntimes) {
+        rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],...)
+    }
+    attr(rws,"dt") <- dt
+    return(rws)
+}
+weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
+    colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
+}
+```
+
+Approximations, generally
+=========================
+
+We have a function $p(x)$ (the local proportion of $A$ alleles),
+and another function $f_H(x)$ (the local probability an $A$ is in a heterozygote),
+which happens to equal $(1-s)(1-p(x))/(1-s(1-p(x)))$ but we might not want to use that fact;
+then $p$ defines a diffusion $X$ by $dX_t = \log(p(x))' dt + dB_t$
+and then we define $H_t = \int_0^t f_H(X_s) ds$.
+We want to know $\E^x[\exp(-r H_t)]$ as a function of $x$, $r$, and $t$.
+
+More concretely,
+we want the distribution of the time to first recombination in a heterozygote;
+denote this by $T$, so that
+$$
+\begin{aligned}
+\P\{ T > t \} 
+&= \exp\left\{ - \int_0^t r f_H(X_s) ds \right\} \\
+&= \exp\left\{ - \int_{-\infty}^{\infty} r f_H(x) \ell_t(x) dx \right\}  ,
+\end{aligned}
+$$
+where $\ell$ is the local time density for $X$.
+This is the Laplace transform of 
+the heterozygote-weighted local time, $H_t = \int f_H(x) \ell_t(x) dx$,
+so it means that we want to come up with a reasonable approximation to this quantity.
+
+This suggests two possible approximations:
+
+1. A lineage doesn't go past the hybrid zone,
+   and only recombines when it's in the hybrid zone,
+   which has width something,
+   and where the probability of being in a heterozygote is 1/2.
+
+2. A lineage spends little time in the hybrid zone,
+   and recombines when it's past the hybrid zone,
+   where it's type is rare,
+   thus replacing both the drift $\partial_x \log(p(x))$
+   and the probability of being in a heterozygote $f_H(x)$ with step functions.
+
+The first one seems more natural,
+but it requires two parameters: 
+what the width should be and where the barrier should be.
+
+
+The right model
+===============
+
+When the lineage is at $x$, 
+the lineage recombines to the other background
+in a given generation
+with probability equal to the recombination rate 
+multiplied by the probability of being found in a heterozygote.
+If $p_{AB}(x)$ is the local fraction of heterozygotes,
+and heterozygotes have relative fecundity $1-s$,
+then the probability of being in a heterozygote is
+$(1-s)p_{AB}(x)/((1-s)p_{AB}(x)+2p_{AA}(x))$;
+if diploid genotypes are assorted randomly,
+then $p_{AB} = 2p(1-p)$ and $p_{AA}=p^2$, so the probability that an $A$ lineage
+passes through a heterozygote in a given generation is
+$$
+\begin{align*}
+f_H(x) 
+&= 
+\frac{ (1-s)p(x)(1-p(x)) }{ p(x)^2 + (1-s) p(x) (1-p(x)) }
+&= 
+\frac{ (1-s)(1-p(x)) }{ p(x) + (1-s) (1-p(x)) } \\
+&= 
+\frac{ (1-s)(1-p(x)) }{ 1 - s (1-p(x)) } .
+\end{align*}
+$$
+
+Bazykin's approximation to a cline is
+$$
+p(x) = \frac{1}{2} (1+\tanh(-2x\sqrt{s}/\sigma))
+$$
+Here's what that looks like:
+```{r tanh_cline}
+tanh_cline
+s <- 0.1
+xx <- seq(-15,15,length.out=500)
+plot(xx, (-1)*tanh_drift(xx,s=s), type='l', col='red', xlab="space", ylab='proportion or drift')
+lines(xx, tanh_cline(xx,s=s), col='black')
+lines(xx, 2*tanh_cline(xx,s=s)*(1-tanh_cline(xx,s=s)), col='blue')
+lines(xx, tanh_het(xx,s=s), col='green')
+legend("topleft",lty=1,col=c("black","red","blue","green"),
+        legend=c("p(x)","-log(p(x))'","2p(1-p)","prob of het"))
+```
+
+A lineage does something a bit more complicated,
+but let's just run a random walk with drift equal to the logarithmic derivative of $p(x)$,
+i.e.,
+$$
+\begin{align*}
+    \partial_x \log(p(x)) 
+    &= -\frac{2\sqrt{s}}{\sigma} 
+        \frac{1-\tanh^2(-2x\sqrt{s}/σ)}{1+\tanh(-2x\sqrt{s}/σ)} .
+\end{align*}
+$$
+(Really, the drift should be the logarithmic derivative of $p(x)(1-sf_H(x))$.)
+
+```{r sim_lineage,cache=TRUE}
+tanh_drift
+nwalks <- 1e4
+ntimes <- 1e3
+s <- 0.1
+tau <- 10
+xx <- seq(-15,15,length.out=500)
+tt <- seq(0,tau,length.out=ntimes)
+rws <- sim_diffusion( tanh_drift, tau, nwalks, ntimes, s=s, xinit=rnorm(nwalks) )
+layout( t(1:2), widths=c(3,1) )
+matplot(tt, rws[,1:80],type='l', ylab='position', xlab='time', ylim=range(rws) )
+legend("topright",lwd=2,legend=c("prob of het","cline","drift"),col=c("black","green","red"))
+plot( (-1)*tanh_drift(xx,s=s), xx, col='red', lwd=2, type='l', ylim=range(rws), ylab='', xlab='drift or prob' )
+lines( tanh_cline(xx,s=s), xx, col='green', lwd=2 )
+lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+The cline is in green and the local probability of being in a heterozygote is in black;
+the drift (multiplied by $-1$) is in red.
+
+Now let's get local times for those walks.
+```{r lineage_local_times,cache=TRUE,depends="sim_lineage"}
+xx <- seq( min(rws), max(rws), length.out=200 )
+xmids <- xx[-1]-diff(xx)/2
+lts <- attr(rws,"dt")*apply( matrix(findInterval(rws,xx),nrow=nrow(rws)), 2, tabulate, nbins=length(xx)-1 )
+layout( t(1:2), widths=c(3,1) )
+matplot(lts[,1:30],xmids,type='l',xlab="local time", ylab="space")
+plot( tanh_cline(xx,s=s), xx, col='green', lwd=2, type='l', ylim=range(rws), ylab='' )
+lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
+```
+
+
+Here is the distribution of $T=\int_0^{`r tau`} f_H(X_t) dt$:
+```{r dist_het_time, cache=TRUE, depends="sim_het_time"}
+het.time <- weighted_time( rws, tanh_het, s=s )
+layout(1:2)
+hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
+hist( log(het.time), breaks=50, xlab="log(time in hets)", freq=FALSE , main="histogram of log(T)") 
+```
+
+The exact solution
+------------------
+
+Let
+$$
+\zeta(x,t,r) = \P\{ T_r > t \} .
+$$
+Then the Kolmogorov forward equation tells us that $\zeta$ solves the following differential equation:
+$$\begin{aligned}
+    \frac{\partial}{\partial t} \zeta(x,t,r) 
+    &= 
+    \frac{\sigma^2}{2} \frac{\partial^2}{\partial x^2} \zeta(x,t,r) + \frac{\partial }{\partial x} \log(p(x)) \frac{\partial }{\partial x} \zeta(x,t,r)  - r f_H(x) \zeta(x,t,r)  \\
+    \zeta(x,0,r) = 1 .
+\end{aligned}$$
+
+So, let's solve that, numerically.
+We'll use the `ReacTran` library,
+which in 1D solves equations of the form
+$$\begin{aligned}
+   \frac{\partial C}{\partial t} 
+   &= 
+   \frac{1}{A} \grad \cdot A \left( D \grad C - v C \right) \\
+   &= 
+   \left( \frac{1}{A} \grad AD - v \right) \cdot \grad C 
+   - \frac{1}{A} \grad A \cdot v C 
+   + D \Delta C \\
+\end{aligned}$$
+which is the same as what we have if we let $D=\sigma^2/2$ and $A=p$ and $v=0$.
+```{r solve_pde, cache=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 1000)
+clinefn <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
+hetfn <- setup.prop.1D(grid=thegrid, func=tanh_het, s=s)
+xx <- seq(-15,15,length.out=500)
+pde.fn <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+    list( tran - r * hetfn$mid * y )
+}
+yinit <- rep(1.0,thegrid$N)
+tt <- seq(0,100,length.out=500)
+r <- 1
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
+image(pde.soln,legend=TRUE,main="prob of no recomb by t", yaxt='n', ylab='space')
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+```
+
+It's reassuring the solution is between 0 and 1.
+Let's spot check that with the simulation.
+Here it is at $t=`r tau`$:
+```{r check_pde_soln, cache=TRUE}
+check.t <- function (alpha) {
+    t.tau <- which.min(abs(tt-alpha*tau))
+    probs <- exp( - weighted_time( rws, tanh_het, s=s, use.t=1:floor(nrow(rws)*alpha) ) )
+    plot(rws[1,],probs,xlab='initial location', ylab=paste('probability of no recomb by t=',alpha*tau),ylim=c(0,1))
+    lines(lowess(rws[1,],probs,f=0.05),col='red',lwd=2)
+    lines(thegrid$x.int,pde.soln[t.tau,],col='green',lwd=2)
+    legend("topright",lwd=2,col=c("red","green"),legend=c("mean","numerical solution"))
+}
+check.t(1)
+```
+and, at other values of $t$:
+```{r check_pde_soln_2, cache=TRUE, depends="check_pde_soln"}
+layout(t(1:2))
+check.t(0.05)
+check.t(0.1)
+check.t(0.25)
+check.t(0.5)
+```
+**Looks pretty good.**
+
+
+
+Comparison, by simulation
+=========================
+
+Here are distributions of $T=\int_0^{`r tau`} f_H(X_t) dt$
+for two different starting points: $x=0$ and $x=-3$,
+and five different models:
+
+- **tanh:** the "correct" model;
+- **reflected:** a Brownian motion reflected at zero and counting one-half time in a neighborhood of size $\sigma/\sqrt{s}$;
+- **reflected tanh:** a Brownian motion reflected at zero and counting time weighted by the $\tanh$ cline;
+- **pushed:** a Brownian motion pushed back at rate $4\sigma\sqrt{s}$ above zero and counting time above zero;
+- **pushed tanh:** a Brownian motion pushed back at rate $4\sigma\sqrt{s}$ above zero and counting time weighted by the $\tanh$ cline.
+
+```{r sim_general, fig.height=3*fig.dim, cache=TRUE}
+nwalks <- 1e4
+ntimes <- 1e3
+s <- 0.1
+tau <- 10
+initvals <- c(0,-3)
+lt.comparison <- lapply( initvals, function (xinit) { list(
+        tanh=weighted_time( 
+               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s, xinit=xinit ),
+               tanh_het, s=s
+           ),
+        reflected=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                function (x,s) { ifelse(abs(x)<1/(2*sqrt(s)), 1/2, 0) }, s=s
+            ),
+        reflected_tanh=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                tanh_het, s=s
+            ),
+        pushed=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                function (x) { x>0 }
+            ),
+        pushed_tanh=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                tanh_het, s=s
+            )
+        ) } )
+layout(matrix(1:(length(lt.comparison)*length(lt.comparison[[1]])),ncol=2))
+for (k in seq_along(lt.comparison)) {
+    for (j in seq_along(lt.comparison[[k]])) {
+        hist(lt.comparison[[k]][[j]],xlim=range(lt.comparison),main=names(lt.comparison[[k]])[j],breaks=seq(0,tau,length.out=50),xlab="time in hets")
+    }
+}
+```
+
+Of course, we aren't actually trying to estimate the distribution of $T$ itself,
+but rather the probabilities of recombination (the Laplace transform).
+Here are these probabilities, as a function of $r$
+(the second plots are on a log-log scale):
+```{r recomb_prob_comparisons, cache=TRUE, depends="sim_general"}
+rvals <- exp(seq(log(.001),log(0.5),length.out=400))
+precombs <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) sapply( rvals, function (r) { mean((-1)*expm1(-r*lt)) } ) )
+    } )
+layout(t(1:2))
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), log='xy', main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1  )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+```
+
+Here's the same thing for a much longer time:
+```{r sim_general_longer, fig.height=3*fig.dim, cache=TRUE}
+nwalks <- 1e3
+ntimes <- 1e4
+s <- 0.1
+tau <- 100
+initvals <- c(0,-3)
+lt.comparison <- lapply( initvals, function (xinit) { list(
+        tanh=weighted_time( 
+               sim_diffusion( tanh_drift,tau,nwalks,ntimes,s=s, xinit=xinit ),
+               tanh_het, s=s
+           ),
+        reflected=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                function (x,s) { ifelse(abs(x)<1/(2*sqrt(s)), 1/2, 0) }, s=s
+            ),
+        reflected_tanh=weighted_time(
+                -abs(sim_diffusion( function(...){0}, tau, nwalks, ntimes, xinit=xinit )),
+                tanh_het, s=s
+            ),
+        pushed=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                function (x) { x>0 }
+            ),
+        pushed_tanh=weighted_time(
+                sim_diffusion( function(x,s){ifelse(x>0,-4*sqrt(s),0)}, tau, nwalks, ntimes, s=s, xinit=xinit ),
+                tanh_het, s=s
+            )
+        ) } )
+tbreaks <- seq(0,tau,length.out=50)
+Tdists <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) tabulate(findInterval(lt,tbreaks),nbins=length(tbreaks)-1) )
+    } )
+rvals <- exp(seq(log(.001),log(0.5),length.out=400))
+precombs <- lapply( lt.comparison, function (lts) {
+        sapply( lts, function (lt) sapply( rvals, function (r) { mean((-1)*expm1(-r*lt)) } ) )
+    } )
+layout(t(1:2))
+for (k in seq_along(precombs)) {
+    matplot( tbreaks[-1]-diff(tbreaks)/2, Tdists[[k]], type='l', col=1:ncol(Tdists[[k]]), main=paste("x =",initvals[k]), ylim=range(Tdists), xlab="time in hets", lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+for (k in seq_along(precombs)) {
+    matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
+    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+}
+```
+
+
+
+
+Killing at Brownian local times
+===============================
+
+Now, let's look at the analytics for the first approximation.
+
+It states in [Takacs](https://projecteuclid.org/euclid.aoap/1177004703) that 
+if $\ell(x)$ is the local time at $x$ for Brownian motion run for time 1 and begun at 0,
+i.e.,
+$$
+\begin{aligned}
+    \ell(x) = \lim_{\epsilon \to 0} \frac{1}{\epsilon}
+        \text{measure}\{t \,:\, x \le B_t \le x+\epsilon, \, 0 \le t \le 1\}
+\end{aligned}
+$$
+then
+$$
+\begin{aligned}
+    \P\{ \ell(x) \le u \} = 2 \Phi(|x|+u)-1,
+\end{aligned}
+$$
+where $\Phi(x)=\P\{B_1 \le x\}$ is the Gaussian CDF.
+Differentiating this, $\P\{\ell \in du\} = \partial_u \P\{\ell \le u\}$, so
+$$
+\begin{aligned}
+    \P\{ \ell(x) = 0 \} &= 2 \Phi(|x|)-1 \\
+    \P\{ \ell(x) \in du \} &= 2 \phi(|x|+u) ,
+\end{aligned}
+$$
+where $\phi$ is the Gaussian density.
+
+Let's check this:
+```{r sim_rw, cache=TRUE}
+nwalks <- 1e4
+ntimes <- 1e3
+# want total time to be tau, so:
+eps <- 1/sqrt(ntimes)
+rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
+rws <- rbind(0,apply(rws,2,cumsum))
+matplot(seq(0,1,length.out=ntimes),rws[,1:20],type='l', ylab='position')
+```
+Here we've simulated `r nwalks` random walks for a total of `r ntimes` steps,
+and scaled steps to have this be a total Brownian time of 1.
+Let's check;
+this should just be a standard Gaussian:
+```{r final_dist}
+xh <- hist(rws[ntimes,],breaks=50,main="final position")
+lines( xh$mids, sum(xh$counts)*diff(pnorm(xh$breaks)) )
+```
+
+Now, let's check on the local time formula.
+The number of steps the random walk spends at position $k$ on a grid with spacing $\epsilon$
+and a time step of \gamma
+should be $\epsilon \times \ell(k\epsilon) / \gamma$.
+First, the local time at 0:
+```{r local_times_0, cache=TRUE, depends="sim_rw"}
+xh <- hist(colSums(abs(rws)<=1.5*eps)/ntimes/(3*eps),main="local time at 0", breaks=30)
+lines( xh$mids, sum(xh$counts)*diff( 2*pnorm(xh$breaks)-1 ), col='red' )
+```
+What about the local time at other locations?
+Note there is an atom at 0 now
+(that is depicted by the dots in the figures below),
+and that the discretization could trip us up;
+the colors (red/green/blue) use the (mid/upper/lower) points of the interval that we count in.
+```{r local_times, cache=TRUE, depends="sim_rw"}
+layout(matrix(1:4,nrow=2))
+for (loc in c(0.1, 0.2, 0.4, 0.6)) {
+    lts <- colSums(abs(rws-loc)<=1.5*eps)/ntimes/(3*eps)
+    zeros <- (lts==0)
+    pred.zero <- 2*pnorm(abs(loc)+c(0,1.5*eps,-1.5*eps))-1
+    xh <- hist(lts[!zeros],main=paste("local time at",loc), breaks=30, ylim=range(c(0,pred.zero*nwalks)))
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc)+xh$breaks)-1 ), col='red' )
+    points(rep(0,4), c(sum(zeros),pred.zero*nwalks), col=1:4, pch=20, cex=2)
+    # lower bound
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc+1.5*eps)+xh$breaks)-1 ), col=3 )
+    # upper bound
+    lines( xh$mids, sum(!zeros)*diff( 2*pnorm(abs(loc-1.5*eps)+xh$breaks)-1 ), col=4 )
+}
+```
+Clearly, the discretization is still tripping us up a bit,
+but it's pretty good.
+
+Its Laplace transform
+=====================
+
+Now suppose that something happens at rate $r$ relative to the local time at $x$
+(e.g., recombination to the other background).
+Then the chance that this has not happened by time 1 is
+$$
+\begin{aligned}
+\zeta(x,r) &:=
+\E\left[ e^{-r\ell(x)} \right] \\
+&=
+2\Phi(|x|)-1 + 
+\int_0^\infty e^{-rt} 2 \phi(|x|+t) dt \\
+&=
+2\Phi(|x|)-1 + 
+e^{r|x|} \int_{|x|}^\infty e^{-rt} 2 \phi(t) dt \\
+&=
+2\Phi(|x|)-1 + 
+2 e^{r|x|} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - rt - t^2/2 \right) dt \\
+&=
+2\Phi(|x|)-1 + 
+2 e^{r|x|+r^2/2} \int_{|x|}^\infty \frac{1}{\sqrt{2\pi}} \exp\left( - (t+r)^2/2 \right) dt \\
+&=
+2\Phi(|x|)-1 + 
+2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
+\end{aligned}
+$$
+At $r=0$ this equals 1, as it should, since it's the chance that nothing happens.
+For large $x$, since $1-\Phi(x) \sim e^{-x^2/2}/\sqrt{2\pi}x$,
+this is approximately 
+$1 + 2 \exp( r|x| + r^2/2 - (|x|+r)^2/2 )$,
+which goes to 1, as it should.
+
+
+Let's check that, too: why not?
+```{r killing, cache=TRUE, depends="sim_rw"}
+loc <- 0.1
+zeta <- function (x,r) {
+    2*pnorm(abs(x)) - 1 + 2 * exp( r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE) )
+}
+compare.rates <- as.data.frame( t( sapply( c(0.25,0.5,1,1.5,2,2.5,3), function (rate) {
+        visits <- colSums(abs(rws-loc)<=1.5*eps)
+        killed <- ( rbinom(ncol(rws),size=visits,prob=rate/ntimes/(3*eps)) == 0 )
+        c( 
+          rate=rate,
+          simulation=mean(killed), 
+          theory=zeta(loc,rate),
+          SE=sqrt(mean(killed)*(1-mean(killed))/nwalks)
+          )
+    } ) ) )
+with(compare.rates, {
+         plot( rate, theory, type='l', xlab="recomb rate", ylab="prob of recomb", col='red', ylim=c(0,1) ) 
+         points( rate, simulation, pch=20 )
+         arrows( x0=rate, y0=simulation-2*SE, y1=simulation+2*SE, angle=90, code=3 )
+    } )
+```
+
+This is very steep at $x=0$.
+Notice that as $x$ goes to 0,
+$$
+\begin{aligned}
+    \lim_{x \to 0} \zeta(x,r) 
+    &= 2 e^{r^2/2} (1-\Phi(r)) \\
+    &= \frac{2}{r\sqrt{2\pi}} + O(r^{-3}) .
+\end{aligned}
+$$
+so that the difference in the left and right limits is
+$$
+\begin{aligned}
+    \lim_{x \to 0-} p(x,r) 
+    -\lim_{x \to 0+} p(x,r) 
+    &= 
+    \frac{1}{2}+\frac{2}{r\sqrt{2\pi}} 
+    - \frac{1}{2}-\frac{2}{r\sqrt{2\pi}} 
+      +O(r^{-3}) \\
+    &=
+    \frac{4}{r\sqrt{2\pi}}
+      +O(r^{-3}) 
+\end{aligned}
+$$
+
+Let's also look at the slope of $p$ at $x=0$.
+Since $\partial_x |x| = \sgn(x)$,
+$$
+\begin{aligned}
+    \partial_x \zeta(x,r)
+    &=
+    2 \sgn(x) \left(
+    \phi(|x|)
+    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
+    - e^{r|x|+r^2/2} \phi(|x|+r)
+      \right)
+\end{aligned}
+$$
+and so
+$$
+\begin{aligned}
+    -\partial_x p(x)
+    &=
+    \phi(|x|)
+    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
+    - e^{r|x|+r^2/2} \phi(|x|+r) \\
+    &\to
+    \frac{1}{\sqrt{2\pi}}(1-e^{r^2/2}e^{-r^2/2})
+    + r e^{r^2/2} (1-\Phi(r))  \qquad \text{as } x \to 0 \\
+    &=
+    r e^{r^2/2} (1-\Phi(r)) \\
+    &=
+    \frac{1}{\sqrt{2\pi}} + O(\frac{1}{r}) .
+\end{aligned}
+$$
+
+Also note that by the asymptotics for $1-\Phi(x)$,
+$$
+\begin{aligned}
+    \zeta(x,r) \approx 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) \qquad \text{for large }|x| .
+\end{aligned}
+$$
+
+
+
+What this says about clines
+===========================
+
+The above restricted to standard Brownian motion on one unit of time.
+Really, we will want to use this across $\tau$ generations,
+modeling a random walk with variance $\sigma^2$ per generation.
+
+The key quantity we want is the probability that a Brownian motion with variance $\sigma^2$ killed at rate $r$
+with respect to its local time at $x$ was still alive at time $\tau$.
+Denote this by
+$$
+\begin{aligned}
+    \zeta(x,r,\tau,\sigma).
+\end{aligned}
+$$
+By Brownian scaling,
+since $B_{ct}$ has the same distribution as $\sqrt{c}B_t$,
+$$
+\begin{aligned}
+    \zeta(x,r,\tau,\sigma) 
+    &=
+    \zeta(x,r\tau,1,\sqrt{\tau}\sigma) \\
+    &=
+    \zeta(x/\sqrt{\tau\sigma^2},r\tau) ,
+\end{aligned}
+$$
+where
+$$
+\begin{aligned}
+    \zeta(x,r)
+    &=
+    1 - 2(1-\Phi(|x|)) + 
+    2 e^{r|x|+r^2/2} \left( 1-\Phi(|x|+r) \right) .
+\end{aligned}
+$$
+
+**Cline flattening:**
+immediately, this tells us how a cline gets wider as time progresses:
+for a fixed $r$, the width grows as $\sqrt{\tau}$.
+It also tells us that clines with the same $r\tau$ have the same shape,
+after rescaling the width by $\sqrt{\tau}$.
+Also, this tells us we only have a cline for $r$ of order at least $1/\tau$:
+for smaller $r$, the locus is still completely linked to the selected locus,
+and hence a step function.
+
+More generally, here's what $\zeta$ looks like:
+```{r plot_zeta, fig.height=2*fig.dim}
+layout(1:2)
+xvals <- seq(0,5,length.out=150)
+rvals <- seq(0,10,length.out=100)
+zetavals <- outer( xvals, rvals, zeta )
+matplot(xvals,zetavals,type='l',xlab="x",ylab=expression(zeta),col=rainbow(length(rvals)))
+lrvals <- seq(1,length(rvals),length.out=6)
+legend("bottomright",lty=1,col=rainbow(length(rvals))[lrvals],legend=paste("r=",round(rvals[lrvals],digits=2)))
+matplot(rvals,t(zetavals),type='l',xlab="r",ylab=expression(zeta),col=rainbow(length(xvals)))
+lxvals <- seq(1,length(xvals),length.out=6)
+legend("bottomright",lty=1,col=rainbow(length(xvals))[lxvals],legend=paste("x=",round(xvals[lxvals],digits=2)),bg='white')
+```
+
+Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
+at a location at recombination distance $r$ from the selected site
+inherits from the left-hand side of the barrier
+(i.e., an ancestor on $(-\infty,0)$)
+$\tau$ generations ago.
+(Note that $r$ should be scaled by the density and fecundity of heterozygotes in the cline --
+see below.)
+For an individual to the left of the barrier ($x<0$),
+the probability of inheriting from the left of the barrier at $\tau$
+is the probability that no recombination at the barrier has occurred,
+plus one-half the probability that recombination in a heterozygote has occurred,
+i.e., $\zeta +(1-\zeta)/2=(1+\zeta)/2$.
+If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
+i.e., $(1-\zeta)/2$.
+Combining these,
+the probability of ending up on the left-hand side is
+$$
+\begin{aligned}
+    p(x,r,\tau,A) = 
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+\end{aligned}
+$$
+
+Here's the cline shape:
+```{r show_cline, cache=TRUE}
+pcline
+xx <- seq(-15,15,length.out=500)
+for (tau in c(5,50)) {
+    plot(xx, pcline(xx,r=1), type='n', 
+            xlab="distance from cline center", ylab="prob inherited from the left", 
+            main=as.expression(substitute(tau==mytau,list(mytau=tau))) )
+    rr <- seq(0,0.2,length.out=11)
+    pp <- sapply( rr, function (r) { pcline(xx,r=r,tau=tau) } )
+    matplot(xx,pp,type='l',lty=1,col=rainbow(length(rr)),add=TRUE)
+    legend("topright",lty=1,col=rainbow(length(rr)),legend=paste("r=",rr))
+}
+```
+
+
+
+Brownian motion with drift above zero
+=====================================
+
+A better model for the process might be Brownian motion
+that, when above zero, has negative drift,
+and is killed at some rate.
+In other words, 
+if $dX_t = -\theta(X_t) dt + dB_t$,
+where $\theta(x)=\theta$ for $x \ge 0$, then
+we want to know
+$$\begin{aligned}
+    u(x;\lambda,\theta):=\E^x \left[ \exp\left( - \lambda \int_0^\infty X_t dt \right) \right] .
+\end{aligned}$$
+(*Small problem:*  this isn't guarenteed to be on the correct size of zero when we want it to.)
+Well, by Girsanov's theorem, we know that
+$\E[f(X_t)] = \E[f(B_t)\zeta(t)]$
+where
+$$\begin{aligned}
+\zeta(t) = \exp\left[ \int_0^t \theta(B_u) dB_t - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+\end{aligned}$$
+and since by Tanaka's formula,
+$$\begin{aligned}
+\theta \max(0,B_t) - \max(0,B_0) = \int_0^t \theta(B_u) du + \theta \ell_t(0) ,
+\end{aligned}$$
+thus
+$$\begin{aligned}
+\zeta(t) = \exp\left[ \theta \max(0,B_t) - \theta \max(0,B_0) - \theta \ell_t(0) - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+\end{aligned}$$
+
+
+More than we need to know
+-------------------------
+
+According to Karatzas & Shreve (1984)
+(with their $\delta=\theta_1=0$),
+if $dX_t = -\theta(X_t) dt + dB_t$,
+where $\theta(x)=\theta$ for $x \ge 0$, then
+if we define
+$$
+\begin{aligned}
+h(s;x,\mu) = \frac{|x|}{\sqrt{2\pi s^3}} \exp\left[-\frac{(x+\mu s)^2}{2s}\right] \qquad x>0 ,
+\end{aligned}
+$$
+(this is the density of the first time a BM with drift $\mu$ started at $x$ hits 0),
+then
+$$
+\begin{aligned}
+p_t(x,z) 
+&= \P\{ X_t = z \mid X_0 = x \}\\
+&= \begin{cases}
+    2 \int_0^\infty \int_0^t h(t-\tau;b-z,0) h(\tau;x+b,\theta) d\tau db
+        & \qquad x \ge 0, \quad z\le 0 \\
+    2 \int_0^\infty \int_0^t e^{2\theta z} h(t-\tau;b,0) h(\tau;x+b,\theta) d\tau db & \\
+    \qquad {} + \frac{1}{\sqrt{2\pi t}} 
+        \left\{ 
+            \exp\left[ -\frac{ (x-z+\theta t)^2 }{2t} \right]
+            +\exp\left[ -\frac{ (x+z-\theta t)^2 }{2t} - 2 \theta x \right]
+        \right\}
+        & \qquad x \ge 0, \quad z > 0 .
+\end{cases}
+\end{aligned}
+$$
+Also, $p_t(x,z;\theta)=p_t(-x,-z;-\theta)$ gets the same expressions for $x<0$.
