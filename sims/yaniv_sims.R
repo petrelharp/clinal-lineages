@@ -55,6 +55,10 @@ my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.an
 	#my.genos is a list of nloci*ninds dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.
 freqs = lapply(my.genos,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X),breaks=seq(0,ncol(X),deme_size)),mean)/2})})
 
+matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
+legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
+matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
 ###########################
 ###########################
 #To get distribution of chunks of ancestry B to the (wlog) right of the selected locus:
@@ -77,6 +81,25 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 
 #output is a nind*2 matrix, where each column is a chromosome. 
 #EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
+#D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
+
+add.alpha <- function(col, alpha=1){
+if(missing(col))
+stop("Please provide a vector of colours.")
+apply(sapply(col, col2rgb)/255, 2, 
+function(x) 
+rgb(x[1], x[2], x[3], alpha=alpha)) 
+
+}
+
+transparent_rainbow = add.alpha(rainbow(ndemes),0.75)
+
+D = 1; hist(testB[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+
+for(D in seq(3,ndemes,5)){
+	hist(testB[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.05),ylim=c(0,50),add=T)	
+}
+
 ######################
 ######################
 #Get LD between two specified loci:
@@ -97,7 +120,10 @@ get.LD = function(IND_DATA= sims.sums[[1]]$ind.ancest,DEME=1,CHR=1,POS1 = 0.5, P
 	return(LD)
 }
 
-LD_by_deme = sapply(1:ndemes,get.LD,POS1=0.5,POS2=0.6,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)
+#EXAMPLE: LD_by_deme = sapply(1:ndemes,get.LD,POS1=0.5,POS2=0.6,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)
+
+LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
+matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
 
 ######COMPARE TO THEORY:
 
