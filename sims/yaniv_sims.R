@@ -55,9 +55,12 @@ my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.an
 	#my.genos is a list of nloci*ninds dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.
 freqs = lapply(my.genos,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X),breaks=seq(0,ncol(X),deme_size)),mean)/2})})
 
+
+#pdf(file="freqplot.pdf")
 matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
 legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
 matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+#dev.off()
 
 ###########################
 ###########################
