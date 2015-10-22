@@ -53,11 +53,11 @@ sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
 weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
     colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
 }
-clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,ylab="probability",ylim=c(0,1),...) {
+clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,ylab="probability",ylim=c(0,1),legend=TRUE,...) {
     # plot output of deSolve as clines in a nice way
     graphics::matplot( x, t(soln[times,-1]), type='l', col=rainbow(length(times)), lty=1, 
             xlab="space", ylab=ylab, ylim=ylim, ...)
-    legend("bottomleft", lty=1, col=rainbow(length(times)), legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
+    if (legend) legend("bottomleft", lty=1, col=rainbow(length(times)), legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
     return( invisible( t(soln[times,-1]) ) )
 }
 ```
@@ -562,8 +562,8 @@ nwalks <- 1e4
 ntimes <- 1e3
 # want total time to be tau, so:
 eps <- 1/sqrt(ntimes)
-rws <- matrix( rnorm(nwalks*ntimes)*eps, nrow=ntimes, ncol=nwalks )
-rws <- rbind(0,apply(rws,2,cumsum))
+rws <- rbind(rep(0,nwalks), matrix( rnorm(nwalks*(ntimes-1))*eps, nrow=ntimes-1, ncol=nwalks ) )
+rws <- apply(rws,2,cumsum)
 matplot(seq(0,1,length.out=ntimes),rws[,1:20],type='l', ylab='position')
 ```
 Here we've simulated `r nwalks` random walks for a total of `r ntimes` steps,
@@ -662,72 +662,8 @@ with(compare.rates, {
     } )
 ```
 
-This is very steep at $x=0$.
-Notice that as $x$ goes to 0,
-$$
-\begin{aligned}
-    \lim_{x \to 0} \zeta(x,r) 
-    &= 2 e^{r^2/2} (1-\Phi(r)) \\
-    &= \frac{2}{r\sqrt{2\pi}} + O(r^{-3}) .
-\end{aligned}
-$$
-so that the difference in the left and right limits is
-$$
-\begin{aligned}
-    \lim_{x \to 0-} p(x,r) 
-    -\lim_{x \to 0+} p(x,r) 
-    &= 
-    \frac{1}{2}+\frac{2}{r\sqrt{2\pi}} 
-    - \frac{1}{2}-\frac{2}{r\sqrt{2\pi}} 
-      +O(r^{-3}) \\
-    &=
-    \frac{4}{r\sqrt{2\pi}}
-      +O(r^{-3}) 
-\end{aligned}
-$$
-
-Let's also look at the slope of $p$ at $x=0$.
-Since $\partial_x |x| = \sgn(x)$,
-$$
-\begin{aligned}
-    \partial_x \zeta(x,r)
-    &=
-    2 \sgn(x) \left(
-    \phi(|x|)
-    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
-    - e^{r|x|+r^2/2} \phi(|x|+r)
-      \right)
-\end{aligned}
-$$
-and so
-$$
-\begin{aligned}
-    -\partial_x p(x)
-    &=
-    \phi(|x|)
-    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
-    - e^{r|x|+r^2/2} \phi(|x|+r) \\
-    &\to
-    \frac{1}{\sqrt{2\pi}}(1-e^{r^2/2}e^{-r^2/2})
-    + r e^{r^2/2} (1-\Phi(r))  \qquad \text{as } x \to 0 \\
-    &=
-    r e^{r^2/2} (1-\Phi(r)) \\
-    &=
-    \frac{1}{\sqrt{2\pi}} + O(\frac{1}{r}) .
-\end{aligned}
-$$
-
-Also note that by the asymptotics for $1-\Phi(x)$,
-$$
-\begin{aligned}
-    \zeta(x,r) \approx 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) \qquad \text{for large }|x| .
-\end{aligned}
-$$
-
-
-
-What this says about clines
-===========================
+Other values of time
+--------------------
 
 The above restricted to standard Brownian motion on one unit of time.
 Really, we will want to use this across $\tau$ generations,
@@ -762,8 +698,72 @@ $$
 \end{aligned}
 $$
 
-**Cline flattening:**
-immediately, this tells us how a cline gets wider as time progresses:
+
+
+Solving the PDE
+---------------
+
+Let's check this agrees with the solution for the PDE.
+According to Knight 1981 (Thm 7.4.3), $\zeta'(0) = - 2 r \zeta(0)$;
+ReacTran lets you specify the 'flux' at the boundary is proportional to $\zeta(0)$,
+where the flux is in our case $\sigma^2/2 \zeta'$.
+First note that the solution depends on where we put the boundaries:
+```{r reflected_pde_boundaries}
+solve.reflected <- function (x.up=-20) {
+    x.eps <- 5*eps
+    thegrid <- setup.grid.1D(x.up=x.up, x.down=0, N = 5000)
+    hetfn <- setup.prop.1D(grid=thegrid, func=function(x){abs(x)<x.eps})
+    yinit <- rep(1.0,thegrid$N)
+    tau <- 40
+    tt <- seq(0,tau,length.out=20)
+    r <- 1
+    pde.fn <- function (t,y,parms,...) {
+        # flux = zeta'(0)/2 = a.bl.down*( zeta(0) - C.down )
+        tran <- tran.1D(C=y, A=1, D=1/2, dx=thegrid, C.down=0, a.bl.down=4*r)$dC
+        list( tran - r * hetfn$mid * y )
+    }
+    soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
+    attr(soln,"x") <- thegrid$x.mid
+    return(soln)
+}
+pde.soln.0 <- solve.reflected(x.up=-5)
+pde.soln.1 <- solve.reflected(x.up=-8)
+pde.soln.2 <- solve.reflected(x.up=-20)
+clineplot(pde.soln.0,x=attr(pde.soln.0,"x"),times=seq_along(tt),xlim=c(-5,0))
+clineplot(pde.soln.1,x=attr(pde.soln.1,"x"),add=TRUE)
+clineplot(pde.soln.2,x=attr(pde.soln.2,"x"),add=TRUE)
+```
+
+And, the PDE solution doesn't agree with the simulations very well: 
+clearly, we need a different boundary condition at zero.
+This is broken in ReacTran; I've modified the function to fix this.
+```{r reflected_pde,cache=TRUE}
+source("tran.1D.R")
+x.eps <- 5*eps
+thegrid <- setup.grid.1D(x.up=-20, x.down=0, N = 5000)
+hetfn <- setup.prop.1D(grid=thegrid, func=function(x){abs(x)<x.eps})
+yinit <- rep(1.0,thegrid$N)
+tau <- 40
+tt <- seq(0,tau,length.out=20)
+r <- 1
+pde.fn <- function (t,y,parms,...) {
+    # flux = zeta'(0)/2 = a.bl.down*( zeta(0) - C.down )
+    tran <- tran.1D(C=y, A=1, D=1/2, dx=thegrid, C.down=0, a.bl.down=2*r )$dC
+    list( tran - r * hetfn$mid * y )
+}
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
+ps <- clineplot(pde.soln,times=seq_along(tt),xlim=c(-8,0),legend=FALSE)
+matlines( thegrid$x.mid, outer( thegrid$x.mid, tt, function(x,t) { zeta.reflected(x/sqrt(t),r*t*x.eps) }), lty=3, col=rainbow(length(tt)) )
+legend("bottomleft",lty=1:2,legend=c("PDE","theory"))
+```
+Still not right...
+
+
+
+The associated cline shape
+--------------------------
+
+The Brownian rescaling above tells us how a cline gets wider as time progresses:
 for a fixed $r$, the width grows as $\sqrt{\tau}$.
 It also tells us that clines with the same $r\tau$ have the same shape,
 after rescaling the width by $\sqrt{\tau}$.
@@ -808,6 +808,71 @@ for (tau in c(5,50)) {
 }
 ```
 
+Asymptotics
+-----------
+
+This is very steep at $x=0$.
+Notice that as $x$ goes to 0,
+$$
+\begin{aligned}
+    \lim_{x \to 0} \zeta(x,r) 
+    &= 2 e^{r^2/2} (1-\Phi(r)) \\
+    &= \frac{2}{r\sqrt{2\pi}} + O(r^{-3}) .
+\end{aligned}
+$$
+so that the difference in the left and right limits is
+$$
+\begin{aligned}
+    \lim_{x \to 0-} q(x,r) 
+    -\lim_{x \to 0+} q(x,r) 
+    &= 
+    \frac{1}{2}+\frac{2}{r\sqrt{2\pi}} 
+    - \frac{1}{2}-\frac{2}{r\sqrt{2\pi}} 
+      +O(r^{-3}) \\
+    &=
+    \frac{4}{r\sqrt{2\pi}}
+      +O(r^{-3}) 
+\end{aligned}
+$$
+
+Let's also look at the slope of $q$ at $x=0$.
+Since $\partial_x |x| = \sgn(x)$,
+$$
+\begin{aligned}
+    \partial_x \zeta(x,r)
+    &=
+    2 \sgn(x) \left(
+    \phi(|x|)
+    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
+    - e^{r|x|+r^2/2} \phi(|x|+r)
+      \right)
+\end{aligned}
+$$
+and so
+$$
+\begin{aligned}
+    -\partial_x q(x)
+    &=
+    \phi(|x|)
+    + r e^{r|x|+r^2/2} (1-\Phi(|x|+r))
+    - e^{r|x|+r^2/2} \phi(|x|+r) \\
+    &\to
+    \frac{1}{\sqrt{2\pi}}(1-e^{r^2/2}e^{-r^2/2})
+    + r e^{r^2/2} (1-\Phi(r))  \qquad \text{as } x \to 0 \\
+    &=
+    r e^{r^2/2} (1-\Phi(r)) \\
+    &=
+    \frac{1}{\sqrt{2\pi}} + O(\frac{1}{r}) .
+\end{aligned}
+$$
+
+Also note that by the asymptotics for $1-\Phi(x)$,
+$$
+\begin{aligned}
+    \zeta(x,r) \approx 1 - \sqrt{\frac{2}{\pi}} e^{-x^2/2} \left( \frac{r}{x+r} \right) \qquad \text{for large }|x| .
+\end{aligned}
+$$
+
 
 
 Brownian motion with drift above zero
@@ -818,27 +883,44 @@ that, when above zero, has negative drift,
 and is killed at some rate.
 In other words, 
 if $dX_t = -\theta(X_t) dt + dB_t$,
-where $\theta(x)=\theta$ for $x \ge 0$, then
-we want to know
+where $\theta(x)=\theta$ for $x \ge 0$, 
+and we define
 $$\begin{aligned}
-    u(x;\lambda,\theta):=\E^x \left[ \exp\left( - \lambda \int_0^\infty X_t dt \right) \right] .
+\Gamma_t = \text{meas}\{ t : X_t > 0 \} ,
 \end{aligned}$$
-(*Small problem:*  this isn't guarenteed to be on the correct size of zero when we want it to.)
+then we want to know
+$$\begin{aligned}
+    u(x;\lambda,\theta):=\E^x \left[ \exp\left( - \lambda \Gamma_t \right) \right] .
+\end{aligned}$$
+(*Small problem:*  $X$ isn't guarenteed to be on the correct side of zero when we want it to be.)
 Well, by Girsanov's theorem, we know that
-$\E[f(X_t)] = \E[f(B_t)\zeta(t)]$
+$\E[f(X_t)] = \E[f(B_t)Z(t)]$
 where
 $$\begin{aligned}
-\zeta(t) = \exp\left[ \int_0^t \theta(B_u) dB_t - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+Z(t) = \exp\left[ \int_0^t \theta(B_u) dB_t - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
 \end{aligned}$$
 and since by Tanaka's formula,
 $$\begin{aligned}
-\theta \max(0,B_t) - \max(0,B_0) = \int_0^t \theta(B_u) du + \theta \ell_t(0) ,
+\theta \left(\max(0,B_t) - \max(0,B_0)\right) 
+&= 
+\int_0^t \theta(B_u) du + \theta \ell_t(0) \\
+&= 
+\theta \Gamma_t + \theta \ell_t(0) ,
 \end{aligned}$$
 thus
 $$\begin{aligned}
-\zeta(t) = \exp\left[ \theta \max(0,B_t) - \theta \max(0,B_0) - \theta \ell_t(0) - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
+Z(t) = \exp\left[ \theta \max(0,B_t) - \theta \max(0,B_0) - \theta \ell_t(0) - \frac{1}{2} \int_0^t \theta(B_u)^2 du \right] 
 \end{aligned}$$
-
+and we want to know
+$$\begin{aligned}
+u(x;\lambda,\theta)
+&=
+\E^x \left[
+\exp\left( 
+- \lambda \Gamma_t
+\right)
+\right]
+\end{aligned}$$
 
 More than we need to know
 -------------------------
