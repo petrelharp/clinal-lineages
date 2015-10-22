@@ -351,9 +351,9 @@ then run the lineage back through it.
 The forwards-time evolution of the cline,
 with isotropic density and migration,
 solves the PDE (Barton 1979):
-$ \begin{align*}
-  \partial_t p(x,t) = \frac{\sigma^2}{2} \partial_x^2 + sp(x,t)(1-p(x,t))(2p(x,t)-1) .
-\end{align*} $
+$$\begin{aligned*}
+  \partial_t p(x,t) = \frac{\sigma^2}{2} \partial_x^2 p(x,t)+ s p(x,t)(1-p(x,t))(2p(x,t)-1) .
+\end{aligned*}$$
 ```{r fwds_pde, cache=TRUE}
 thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
 yinit <- ifelse( thegrid$x.mid>0, 0, 1 )
@@ -396,6 +396,14 @@ layout(1)
 plot(fb.p,st.p,asp=1,pch=20,cex=0.5,xlab="forwards-backwards",ylab="stationary",col=rainbow(ncol(fb.p))[col(fb.p)])
 abline(0,1,lwd=3)
 ```
+
+Just forwards
+-------------
+
+An alternate route to this would have been to
+solve the coupled PDE for the frequencies of the selected locus 
+and the linked locus.
+
 
 
 Comparison, by simulation
@@ -507,11 +515,11 @@ precombs <- lapply( lt.comparison, function (lts) {
 layout(t(1:2))
 for (k in seq_along(precombs)) {
     matplot( tbreaks[-1]-diff(tbreaks)/2, Tdists[[k]], type='l', col=1:ncol(Tdists[[k]]), main=paste("x =",initvals[k]), ylim=range(Tdists), xlab="time in hets", lty=1 )
-    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+    legend("bottomright",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
 }
 for (k in seq_along(precombs)) {
     matplot( rvals, precombs[[k]], type='l', col=1:ncol(precombs[[k]]), main=paste("x =",initvals[k]), ylim=range(precombs), ylab="prob of recomb", xlab='r', lty=1 )
-    legend("topleft",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
+    legend("bottomright",lty=1,col=1:ncol(precombs[[k]]),legend=colnames(precombs[[k]]))
 }
 ```
 
@@ -787,9 +795,7 @@ $$
 
 Here's the cline shape:
 ```{r show_cline, cache=TRUE}
-zeta.pcline <- function (x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1) {
-    (1/2)*( 1 - sign(x)*zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau) )
-}
+zeta.pcline <- function (x,r) { pcline(x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1)
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, zeta.pcline(xx,r=1), type='n', 
