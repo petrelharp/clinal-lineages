@@ -19,8 +19,8 @@ library(deSolve)
 
 *Useful functions used below:*
 ```{r setup_fns}
-pcline <- function (x,r,tau=1,sigma=1) {
-    (1/2)*( 1 - sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau) )
+pcline <- function (x,r,recombfn,...) {
+    (1/2)*( 1 - sign(x)*recombfn(x,2*r,...) )
 }
 tanh_cline <- function (x,s,sigma=1) {
     (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
@@ -33,6 +33,9 @@ tanh_het <- function (x,s,sigma=1) {
     # prob of being in a het = (1-s)(1-p)/(1-s(1-p))
     pp <- tanh_cline(x,s,sigma=sigma)
     (1-s)*(1-pp)/(1-s*(1-pp))
+}
+zeta.reflected <- function (x,r) {
+    2*pnorm(abs(x)) - 1 + 2 * exp( r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE) )
 }
 sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
     # want total time to be tau, so:
@@ -50,6 +53,13 @@ sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
 weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
     colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
 }
+clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,ylab="probability",ylim=c(0,1),...) {
+    # plot output of deSolve as clines in a nice way
+    graphics::matplot( x, t(soln[times,-1]), type='l', col=rainbow(length(times)), lty=1, 
+            xlab="space", ylab=ylab, ylim=ylim, ...)
+    legend("bottomleft", lty=1, col=rainbow(length(times)), legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
+    return( invisible( t(soln[times,-1]) ) )
+}
 ```
 
 The goal
@@ -57,35 +67,38 @@ The goal
 
 The key quantity we compute with diffusion theory 
 is the probability that a lineage, 
-begun at location $x$ and killed at rate $r$ when in heterozygotes,
+begun at location $x$ and killed at rate $k$ when in heterozygotes,
 is still alive at time $\tau$.
 Denote this by
 $$
 \begin{aligned}
-    \zeta(x,r,\tau,\sigma).
+    \zeta(x,k,\tau).
 \end{aligned}
 $$
-
-Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
+Now, let $q(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
 at a location at recombination distance $r$ from the selected site
 inherits from the left-hand side of the barrier
 (i.e., an ancestor on $(-\infty,0)$)
 $\tau$ generations ago.
-(Note that $r$ should be scaled by the density and fecundity of heterozygotes in the cline --
-see below.)
-For an individual to the left of the barrier ($x<0$),
+The probability that a recombination occurs 
+between the lineage and the selected locus on either pair of chromatids
+is $2r$,
+and if this happens, the lineage ends up on either background with probability $1/2$.
+Therefore,
+for an individual to the left of the barrier ($x<0$),
 the probability of inheriting from the left of the barrier at $\tau$
 is the probability that no recombination at the barrier has occurred,
 plus one-half the probability that recombination in a heterozygote has occurred,
-i.e., $\zeta +(1-\zeta)/2=(1+\zeta)/2$.
+so if $\zeta = \zeta(x,2r,\tau)$, then
+$q=\zeta +(1-\zeta)/2=(1+\zeta)/2$.
 If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
-i.e., $(1-\zeta)/2$.
+i.e., $q=(1-\zeta)/2$.
 Combining these,
 the probability of ending up on the left-hand side is
 $$
 \begin{aligned}
-    p(x,r,\tau,A) = 
-    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+    q(x,r,\tau,A) = 
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,2r,\tau) \right\} .
 \end{aligned}
 $$
 
@@ -298,7 +311,7 @@ pde.fn <- function (t,y,parms,...) {
     tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
     list( tran - r * hetfn$mid * y )
 }
-pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
 image(pde.soln,legend=TRUE,main="prob of no recomb by t", yaxt='n', ylab='space')
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
@@ -327,6 +340,62 @@ check.t(0.8)
 ```
 **Looks pretty good.**
 
+
+The even more right solution
+============================
+
+Actually, the cline gets set up
+in a time-inhomogeneous way.
+Let's do that, by numerical solution,
+then run the lineage back through it.
+The forwards-time evolution of the cline,
+with isotropic density and migration,
+solves the PDE (Barton 1979):
+$ \begin{align*}
+  \partial_t p(x,t) = \frac{\sigma^2}{2} \partial_x^2 + sp(x,t)(1-p(x,t))(2p(x,t)-1) .
+\end{align*} $
+```{r fwds_pde, cache=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
+yinit <- ifelse( thegrid$x.mid>0, 0, 1 )
+tt <- seq(0,tau,length.out=100)
+fwds.pde <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, D=1/2, dx=thegrid)$dC
+    list( tran + s * y * (1-y) * (2*y-1) )
+}
+fwds.soln <- ode.1D( y=yinit, times=tt, func=fwds.pde, nspec=1 ) # note FIRST COLUMN IS TIME
+image(fwds.soln,legend=TRUE,main="mean cline development", yaxt='n', ylab='space')
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+```
+Now, let's run the killed lineage backwards in it:
+```{r fwds_back_pde, cache=TRUE, depends="fwds_pde"}
+yinit <- rep(1.0,thegrid$N)
+cline.interp <- function (T) {
+    # return the interpolated cline for a particular time
+    which.t <- findInterval(T,fwds.soln[,1],rightmost.closed=TRUE)
+    lu <- fwds.soln[c(which.t,which.t+1),1]
+    alpha <- (T-lu[1])/diff(lu)
+    return( (1-alpha)*fwds.soln[which.t,-1] + alpha*fwds.soln[which.t+1,-1]  )
+}
+rev.pde <- function (t,y,parms,...) {
+    p <- cline.interp(tau-t)
+    # p <- setup.prop.1D(grid=thegrid, xy=cbind(thegrid$x.mid,cline.interp(tau-t)), interp="linear")
+    tran <- tran.1D(C=y, A=p, D=1/2, dx=thegrid)$dC
+    list( tran - r * (1-p) * y )
+}
+rev.soln <- ode.1D( y=yinit, times=tt, func=rev.pde, nspec=1, tcrit=tau ) # note FIRST COLUMN IS TIME
+image(rev.soln,legend=TRUE,main="prob of no recomb by t", yaxt='n', ylab='space')
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+```
+
+Let's compare the case where the cline is set up instantly or not:
+```{r compare_rightness, cache=TRUE,depends=c("fwds_back_pde","solve_pde_setup","setup_fns")}
+layout(t(1:2))
+fb.p <- clineplot(rev.soln,main="forwards-backwards")
+st.p <- clineplot(pde.soln,main="stationary cline")
+layout(1)
+plot(fb.p,st.p,asp=1,pch=20,cex=0.5,xlab="forwards-backwards",ylab="stationary",col=rainbow(ncol(fb.p))[col(fb.p)])
+abline(0,1,lwd=3)
+```
 
 
 Comparison, by simulation
@@ -566,17 +635,15 @@ which goes to 1, as it should.
 
 Let's check that, too: why not?
 ```{r killing, cache=TRUE, depends="sim_rw"}
+zeta.reflected
 loc <- 0.1
-zeta <- function (x,r) {
-    2*pnorm(abs(x)) - 1 + 2 * exp( r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE) )
-}
 compare.rates <- as.data.frame( t( sapply( c(0.25,0.5,1,1.5,2,2.5,3), function (rate) {
         visits <- colSums(abs(rws-loc)<=1.5*eps)
         killed <- ( rbinom(ncol(rws),size=visits,prob=rate/ntimes/(3*eps)) == 0 )
         c( 
           rate=rate,
           simulation=mean(killed), 
-          theory=zeta(loc,rate),
+          theory=zeta.reflected(loc,rate),
           SE=sqrt(mean(killed)*(1-mean(killed))/nwalks)
           )
     } ) ) )
@@ -701,7 +768,7 @@ More generally, here's what $\zeta$ looks like:
 layout(1:2)
 xvals <- seq(0,5,length.out=150)
 rvals <- seq(0,10,length.out=100)
-zetavals <- outer( xvals, rvals, zeta )
+zetavals <- outer( xvals, rvals, zeta.reflected )
 matplot(xvals,zetavals,type='l',xlab="x",ylab=expression(zeta),col=rainbow(length(rvals)))
 lrvals <- seq(1,length(rvals),length.out=6)
 legend("bottomright",lty=1,col=rainbow(length(rvals))[lrvals],legend=paste("r=",round(rvals[lrvals],digits=2)))
@@ -710,39 +777,26 @@ lxvals <- seq(1,length(xvals),length.out=6)
 legend("bottomright",lty=1,col=rainbow(length(xvals))[lxvals],legend=paste("x=",round(xvals[lxvals],digits=2)),bg='white')
 ```
 
-Now, let $p(x,r,\tau,A)$ denote the probability that a lineage begun at $x<0$
-at a location at recombination distance $r$ from the selected site
-inherits from the left-hand side of the barrier
-(i.e., an ancestor on $(-\infty,0)$)
-$\tau$ generations ago.
-(Note that $r$ should be scaled by the density and fecundity of heterozygotes in the cline --
-see below.)
-For an individual to the left of the barrier ($x<0$),
-the probability of inheriting from the left of the barrier at $\tau$
-is the probability that no recombination at the barrier has occurred,
-plus one-half the probability that recombination in a heterozygote has occurred,
-i.e., $\zeta +(1-\zeta)/2=(1+\zeta)/2$.
-If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
-i.e., $(1-\zeta)/2$.
-Combining these,
-the probability of ending up on the left-hand side is
+Recall from above that the predicted cline is
 $$
 \begin{aligned}
-    p(x,r,\tau,A) = 
-    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,r,\tau) \right\} .
+    q(x,r,\tau,A) = 
+    \frac{1}{2} \left\{ 1 - \sgn(x) \zeta(x,2r,\tau) \right\} .
 \end{aligned}
 $$
 
 Here's the cline shape:
 ```{r show_cline, cache=TRUE}
-pcline
+zeta.pcline <- function (x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1) {
+    (1/2)*( 1 - sign(x)*zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau) )
+}
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
-    plot(xx, pcline(xx,r=1), type='n', 
+    plot(xx, zeta.pcline(xx,r=1), type='n', 
             xlab="distance from cline center", ylab="prob inherited from the left", 
             main=as.expression(substitute(tau==mytau,list(mytau=tau))) )
     rr <- seq(0,0.2,length.out=11)
-    pp <- sapply( rr, function (r) { pcline(xx,r=r,tau=tau) } )
+    pp <- sapply( rr, function (r) { zeta.pcline(xx,r=r,tau=tau) } )
     matplot(xx,pp,type='l',lty=1,col=rainbow(length(rr)),add=TRUE)
     legend("topright",lty=1,col=rainbow(length(rr)),legend=paste("r=",rr))
 }

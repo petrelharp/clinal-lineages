@@ -145,10 +145,19 @@ $endif$
 
 $if(mathjax-url)$
 <!-- dynamically load mathjax for compatibility with self-contained -->
+<!-- but fall back on CDN if local doesn't exist -->
 <script>
   (function () {
+    erfun = function () { 
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.onerror = erfun;
+        script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+        document.getElementsByTagName("head")[0].appendChild(script);
+    };
     var script = document.createElement("script");
     script.type = "text/javascript";
+    script.onerror = erfun;
     script.src  = "$mathjax-url$";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
