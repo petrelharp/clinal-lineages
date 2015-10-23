@@ -1,0 +1,205 @@
+---
+title: "Running simulations by Alisa"
+author: Alisa
+date: "`r date()`"
+output: html_document
+---
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.height=fig.dim,fig.width=2*fig.dim,fig.align='center')
+```
+
+Setting up the simulation
+-------------------------
+To simulate, we read in files from sim-fns.R
+```{r load_fns}
+	source("sim-fns.R")
+```
+
+Start off with simulation of 50 generation zone with 50 demes of 500 individuals each and sigma of 1:
+```{r set_deme_parameters}
+	zone_age	= 50
+	ndemes 		= 50
+	deme_size 	= 500
+	ninds 		= ndemes*deme_size
+	SIGMA 		= 1
+```
+note that zone_age above can be a vector of times.
+
+Now to define selection. 
+```{r set_selection}
+	S  = 0.5
+	qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)))
+```
+Here we selection against heterozygotes to be strong (`r S`).
+`qtl` is a named list, one element per chromosome,
+and each element of the list is a data frame
+whose columns give the name of the locus,
+the selection coefficient,
+and the position in Morgans.
+
+Running the simulation
+-------------------------
+
+This is a two-step process. First we simulate genotypes:
+```{r run_sim_step1,cache=TRUE,depends="set_selection"}
+	sims.s0.1 = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
+	#This can take a while, 
+```
+The output is: a list with hierarchy: `[[zone_age]][[c("inds","sp.inds","deme","pars","QTL")]]` where:
+
+	- `inds` is a list of length `ninds`, such that each `[[ind]][[chr]][[X1/X2]]` is a data.frame with columns
+        * `pos` : coordinates of rec.,  (*what does this mean?*)
+        * `ancest` : ancestor ID
+	- `sp.ids` is a character vector of length `ninds`, giving the ancestry given an ancestor ID
+	- `deme` is an integer vector of length `ninds`, giving the deme number of an ancestor, given their ancestor ID
+	- `pars` is an integer that gives the number of generations of the simulation
+	- `QTL` is the QTL vector used in the simulation
+
+The second step is to parse the simulated genotypes:
+```{r run_sim_step2,cache=TRUE,depends="run_sim_step1"}
+	sims.sums = lapply(sims.s0.1,spBreaks)
+```
+The output here is a list: `[[zone_age]][[c("ind.ancestry","ancest.prop")]]`
+
+    * `ind.ancestry` is a list of length ninds: each `[[ind][[chr]]][[X1/X2]]` is a data.frame with columns
+        * `starts` = (chunk) starts, 
+        * `stops` = (chunk) stops, 
+        * `sp2` = sp2(T/F) (*what is this?*)
+    * `ancest.prop` is a $2 \times$`ninds` matrix giving the ancestry proportion of each individual on each of their two copies of the chromosome.
+		
+This resulting files can get quite large, but we've saved them here
+```{r save_file,cache=TRUE,depends="run_sim_step1"}
+	save(sims.s0.1,file="sims_sums_s0.5_sigma1_50by500_tau50.Robj")
+```
+
+
+Getting relevant statistics
+-------------------------
+Let's start by defining a vector of loci at which we will measure things:
+
+```{r focal_loci}
+	loci = list(seq(0.5,1,0.05))
+```
+
+Now, we get frequencies at each of the sites in the above vector, 
+first by getting genotypes at all loci, then using those to calculate an allele frequency for each deme:
+```{r get_frequencies}
+	genotypes = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.ancest, geno.ind, loci)))})
+	freqs = lapply(genotypes,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X),breaks=seq(0,ncol(X),deme_size)),mean)/2})})
+	xx <- (1:ndemes)-0.5-ndemes/2
+		matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
+		legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
+		matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+```
+(`genotypes` is a list of `nloci`$\times$`ninds` dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.)
+Each line in the plot represents a locus a given distance from the selected locus.
+
+We can compare these frequencies to predictions made by theory :
+
+```{r peters_predictions}
+    zeta <- function(x,r){
+        2*pnorm(abs(x)) - 1 + 2 * exp(r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE))	
+    }
+    pcline <- function(x,r,tau=zone_age,sigma=SIGMA){
+        (1/2)*(1-sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau))	
+    }
+
+	rr=(loci[[1]]-0.5)*SIGMA/sqrt(S) # loci at which frequency is measured
+	xx <- (1:ndemes)-0.5-ndemes/2	 # deme positions
+	pp <- do.call(cbind,lapply(rr,function(R){pcline(xx,r=R,tau=zone_age,sigma=SIGMA)})) #allele frequency
+
+        matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
+        legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
+        matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
+```
+
+Next, we think about tract lengths in these populations. The following generates the distribution of lengths 
+of continuous ancestry B to the right of the specified locus (`focal_sites`) (in this case the selected locus). 
+Note that if the specified locus is of ancestry A, then the length of ancestry B is 0. The first function finds
+and measures the chunk in an individual that contains the focal site. The second function generates a 
+distribution for each deme.
+
+```{r tract_length_functions}
+	focal_sites = lapply(qtl,function(Z){Z$pos})
+
+	get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE){
+		#return the interval containing focal site for a individual	
+		chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
+		identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
+		replace(chunk,which(identity==ancA),0)
+	}
+	
+	get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,POS=0.5,ancA = TRUE){
+		#get distribution of chunks within a deme
+		INDS = IND_DATA[which(sims.s0.1[[1]]$deme==DEME)]
+		intervals = do.call(rbind,lapply(INDS,get.interval.size,CHR=CHR,POS=POS,ancA=ancA)) 	
+		return(intervals)
+	}
+
+
+```
+the output of get.deme.chunks is a nind*2 matrix, where each column is a chromosome. To run:
+
+```{r get_tract_lengths}
+	tracts = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F)})
+
+	transparent_rainbow = adjustcolor(rainbow(ndemes),0.75)
+	
+    D = 1 
+    hist(tracts[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+    for (D in seq(1,ndemes,5)) {
+        hist(tracts[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.05),ylim=c(0,50),add=T)	
+    }
+```
+To get LD in these populations, we define `get.genotype` to get the genotypes at two loci in individuals, and `get.LD` to calculate LD in a deme:
+```{r LD_functions}
+ 	get.genotype = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS1=0.5,POS2=0.5){
+	site1 = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS1 & X$stops>POS1),3]})	
+	site2 = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS2 & X$stops>POS2),3]})
+	return(rbind(site1,site2))
+	}
+
+	get.LD = function(IND_DATA= sims.sums[[1]]$ind.ancest,DEME=1,CHR=1,POS1 = 0.5, POS2=0.1){
+	INDS = IND_DATA[which(sims.s0.1[[1]]$deme==DEME)]
+	genotypes = do.call(cbind,lapply(INDS,get.genotype,CHR=CHR,POS1=POS1,POS2=POS2))
+	freqB1 = length(which(genotypes[1,]))/length(genotypes[1,])
+	freqB2 = length(which(genotypes[2,]))/length(genotypes[2,])
+	freqB12 = length(which(genotypes[1,] & genotypes[2,]))/length(genotypes[1,])
+	LD = freqB12 - freqB2*freqB1
+	return(LD)
+}
+
+```
+We can just calculate LD over demes and loci pairs. Here's an example of LD between pairs of loci where one member of the
+pair is selected on. This gives a plot of decay in population LD as we get further away from the center of the zone.
+
+```{r ld_matrix}
+LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
+	matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
+
+```
+
+Simulate a realistic population (with Populus as a model)
+-------------------------
+We propose that the density of Populus along a one-dimensional transect is one every 10 meters. Additionally, based on a
+literature search that suggests most pollen only makes it to the nearest neighbor and seeds do not disperse much, with 
+potentially a long tail, we propose a sigma of 100m. Furthermore, based on HZ width of 20km for most of the geome, we 
+propose that width at selected loci may be 1km, giving a selection coefficient of 0.01 (based on width = 2*sigma/sqrt(S)). 
+We space demes ever 1km for 100km, with 100 individuals per deme (given above density of 1/10 inds/meter). In units of demes, sigma is 10.
+
+```{r set_populus_parameters,cache=TRUE}
+	zone_age	= 10
+	ndemes 		= 100
+	deme_size 	= 100
+	ninds 		= ndemes*deme_size
+	SIGMA 		= 0.1
+	S 			= 0.01
+	qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)))
+	
+	sims.populus_like.10gens = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
+	sims.sums.populus_like.10gens = lapply(sims.populus_like.10gens,spBreaks)
+	save(sims.populus_like.10gens,file="simspopulus_like.10gens.Robj")
+```
