@@ -88,7 +88,9 @@ $$\begin{aligned}
         \grad \log(u(x)) \cdot \grad q_A(x,t) + \frac{\sigma^2}{2} \Delta q_A(x,t) + r (1-v(x)) (q_B(x,t)-q_A(x,t)) \\
     \partial_t q_B(x,t)
         &= 
-        \grad \log(1-u(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r v(x) (q_A(x,t)-q_B(x,t)) .
+        \grad \log(1-u(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r v(x) (q_A(x,t)-q_B(x,t)) \\
+    q_A(x,0) &= 1 \\
+    q_A(x,t) &= 1-q_B(-x,t) .
 \end{aligned}$$
 
 Here's a function to solve this numerically:
@@ -132,7 +134,8 @@ These combine to give the predicted cline:
 ```{r show_pde_cline,cache=TRUE,depends="solve_pde_setup"}
 A.inds <- 1+(1:thegrid$N)
 B.inds <- 1+thegrid$N+(1:thegrid$N)
-pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*cline.A$mid[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*cline.B$mid[col(pde.soln[,B.inds])] )
+sel.cline <- tanh_cline(thegrid$x.mid,s=s)
+pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*sel.cline[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*(1-sel.cline)[col(pde.soln[,B.inds])] )
 attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
 attr(pde.cline,"nspec")<-1
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))

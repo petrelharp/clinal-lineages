@@ -14,7 +14,6 @@ $$
 fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 library(ReacTran)
-library(deSolve)
 ```
 
 *Useful functions used below:*
@@ -313,9 +312,9 @@ then run the lineage back through it.
 The forwards-time evolution of the cline,
 with isotropic density and migration,
 solves the PDE (Barton 1979):
-$$\begin{aligned*}
+$$\begin{aligned}
   \partial_t p(x,t) = \frac{\sigma^2}{2} \partial_x^2 p(x,t)+ s p(x,t)(1-p(x,t))(2p(x,t)-1) .
-\end{aligned*}$$
+\end{aligned}$$
 ```{r fwds_pde, cache=TRUE}
 thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
 yinit <- ifelse( thegrid$x.mid>0, 0, 1 )
@@ -663,10 +662,14 @@ According to Knight 1981 (Thm 7.4.3), $\zeta'(0) = - 2 r \zeta(0)$;
 ReacTran lets you specify the 'flux' at the boundary is proportional to $\zeta(0)$,
 where the flux is in our case $\sigma^2/2 \zeta'$.
 First note that the solution depends on where we put the boundaries:
-```{r reflected_pde_boundaries}
-source("tran.1D.R")
+```{r reflected_pde_boundaries,cache=TRUE}
+# NOTE: must install ReacTran from R-forge, e.g. 
+#   install.packages("ReacTran",repos="http://r-forge.r-project.org")
+# or else
+#   source("tran.1D.R")
+# to fix bug in using convective boundary conditions.
+x.eps <- 5*mean(thegrid$dx)
 solve.reflected <- function (x.up=-20) {
-    x.eps <- 5*eps
     thegrid <- setup.grid.1D(x.up=x.up, x.down=0, N = 5000)
     hetfn <- setup.prop.1D(grid=thegrid, func=function(x){abs(x)<x.eps})
     yinit <- rep(1.0,thegrid$N)
@@ -685,7 +688,7 @@ solve.reflected <- function (x.up=-20) {
 pde.soln.0 <- solve.reflected(x.up=-5)
 pde.soln.1 <- solve.reflected(x.up=-8)
 pde.soln.2 <- solve.reflected(x.up=-20)
-clineplot(pde.soln.0,x=attr(pde.soln.0,"x"),times=seq_along(tt),xlim=c(-5,0))
+clineplot(pde.soln.0,x=attr(pde.soln.0,"x"),xlim=c(-5,0))
 clineplot(pde.soln.1,x=attr(pde.soln.1,"x"),add=TRUE)
 clineplot(pde.soln.2,x=attr(pde.soln.2,"x"),add=TRUE)
 ```
@@ -694,8 +697,6 @@ And, the PDE solution doesn't agree with the simulations very well:
 clearly, we need a different boundary condition at zero.
 This is broken in ReacTran; I've modified the function to fix this.
 ```{r reflected_pde,cache=TRUE}
-source("tran.1D.R")
-x.eps <- 5*eps
 thegrid <- setup.grid.1D(x.up=-20, x.down=0, N = 5000)
 hetfn <- setup.prop.1D(grid=thegrid, func=function(x){abs(x)<x.eps})
 yinit <- rep(1.0,thegrid$N)
