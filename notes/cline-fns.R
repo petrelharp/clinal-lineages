@@ -1,7 +1,7 @@
 pcline <- function (x,r,p=recombfn(x,2*r,...),recombfn,...) {
     (1/2)*( 1 - sign(x)*p )
 }
-tanh_cline <- function (x,s,sigma=1) {
+tanh_cline <- function (x,s,sigma=1,...) {
     (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
 }
 tanh_drift <- function (x,s,sigma=1) {

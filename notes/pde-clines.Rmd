@@ -72,30 +72,59 @@ $$\begin{aligned}
         \grad \log(p(x)) \cdot \grad q_A(x,t) + \frac{\sigma^2}{2} \Delta q_A(x,t) + r (1-p(x)) (q_B(x,t)-q_A(x,t)) \\
     \partial_t q_B(x,t)
         &= 
-        \grad \log(1-p(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r p(x) (q_A(x,t)-q_B(x,t)) \\
+        \grad \log(1-p(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r p(x) (q_A(x,t)-q_B(x,t)) .
 \end{aligned}$$
 
-Let's solve this numerically.
+Paving the way for analytic approximations
+------------------------------------------
+
+Note that $p$ appears twice here:
+first pushing lineages, and second causing recombination.
+We may want to decouple these for the purposes of approximation:
+we'll consider the following system of PDE:
+$$\begin{aligned}
+    \partial_t q_A(x,t)
+        &= 
+        \grad \log(u(x)) \cdot \grad q_A(x,t) + \frac{\sigma^2}{2} \Delta q_A(x,t) + r (1-v(x)) (q_B(x,t)-q_A(x,t)) \\
+    \partial_t q_B(x,t)
+        &= 
+        \grad \log(1-u(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r v(x) (q_A(x,t)-q_B(x,t)) .
+\end{aligned}$$
+
+Here's a function to solve this numerically:
 ```{r solve_pde_setup, cache=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
+solve.pde <- function ( u, v=u, r, times, ... ) {
+    vfn <- function(x,t){v(x=x,t=t,...)}
+    cline.A <- setup.prop.1D(grid=thegrid, func=u, ...)
+    cline.B <- setup.prop.1D(grid=thegrid, func=function(x,...)1-u(x,...), ...)
+    yinit <- c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) )
+    r <- 0.1
+    pde.fn <- function (t,y,parms,...) {
+        yA <- y[1:thegrid$N]
+        yB <- y[thegrid$N+(1:thegrid$N)]
+        tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=thegrid)$dC
+        tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=thegrid)$dC
+        list( c( 
+                tran.A + r * (1-vfn(x=thegrid$x.mid,t=t)) * (yB-yA),
+                tran.B + r * vfn(x=thegrid$x.mid,t=t) * (yA-yB)
+                ) )
+    }
+    ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
+}
+```
+
+
+Numerical solutions
+-------------------
+
+Let's solve this numerically.
+```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
 s <- 0.1
 tau <- 100
-thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
-cline.A <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
-cline.B <- setup.prop.1D(grid=thegrid, func=function(x,s)1-tanh_cline(x,s), s=s)
-yinit <- c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) )
 tt <- seq(0,tau,length.out=100)
 r <- 0.1
-pde.fn <- function (t,y,parms,...) {
-    yA <- y[1:thegrid$N]
-    yB <- y[thegrid$N+(1:thegrid$N)]
-    tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=thegrid)$dC
-    tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=thegrid)$dC
-    list( c( 
-            tran.A + r * cline.B$mid * (yB-yA),
-            tran.B + r * cline.A$mid * (yA-yB)
-            ) )
-}
-pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
+pde.soln <- solve.pde( u=tanh_cline, r=r, times=tt, s=s )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
