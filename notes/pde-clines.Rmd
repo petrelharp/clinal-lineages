@@ -123,8 +123,8 @@ Numerical solutions
 Let's solve this numerically.
 ```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
 s <- 0.1
-tau <- 100
-tt <- seq(0,tau,length.out=100)
+zone.age <- 100  # this is tau
+tt <- seq(0,zone.age,length.out=100)
 r <- 0.1
 pde.soln <- solve.pde( u=tanh_cline, r=r, times=tt, s=s )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
@@ -141,4 +141,49 @@ attr(pde.cline,"nspec")<-1
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
 # same thing, plotted with lines
 clineplot(pde.cline,main=sprintf("clines, at r=%0.2f",r))
+```
+
+
+Comparison to simulation
+------------------------
+
+We'll setup, run, and summarize simulations
+as described in [this file](../sims/run-sims.html).
+```{r setup_sims, cache=TRUE}
+source("../sims/sim-fns.R")
+zone.age	= 50
+ndemes 		= 500
+deme.size 	= 10
+ninds 		= ndemes*deme.size
+SIGMA 		= 1
+s           = 0.1
+qtl         = list(chr1=data.frame(traits=c("underdominant"), s = s,pos=c(0.5)))
+# spatial locations
+xx <- (1:ndemes)-0.5-ndemes/2
+# run the simulation
+sim <- sim.zone(n.gen=zone.age,n.ind=ninds,n.deme=ndemes,sigma=SIGMA,quiet=TRUE)
+# post-process
+sim.sums <- spBreaks(sim)
+```
+and, postprocess:
+```{r genotype_sims, cache=TRUE, depends="setup_sims"}
+rvals <- c(0,exp(seq(log(.001),log(0.5),length.out=10)))
+loci <- list(0.5+rvals)
+genotypes <- data.frame(do.call(cbind,lapply(sim.sums$ind.ancest, geno.ind, loci)))
+freqs <- apply(genotypes,1,function(Z){
+            tapply(Z,cut(1:ncol(genotypes),breaks=seq(0,ncol(genotypes),deme.size)),mean)/2
+        })
+```
+
+OK, now let's match the PDE solution to the simulation.
+First, does the cline at the selected locus match the the tanh cline?
+```{r match_cline}
+plot(xx,freqs[,1],type='l',xlab="spatial location",ylab="proportion")
+lines(xx,1-tanh_cline(xx,s=s,sigma=SIGMA),col='red')
+```
+Looks pretty reasonable.
+
+```{r match_pde}
+tt <- seq(0,zone.age,length.out=100)
+pde.solns <- lapply(rvals, function (r) { solve.pde( u=tanh_cline, r=r, times=tt, s=s ) })
 ```

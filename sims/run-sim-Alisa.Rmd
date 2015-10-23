@@ -25,7 +25,7 @@ Start off with simulation of 50 generation zone with 50 demes of 500 individuals
 	ninds 		= ndemes*deme_size
 	SIGMA 		= 1
 ```
-note that zone_age above can be a vector of times.
+note that `zone_age` above can be a vector of times.
 
 Now to define selection. 
 ```{r set_selection}
