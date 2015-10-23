@@ -84,7 +84,7 @@ cline.A <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
 cline.B <- setup.prop.1D(grid=thegrid, func=function(x,s)1-tanh_cline(x,s), s=s)
 yinit <- c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) )
 tt <- seq(0,tau,length.out=100)
-r <- 1
+r <- 0.1
 pde.fn <- function (t,y,parms,...) {
     yA <- y[1:thegrid$N]
     yB <- y[thegrid$N+(1:thegrid$N)]
