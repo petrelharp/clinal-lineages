@@ -1,0 +1,112 @@
+---
+title: "Clines from PDE"
+date: "`r date()`"
+---
+
+$$
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\grad}{\nabla}
+$$
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
+library(ReacTran)
+```
+
+*Useful functions used below:*
+```{r setup_fns}
+source("cline-fns.R")
+```
+
+The goal
+========
+
+
+Suppose that a lineage moves in a frequency profile $p(x)$ of allele $A$,
+switching between backgrounds at rate $r p(x)$ or $r (1-p(x))$.
+Let $(X_t,Z_t)$ denote this process,
+so that
+$$\begin{aligned}
+    dX_t &= \grad \log(p(X_t)) dt + dB_t  \qquad \text{if } Z_t = A \\
+         &= \grad \log(1-p(X_t)) dt + dB_t  \qquad \text{if } Z_t = B \\
+    \P\{ Z_{t+\epsilon} = B | Z_t = A \} &= \epsilon r (1-p(X_t)) + O(\epsilon^2) \\
+    \P\{ Z_{t+\epsilon} = A | Z_t = B \} &= \epsilon r p(X_t) + O(\epsilon^2) .
+\end{aligned}$$
+(Note that $p$ may also depend on $t$.)
+We would like to find the probability that 
+a lineage which we sample at location $x$ on background $z$,
+derived from background $A$ $\tau$ units of time ago,
+which we denote by
+$$
+q(x,z,\tau,r) = \P\{ Z_\tau = A \} .
+$$
+(Note that this gives us linkage to the selected site,
+and for the cline shape we only need $p(x,\tau) q(x,A,\tau,r) + (1-p(x,\tau) q(x,B,\tau,r)$,
+but it is easier to compute this.)
+
+Let $f$ be a function from $\R \times \{A,B\} \to \R$.
+The process above has generator
+$$\begin{aligned}
+    Gf(x,z) 
+    &:= \partial_t \E^{(x,z)}\left[ f(X_t,Z_t) \right] \vert_{t=0} \\
+    &= \begin{cases}
+    \grad \log(p(x)) \cdot \grad f(x,A) + \frac{\sigma^2}{2} \Delta f(x,A) + r (1-p(x)) (f(x,B)-f(x,A)) \qquad &\text{if } z=A \\
+    \grad \log(1-p(x)) \cdot \grad f(x,B) + \frac{\sigma^2}{2} \Delta f(x,B) + r p(x) (f(x,A)-f(x,B)) \qquad &\text{if } z=B .
+    \end{cases}
+\end{aligned}$$
+
+We know that 
+$$\begin{aligned}
+q(x,A,0,r) = 1  \\
+q(x,B,0,r) = 0  \\
+\end{aligned}$$
+and that $\partial_t q = G q$, i.e.,
+(writing $q(x,A,t,r) = q_A(x,t)$ for the moment):
+$$\begin{aligned}
+    \partial_t q_A(x,t)
+        &= 
+        \grad \log(p(x)) \cdot \grad q_A(x,t) + \frac{\sigma^2}{2} \Delta q_A(x,t) + r (1-p(x)) (q_B(x,t)-q_A(x,t)) \\
+    \partial_t q_B(x,t)
+        &= 
+        \grad \log(1-p(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r p(x) (q_A(x,t)-q_B(x,t)) \\
+\end{aligned}$$
+
+Let's solve this numerically.
+```{r solve_pde_setup, cache=TRUE}
+s <- 0.1
+tau <- 100
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
+cline.A <- setup.prop.1D(grid=thegrid, func=tanh_cline, s=s)
+cline.B <- setup.prop.1D(grid=thegrid, func=function(x,s)1-tanh_cline(x,s), s=s)
+yinit <- c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) )
+tt <- seq(0,tau,length.out=100)
+r <- 1
+pde.fn <- function (t,y,parms,...) {
+    yA <- y[1:thegrid$N]
+    yB <- y[thegrid$N+(1:thegrid$N)]
+    tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=thegrid)$dC
+    tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=thegrid)$dC
+    list( c( 
+            tran.A + r * cline.B$mid * (yB-yA),
+            tran.B + r * cline.A$mid * (yA-yB)
+            ) )
+}
+pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
+image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+```
+These combine to give the predicted cline:
+```{r show_pde_cline,cache=TRUE,depends="solve_pde_setup"}
+A.inds <- 1+(1:thegrid$N)
+B.inds <- 1+thegrid$N+(1:thegrid$N)
+pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*cline.A$mid[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*cline.B$mid[col(pde.soln[,B.inds])] )
+attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
+attr(pde.cline,"nspec")<-1
+image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
+# same thing, plotted with lines
+clineplot(pde.cline,main=sprintf("clines, at r=%0.2f",r))
+```

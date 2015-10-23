@@ -19,47 +19,7 @@ library(deSolve)
 
 *Useful functions used below:*
 ```{r setup_fns}
-pcline <- function (x,r,recombfn,...) {
-    (1/2)*( 1 - sign(x)*recombfn(x,2*r,...) )
-}
-tanh_cline <- function (x,s,sigma=1) {
-    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
-}
-tanh_drift <- function (x,s,sigma=1) {
-    # log-derivative of tanh_cline
-    -(2*sqrt(s)/sigma) * (1-tanh(-2*x*sqrt(s)/sigma)^2) / (1+tanh(-2*x*sqrt(s)/sigma))
-}
-tanh_het <- function (x,s,sigma=1) {
-    # prob of being in a het = (1-s)(1-p)/(1-s(1-p))
-    pp <- tanh_cline(x,s,sigma=sigma)
-    (1-s)*(1-pp)/(1-s*(1-pp))
-}
-zeta.reflected <- function (x,r) {
-    2*pnorm(abs(x)) - 1 + 2 * exp( r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE) )
-}
-sim_diffusion <- function (drift,tau,nwalks,ntimes,xinit=0,...) {
-    # want total time to be tau, so:
-    dt <- tau/ntimes
-    # put the noise in rws
-    rws <- matrix( c( rep_len(xinit,nwalks), # initial conditions
-                 rnorm(nwalks*(ntimes-1)) ), nrow=ntimes, ncol=nwalks, byrow=TRUE )
-    # and then integrate over it
-    for (k in 2:ntimes) {
-        rws[k,] <- rws[k-1,]+sqrt(dt)*rws[k,]+dt*drift(rws[k-1,],...)
-    }
-    attr(rws,"dt") <- dt
-    return(rws)
-}
-weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
-    colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
-}
-clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,ylab="probability",ylim=c(0,1),legend=TRUE,...) {
-    # plot output of deSolve as clines in a nice way
-    graphics::matplot( x, t(soln[times,-1]), type='l', col=rainbow(length(times)), lty=1, 
-            xlab="space", ylab=ylab, ylim=ylim, ...)
-    if (legend) legend("bottomleft", lty=1, col=rainbow(length(times)), legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
-    return( invisible( t(soln[times,-1]) ) )
-}
+source("cline-fns.R")
 ```
 
 The goal
@@ -84,7 +44,9 @@ The probability that a recombination occurs
 between the lineage and the selected locus on either pair of chromatids
 is $2r$,
 and if this happens, the lineage ends up on either background with probability $1/2$.
-Therefore,
+At this point, its probability of originally coming from one or the other background
+still depends on its location,
+but if we **assume this is 1/2**,
 for an individual to the left of the barrier ($x<0$),
 the probability of inheriting from the left of the barrier at $\tau$
 is the probability that no recombination at the barrier has occurred,
@@ -94,7 +56,7 @@ $q=\zeta +(1-\zeta)/2=(1+\zeta)/2$.
 If $x>0$ this is the one-half times probability a recombination in a heterozygote has occurred,
 i.e., $q=(1-\zeta)/2$.
 Combining these,
-the probability of ending up on the left-hand side is
+the probability of ending up on the left-hand side is *approximated* as
 $$
 \begin{aligned}
     q(x,r,\tau,A) = 
@@ -369,15 +331,8 @@ axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
 Now, let's run the killed lineage backwards in it:
 ```{r fwds_back_pde, cache=TRUE, depends="fwds_pde"}
 yinit <- rep(1.0,thegrid$N)
-cline.interp <- function (T) {
-    # return the interpolated cline for a particular time
-    which.t <- findInterval(T,fwds.soln[,1],rightmost.closed=TRUE)
-    lu <- fwds.soln[c(which.t,which.t+1),1]
-    alpha <- (T-lu[1])/diff(lu)
-    return( (1-alpha)*fwds.soln[which.t,-1] + alpha*fwds.soln[which.t+1,-1]  )
-}
 rev.pde <- function (t,y,parms,...) {
-    p <- cline.interp(tau-t)
+    p <- cline.interp(tau-t,soln=fwds.soln)
     # p <- setup.prop.1D(grid=thegrid, xy=cbind(thegrid$x.mid,cline.interp(tau-t)), interp="linear")
     tran <- tran.1D(C=y, A=p, D=1/2, dx=thegrid)$dC
     list( tran - r * (1-p) * y )
@@ -526,8 +481,8 @@ for (k in seq_along(precombs)) {
 
 
 
-Killing at Brownian local times
-===============================
+Reflected Brownian motion, killed according to local time at zero
+=================================================================
 
 Now, let's look at the analytics for the first approximation.
 
@@ -608,7 +563,7 @@ Clearly, the discretization is still tripping us up a bit,
 but it's pretty good.
 
 Its Laplace transform
-=====================
+---------------------
 
 Now suppose that something happens at rate $r$ relative to the local time at $x$
 (e.g., recombination to the other background).
@@ -709,6 +664,7 @@ ReacTran lets you specify the 'flux' at the boundary is proportional to $\zeta(0
 where the flux is in our case $\sigma^2/2 \zeta'$.
 First note that the solution depends on where we put the boundaries:
 ```{r reflected_pde_boundaries}
+source("tran.1D.R")
 solve.reflected <- function (x.up=-20) {
     x.eps <- 5*eps
     thegrid <- setup.grid.1D(x.up=x.up, x.down=0, N = 5000)
@@ -756,7 +712,7 @@ ps <- clineplot(pde.soln,times=seq_along(tt),xlim=c(-8,0),legend=FALSE)
 matlines( thegrid$x.mid, outer( thegrid$x.mid, tt, function(x,t) { zeta.reflected(x/sqrt(t),r*t*x.eps) }), lty=3, col=rainbow(length(tt)) )
 legend("bottomleft",lty=1:2,legend=c("PDE","theory"))
 ```
-Still not right...
+Still not right... hm.
 
 
 
@@ -795,7 +751,7 @@ $$
 
 Here's the cline shape:
 ```{r show_cline, cache=TRUE}
-zeta.pcline <- function (x,r) { pcline(x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1)
+zeta.pcline <- function (x,r) { pcline(x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1) }
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, zeta.pcline(xx,r=1), type='n', 
@@ -882,9 +838,93 @@ A better model for the process might be Brownian motion
 that, when above zero, has negative drift,
 and is killed at some rate.
 In other words, 
-if $dX_t = -\theta(X_t) dt + dB_t$,
-where $\theta(x)=\theta$ for $x \ge 0$, 
-and we define
+$$\begin{aligned}
+dX_t = -\theta(X_t) dt + dB_t,
+\end{aligned}$$
+where $\theta(x)=\theta$ for $x \ge 0$, and $\theta(x)=0$ for $x<0$.
+
+
+Solving the PDE
+---------------
+
+Above we simulated the clines deriving from this process.
+```{r sim_pushed, cache=TRUE}
+rvals <- exp(seq(log(.001),log(0.5),length.out=10))
+pushfn <- function(x,s){ifelse(x>0,-4*sqrt(s),0)}
+nwalks <- 1e4
+ntimes <- 1e3
+s <- 0.1
+tau <- 10
+xinit <- seq(-8,8,length.out=nwalks)
+sim.rw <- sim_diffusion( pushfn, tau, nwalks, ntimes, s=s, xinit=xinit )
+sim.wt <- weighted_time( sim.rw, function (x) { x>0 } )
+# distribution of time above zero depending on starting point
+plot(xinit,sim.wt,xlab="initial position", ylab="time above zero")
+```
+We can also get the predicted clines by solving the PDE.
+Note that here we are approximating $p(x) = \min(1,\exp(-4x\sqrt{s}))$.
+```{r pushed_pde,cached=TRUE}
+thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
+clinefn <- setup.prop.1D(grid=thegrid, func=function(x,s){ifelse(x>0,exp(-4*x*sqrt(s)),1.0)}, s=s)
+hetfn <- setup.prop.1D(grid=thegrid, func=function(x){ifelse(x>0,1,0)})
+yinit <- rep(1.0,thegrid$N)
+tt <- seq(0,tau,length.out=100)
+pde.solns <- lapply( rvals, function (r) {
+        pde.fn <- function (t,y,parms,...) {
+            tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+            if (any(is.na(tran))) { browser() }
+            list( tran - r * hetfn$mid * y )
+        }
+        ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
+      } )
+layout(t(1:2))
+for (k in c(6,10)) {
+    clineplot(pde.solns[[k]],main=sprintf("r=%0.2f",tau,rvals[k]))
+}
+```
+
+Here are the two compared,
+by smoothing the probabilities for the simulation:
+```{r sim_clines, cache=TRUE, depends=c("sim_pushed","pushed_pde")}
+prob.no.recomb <- sapply( rvals, function (r) { fitted(loess( exp(-r*sim.wt) ~ xinit, span=0.1)) } )
+matplot(xinit,prob.no.recomb,type='l',ylab="prob of no recomb",
+        xlab="space",col=rainbow(length(rvals)),lty=1,main=sprintf("t=%d",tau))
+legend("bottomleft",lty=1:5,col=1:6,legend=paste("r=",round(rvals,digits=2)))
+for (k in seq_along(rvals)) {
+    lines( thegrid$x.mid, pde.solns[[k]][findInterval(tau,pde.solns[[k]][,1]),-1], 
+          lty=3, lwd=3, col=rainbow(length(rvals))[k] )
+}
+```
+Well, that looks reasonable, but hard to tell if the discrepancy is due to the loess or not.
+
+And, finally, here's some actual clines predicted by this model:
+```{r pushed_cline,cache=TRUE,depends="pushed_pde"}
+tau <- 100
+tt <- seq(0,tau,length.out=100)
+pde.solns <- lapply( rvals, function (r) {
+        pde.fn <- function (t,y,parms,...) {
+            tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+            if (any(is.na(tran))) { browser() }
+            list( tran - r * hetfn$mid * y )
+        }
+        ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
+      } )
+plot.tvals <- floor(seq(0,tau,length.out=7))[-1]
+layout(t(1:2))
+for (tval in plot.tvals) {
+    matplot( thegrid$x.mid, 
+            pcline(thegrid$x.mid, p=sapply( pde.solns, cline.interp, T=tval ) ), 
+                   type='l', main=sprintf("t=%d",tval) 
+        )
+    legend("bottomleft",lty=1:5,col=1:6,legend=paste("r=",round(rvals/2,digits=2)))
+}
+```
+
+
+Analytical form
+---------------
+
+If we define
 $$\begin{aligned}
 \Gamma_t = \text{meas}\{ t : X_t > 0 \} ,
 \end{aligned}$$
