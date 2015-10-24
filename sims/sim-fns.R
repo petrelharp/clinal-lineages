@@ -23,7 +23,7 @@ spBreaks = function(sim){
                     if(nrow(PAR)==1){return(data.frame(starts=0,stops=1,sp2 = PAR$ancest > length(sim[[1]])))}
                     sp1 = getRuns(as.numeric( PAR$ancest <= length(sim[[1]])))
                     sp2 = getRuns(as.numeric( PAR$ancest > length(sim[[1]])))
-                    tmp = rbind(data.frame(sp1,sp2=rep(F,nrow(sp1))),data.frame(sp2,sp2=rep(T,nrow(sp2))))
+                    tmp = rbind(data.frame(sp1,sp2=rep(FALSE,nrow(sp1))),data.frame(sp2,sp2=rep(TRUE,nrow(sp2))))
                     tmp = tmp[order(tmp$starts),]
                     tmp$starts = PAR$pos[tmp$starts]
                     tmp$stops = c(PAR$pos[-1],1)[tmp$stops]
@@ -90,6 +90,8 @@ genoAll = function(inds,QTL,sp.ids){
 #######    MAKING A NEW GEN     #######
 
 makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),min.deme=min(demes)){
+    pop.sizes <- table(demes) # number of individuals in each deme
+    chrnames <- namesList( names(inds[[1]]) )
     #genotyping
     if(!is.null(QTL)){ 
         genos = lapply(genoAll(inds=inds,QTL=qtl,sp.ids=sp.ids) ,function(IND){do.call(rbind,IND)})  
@@ -116,16 +118,33 @@ makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),m
     # new locations of individuals
     inds.df$new.deme = pmin(max.deme, pmax(min.deme, inds.df$deme + sample_move ) )
     inds.df$id = seq_along(inds.df$new.deme)
-    new.inds.df = do.call(rbind,lapply(  unique(inds.df$deme)  , function(d){			
-        #find parents
-        a = with(inds.df[inds.df$new.deme==d,], sample(id,size=length(which(demes==d)), prob=w/sum(w) , replace=T))
-        # MODIFY B|A TO ALLOW FOR ASSORTATIVE MATING & eg no selfing
-        b = with(inds.df[inds.df$new.deme==d,], sample(id, size=length(which(demes==d)), prob=w/sum(w) , replace=T))
-        return(cbind(a,b))
+    new.inds.df = do.call(rbind,lapply(  unique(inds.df$deme), function(d){	# iterate over demes
+                these.parents = which(inds.df$new.deme==d)
+                # HACK: if there's no available parents, pick ome
+                while (length(these.parents)==0) {
+                    parent.probs = inds.df$w*exp(-(inds.df$deme-d)^2/sigma)
+                    these.parents = sample.int(nrow(inds.df),1,prob=parent.probs)
+                }
+                if (length(these.parents)>1) {  # this is needed because of sample()'s bad behavior
+                    #find parents
+                    a = with(inds.df[these.parents,], sample(id,size=pop.sizes[d], prob=w, replace=TRUE))
+                    # MODIFY B|A TO ALLOW FOR ASSORTATIVE MATING & eg no selfing
+                    b = with(inds.df[these.parents,], sample(id,size=pop.sizes[d], prob=w, replace=TRUE))
+                } else {
+                    a = b = rep(inds.df[these.parents,"id"][1],pop.sizes[d])  # will be NA if no available parents
+                }
+                return(cbind(a,b))
     }))
-    lapply(seq_along(new.inds.df[,1]),function(NEW){
-        NEW = lapply(list(X1 = inds[[new.inds.df[NEW,1]]],X2 = inds[[new.inds.df[NEW,2]]]),function(PAR){  lapply(PAR,meiosis)   })
-        lapply(namesList(names(NEW[[1]])),function(C){lapply(NEW,function(PARNTL){PARNTL[[C]]})})
+    lapply(1:nrow(new.inds.df),function(k){
+       if (any(is.na(new.inds.df[k,]))) {
+           return( list( NA ) )
+       } else {
+           sperms <- lapply( inds[[new.inds.df[k,1]]], meiosis )
+           eggs <- lapply( inds[[new.inds.df[k,2]]], meiosis )
+           return( lapply( chrnames, function (chrom) {
+                  list( X1=sperms[[chrom]], X2=eggs[[chrom]] )
+                } ) )
+       }
     })
 }
 

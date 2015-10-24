@@ -96,23 +96,35 @@ $$\begin{aligned}
 Here's a function to solve this numerically:
 ```{r solve_pde_setup, cache=TRUE}
 thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
-solve.pde <- function ( u, v=u, r, times, ... ) {
+solve.pde <- function ( u, v=u, r, times, grid, ... ) {
     vfn <- function(x,t){v(x=x,t=t,...)}
-    cline.A <- setup.prop.1D(grid=thegrid, func=u, ...)
-    cline.B <- setup.prop.1D(grid=thegrid, func=function(x,...)1-u(x,...), ...)
-    yinit <- c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) )
+    cline.A <- setup.prop.1D(grid=grid, func=u, ...)
+    cline.B <- setup.prop.1D(grid=grid, func=function(x,...)1-u(x,...), ...)
+    yinit <- c( rep(1.0,grid$N), rep(0.0,grid$N) )
     r <- 0.1
     pde.fn <- function (t,y,parms,...) {
-        yA <- y[1:thegrid$N]
-        yB <- y[thegrid$N+(1:thegrid$N)]
-        tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=thegrid)$dC
-        tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=thegrid)$dC
+        yA <- y[1:grid$N]
+        yB <- y[grid$N+(1:grid$N)]
+        tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=grid)$dC
+        tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=grid)$dC
         list( c( 
-                tran.A + r * (1-vfn(x=thegrid$x.mid,t=t)) * (yB-yA),
-                tran.B + r * vfn(x=thegrid$x.mid,t=t) * (yA-yB)
+                tran.A + r * (1-vfn(x=grid$x.mid,t=t)) * (yB-yA),
+                tran.B + r * vfn(x=grid$x.mid,t=t) * (yA-yB)
                 ) )
     }
-    ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
+    soln <- ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
+    attr(soln,"u") <- u
+    attr(soln,"v") <- v
+    return(soln)
+}
+cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u"), ... ) {
+    A.inds <- 1+(1:grid$N)
+    B.inds <- 1+grid$N+(1:grid$N)
+    sel.cline <- clinefn(grid$x.mid,s=s)
+    pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*sel.cline[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*(1-sel.cline)[col(pde.soln[,B.inds])] )
+    attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
+    attr(pde.cline,"nspec")<-1
+    return(pde.cline)
 }
 ```
 
@@ -126,18 +138,13 @@ s <- 0.1
 zone.age <- 100  # this is tau
 tt <- seq(0,zone.age,length.out=100)
 r <- 0.1
-pde.soln <- solve.pde( u=tanh_cline, r=r, times=tt, s=s )
+pde.soln <- solve.pde( u=tanh_cline, r=r, times=tt, s=s, grid=thegrid )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
 These combine to give the predicted cline:
 ```{r show_pde_cline,cache=TRUE,depends="solve_pde_setup"}
-A.inds <- 1+(1:thegrid$N)
-B.inds <- 1+thegrid$N+(1:thegrid$N)
-sel.cline <- tanh_cline(thegrid$x.mid,s=s)
-pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*sel.cline[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*(1-sel.cline)[col(pde.soln[,B.inds])] )
-attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
-attr(pde.cline,"nspec")<-1
+pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
 # same thing, plotted with lines
 clineplot(pde.cline,main=sprintf("clines, at r=%0.2f",r))
@@ -155,7 +162,7 @@ zone.age	= 50
 ndemes 		= 500
 deme.size 	= 10
 ninds 		= ndemes*deme.size
-SIGMA 		= 1
+SIGMA 		= 10
 s           = 0.1
 qtl         = list(chr1=data.frame(traits=c("underdominant"), s = s,pos=c(0.5)))
 # spatial locations
