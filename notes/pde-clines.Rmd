@@ -95,37 +95,10 @@ $$\begin{aligned}
 
 Here's a function to solve this numerically:
 ```{r solve_pde_setup, cache=TRUE}
+source("cline-fns.R")
 thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
-solve.pde <- function ( u, v=u, r, times, grid, ... ) {
-    vfn <- function(x,t){v(x=x,t=t,...)}
-    cline.A <- setup.prop.1D(grid=grid, func=u, ...)
-    cline.B <- setup.prop.1D(grid=grid, func=function(x,...)1-u(x,...), ...)
-    yinit <- c( rep(1.0,grid$N), rep(0.0,grid$N) )
-    r <- 0.1
-    pde.fn <- function (t,y,parms,...) {
-        yA <- y[1:grid$N]
-        yB <- y[grid$N+(1:grid$N)]
-        tran.A <- tran.1D(C=yA, A=cline.A, D=1/2, dx=grid)$dC
-        tran.B <- tran.1D(C=yB, A=cline.B, D=1/2, dx=grid)$dC
-        list( c( 
-                tran.A + r * (1-vfn(x=grid$x.mid,t=t)) * (yB-yA),
-                tran.B + r * vfn(x=grid$x.mid,t=t) * (yA-yB)
-                ) )
-    }
-    soln <- ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
-    attr(soln,"u") <- u
-    attr(soln,"v") <- v
-    return(soln)
-}
-cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u"), ... ) {
-    A.inds <- 1+(1:grid$N)
-    B.inds <- 1+grid$N+(1:grid$N)
-    sel.cline <- clinefn(grid$x.mid,s=s)
-    pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*sel.cline[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*(1-sel.cline)[col(pde.soln[,B.inds])] )
-    attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
-    attr(pde.cline,"nspec")<-1
-    return(pde.cline)
-}
+solve.pde
+cline.from.soln
 ```
 
 
@@ -158,9 +131,9 @@ We'll setup, run, and summarize simulations
 as described in [this file](../sims/run-sims.html).
 ```{r setup_sims, cache=TRUE}
 source("../sims/sim-fns.R")
-zone.age	= 50
+zone.age	= 20
 ndemes 		= 500
-deme.size 	= 10
+deme.size 	= 5
 ninds 		= ndemes*deme.size
 SIGMA 		= 10
 s           = 0.1
@@ -190,7 +163,18 @@ lines(xx,1-tanh_cline(xx,s=s,sigma=SIGMA),col='red')
 ```
 Looks pretty reasonable.
 
+Here's the PDE solution:
 ```{r match_pde}
 tt <- seq(0,zone.age,length.out=100)
-pde.solns <- lapply(rvals, function (r) { solve.pde( u=tanh_cline, r=r, times=tt, s=s ) })
+pde.solns <- lapply(rvals, function (r) { solve.pde( u=function(...)1-tanh_cline(...), r=r, times=tt, s=s, grid=thegrid ) })
+pde.clines <- lapply( pde.solns, cline.from.soln, grid=thegrid )
+match.clines <- sapply(pde.clines,function(x)x[length(tt),])
+```
+Now, comparing the PDE solution to the others:
+```{r match_cline_pde}
+for (k in seq_along(rvals)) {
+    plot(xx,freqs[,k],type='l',xlab="spatial location",ylab="proportion",main=sprintf("r=%0.3f",rvals[k]))
+    lines(xx,1-tanh_cline(xx,s=s,sigma=SIGMA),col='red',lwd=3)
+    lines(1-thegrid$x.mid*SIGMA,match.clines[,k],col='green',lwd=3)
+}
 ```

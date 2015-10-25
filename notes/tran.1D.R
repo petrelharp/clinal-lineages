@@ -1,6 +1,8 @@
 tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL, 
     flux.down = NULL, a.bl.up = NULL, a.bl.down = NULL, D = 0, 
-    v = 0, AFDW = 1, VF = 1, A = 1, dx, full.check = FALSE, full.output = FALSE) 
+    v = 0, AFDW = 1, VF = 1, A = 1, dx, 
+    log.A = FALSE,   # TRUE if A is given in log units
+    full.check = FALSE, full.output = FALSE) 
 {
     if (is.null(dx)) 
         stop("error: dx should be inputted ")
@@ -94,15 +96,14 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
         if (is.null(A$int) || is.null(A$mid)) 
             stop("error: the surface area A is NULL, should contain (numeric) values")
         if (!is.null(A$int)) {
-            if (!((length(A$int) == 1) || (length(A$int) == (N + 
-                1)))) 
+            if (!((length(A$int) == 1) || (length(A$int) == (N + 1)))) 
                 stop("error: A$int should be a vector of length 1 or N+1")
         }
         if (!is.null(A$mid)) {
             if (!((length(A$mid) == 1) || (length(A$mid) == (N)))) 
                 stop("error: A$mid should be a vector of length 1 or N")
         }
-        if (any(A$int < 0) || any(A$mid < 0)) 
+        if ( (any(A$int <= 0) || any(A$mid <= 0)) || (!log.A && ( any(A$int==0) || any(A$mid==0) )) )
             stop("error: the area A should always be positive")
         gn <- names(grid)
         if (!"dx" %in% gn) 
@@ -273,7 +274,13 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
         flux[1] <- flux.up
     if (!is.null(flux.down)) 
         flux[N + 1] <- flux.down
-    dC <- -diff(A$int * flux)/A$mid/VF$mid/grid$dx
+    
+    if (!log.A) {
+        dC <- -diff(A$int * flux)/A$mid/VF$mid/grid$dx
+    } else {
+        dC <- -( diff(A$int)*flux + diff(flux) )/VF$mid/grid$dx
+    }
+    if (any(is.na(dC))) { browser() }
     if (!full.output) {
         return(list(dC = dC, flux.up = flux[1], flux.down = flux[length(flux)]))
     }

@@ -1,0 +1,54 @@
+---
+title: "Using ReacTran"
+date: "`r date()`"
+---
+
+`ReacTran::tran.1D` returns the reaction-diffusion part of an equation that has a term like
+$$\begin{aligned}
+    \frac{1}{A} \frac{d}{dx}  A f(x)  ,
+\end{aligned}$$
+where $f$ is the flux.
+This can run into numerical difficulties if $A$ is very small (numerically zero).
+In this case, it makes sense to solve, equivalently,
+$$\begin{aligned}
+    \frac{d}{dx} f(x) + f(x) \frac{d}{dx} \log A 
+\end{aligned}$$
+I have modified `tran.1D` to do this (in [tran.1D.R](tran.1D.R)),
+allowing us to pass in $\log A$ instead of $A$.
+
+Now we need a good way to compute the $\log$ of the cline function 
+$$\begin{aligned}
+    c(x) = \frac{1}{2}(1+\tanh(-2 x \sqrt(s)/\sigma)) .
+\end{aligned}$$
+Suppose that $x$ is  large and positive (where the problem is).
+We can rewrite
+$$\begin{aligned}
+1+\tanh(-x) 
+&= 1+\frac{e^{-x}-e^{x}}{e^{-x}+e^{x}} \\
+&= \frac{2e^{-x}}{e^x+e^{-x}} \\
+&= \frac{2e^{-x}}{e^x(1+e^{-2x})} 
+&= \frac{2e^{-2x}}{1+e^{-2x}} 
+\end{aligned}$$
+and so
+$$\begin{aligned}
+\log(1+\tanh(x) )
+&= \log(2) - 2x - \log(1+e^{-2x}) .
+\end{aligned}$$
+
+Here's a quick check:
+```{r log_tanh}
+tanh_cline <- function (x,s,sigma=1,log=FALSE) {
+    if (log) {
+        - (4*x*sqrt(s)/sigma) - log1p(exp(-4*x*sqrt(s)/sigma))
+    } else {
+        (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+    }
+}
+xx <- seq(-30,50,length.out=200)
+# not log-scale
+plot(xx,tanh_cline(xx,s=0.1),type='l')
+lines(xx,exp(tanh_cline(xx,s=0.1,log=TRUE)),col='red',lty=3,lwd=2)
+# log-scale
+plot(xx,log(tanh_cline(xx,s=0.1)),type='l',ylim=range(tanh_cline(xx,s=0.1,log=TRUE)))
+lines(xx,(tanh_cline(xx,s=0.1,log=TRUE)),col='red',lty=3,lwd=2)
+```
