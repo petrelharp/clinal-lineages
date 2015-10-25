@@ -331,8 +331,8 @@ Now, let's run the killed lineage backwards in it:
 ```{r fwds_back_pde, cache=TRUE, depends="fwds_pde"}
 yinit <- rep(1.0,thegrid$N)
 rev.pde <- function (t,y,parms,...) {
-    p <- cline.interp(tau-t,soln=fwds.soln)
-    # p <- setup.prop.1D(grid=thegrid, xy=cbind(thegrid$x.mid,cline.interp(tau-t)), interp="linear")
+    p <- cline_interp(tau-t,soln=fwds.soln)
+    # p <- setup.prop.1D(grid=thegrid, xy=cbind(thegrid$x.mid,cline_interp(tau-t)), interp="linear")
     tran <- tran.1D(C=y, A=p, D=1/2, dx=thegrid)$dC
     list( tran - r * (1-p) * y )
 }
@@ -914,7 +914,7 @@ plot.tvals <- floor(seq(0,tau,length.out=7))[-1]
 layout(t(1:2))
 for (tval in plot.tvals) {
     matplot( thegrid$x.mid, 
-            pcline(thegrid$x.mid, p=sapply( pde.solns, cline.interp, T=tval ) ), 
+            pcline(thegrid$x.mid, p=sapply( pde.solns, cline_interp, T=tval ) ), 
                    type='l', main=sprintf("t=%d",tval) 
         )
     legend("bottomleft",lty=1:5,col=1:6,legend=paste("r=",round(rvals/2,digits=2)))

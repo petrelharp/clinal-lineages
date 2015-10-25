@@ -1,3 +1,4 @@
+
 tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL, 
     flux.down = NULL, a.bl.up = NULL, a.bl.down = NULL, D = 0, 
     v = 0, AFDW = 1, VF = 1, A = 1, dx, 
@@ -24,9 +25,8 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
             (rep(VF, length.out = (N + 1))[1:N] + rep(VF, length.out = (N + 
                 1))[2:(N + 1)]))
     if (!is.list(A)) 
-        A <- list(int = rep(A, length.out = (N + 1)), mid = 0.5 * 
-            (rep(A, length.out = (length(C) + 1))[1:N] + rep(A, 
-                length.out = (N + 1))[2:(N + 1)]))
+        A <- list(int = rep(A, length.out = (N + 1)), 
+                  mid = 0.5 * (rep(A, length.out = (length(C) + 1))[1:N] + rep(A, length.out = (N + 1))[2:(N + 1)]))
     if (is.list(dx)) 
         grid <- dx
     if (!is.list(dx)) 
@@ -278,9 +278,10 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
     if (!log.A) {
         dC <- -diff(A$int * flux)/A$mid/VF$mid/grid$dx
     } else {
-        dC <- -( diff(A$int)*flux + diff(flux) )/VF$mid/grid$dx
+        # (e^x f(x) - e^y f(y))/e^z = e^(x-z) f(x) - e^(y-z) f(y)
+        dC <- -( exp(A$int[-1]-A$mid)*flux[-1] - exp(A$int[-grid$N]-A$mid)*flux[-grid$N] )/VF$mid/grid$dx
     }
-    if (any(is.na(dC))) { browser() }
+    # if (any(is.na(dC))) { browser() }
     if (!full.output) {
         return(list(dC = dC, flux.up = flux[1], flux.down = flux[length(flux)]))
     }

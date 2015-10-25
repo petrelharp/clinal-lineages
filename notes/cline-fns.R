@@ -2,8 +2,12 @@ pcline <- function (x,r,p=recombfn(x,2*r,...),recombfn,...) {
     (1/2)*( 1 - sign(x)*p )
 }
 
-tanh_cline <- function (x,s,sigma=1,...) {
-    (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+tanh_cline <- function (x,s,sigma=1,log=FALSE,...) {
+    if (log) {
+        - (4*x*sqrt(s)/sigma) - log1p(exp(-4*x*sqrt(s)/sigma))
+    } else {
+        (1/2)*(1+tanh(-2*x*sqrt(s)/sigma))
+    }
 }
 
 tanh_drift <- function (x,s,sigma=1) {
@@ -56,19 +60,23 @@ cline_interp <- function (T,soln) {
     return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
 }
 
-solve.pde <- function ( u, v=u, r, times, grid, ... ) {
+solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, 
+                       um1=function(...){1-u(...)}, ... ) {
     # Solve the pde for a lineage 
     #  where 'u' gives the drift and 'v' the rate of recombination.
+    #  and if log.u is TRUE then u is actually log(proportion)
     vfn <- function(x,t){v(x=x,t=t,...)}
-    u.vec <- u(x=grid$x.mid,t=t,...)
+    u.vec <- u(x=grid$x.int,t=t,...)
+    um1.vec <- um1(x=grid$x.int,t=t,...) # 1-u.vec, but maybe log(1-u)
     v.vec <- v(x=grid$x.mid,t=t,...)
-    yinit <- c( rep(1.0,grid$N), rep(0.0,grid$N) )
+    if (log.u) { v.vec <- exp(v.vec) }
+    yinit <- c( rep(0.0,grid$N), rep(1.0,grid$N) )
     r <- 0.1
     pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
-        tran.A <- tran.1D(C=yA, A=u.vec, D=1/2, dx=grid)$dC
-        tran.B <- tran.1D(C=yB, A=1-u.vec, D=1/2, dx=grid)$dC
+        tran.A <- tran.1D(C=yA, A=u.vec, D=1/2, dx=grid, log.A=log.u)$dC
+        tran.B <- tran.1D(C=yB, A=um1.vec, D=1/2, dx=grid, log.A=log.u)$dC
         # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
         list( c( 
                 tran.A + r * (1-v.vec) * (yB-yA),
@@ -76,7 +84,11 @@ solve.pde <- function ( u, v=u, r, times, grid, ... ) {
                 ) )
     }
     soln <- ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
-    attr(soln,"u") <- function(x,t) {u(x=x,...)}
+    attr(soln,"u") <- if (log.u) { 
+            function(x,t) {exp(u(x=x,...))} 
+        } else {
+            function(x,t) {u(x=x,...)} 
+        }
     attr(soln,"v") <- vfn
     return(soln)
 }

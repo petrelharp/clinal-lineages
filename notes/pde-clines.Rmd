@@ -95,8 +95,7 @@ $$\begin{aligned}
 
 Here's a function to solve this numerically:
 ```{r solve_pde_setup, cache=TRUE}
-source("cline-fns.R")
-thegrid <- setup.grid.1D(x.up=-15, x.down=15, N = 5000)
+thegrid <- setup.grid.1D(x.up=-50, x.down=50, N = 5000)
 solve.pde
 cline.from.soln
 ```
@@ -111,7 +110,9 @@ s <- 0.1
 zone.age <- 100  # this is tau
 tt <- seq(0,zone.age,length.out=100)
 r <- 0.1
-pde.soln <- solve.pde( u=tanh_cline, r=r, times=tt, s=s, grid=thegrid )
+log_u <- function(x,...){ tanh_cline(x=-x,...,log=TRUE) }
+log_1mu <- function(x,...){ tanh_cline(x=x,...,log=TRUE) }
+pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, s=s, grid=thegrid, log.u=TRUE )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
@@ -122,6 +123,8 @@ image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
 # same thing, plotted with lines
 clineplot(pde.cline,main=sprintf("clines, at r=%0.2f",r))
 ```
+**Note:** the range should be wide enough these are *going to zero*
+at the ends, or else we have to worry about the boundary conditions.
 
 
 Comparison to simulation

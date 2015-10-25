@@ -52,3 +52,38 @@ lines(xx,exp(tanh_cline(xx,s=0.1,log=TRUE)),col='red',lty=3,lwd=2)
 plot(xx,log(tanh_cline(xx,s=0.1)),type='l',ylim=range(tanh_cline(xx,s=0.1,log=TRUE)))
 lines(xx,(tanh_cline(xx,s=0.1,log=TRUE)),col='red',lty=3,lwd=2)
 ```
+
+Proof of concept
+----------------
+
+```{r check_reactran}
+library(ReacTran)
+orig.tran.1D <- tran.1D
+# modified version with log.A option
+source("tran.1D.R")
+
+thegrid <- setup.grid.1D(x.up=-30, x.down=30, N = 5000)
+
+Avec <- tanh_cline(thegrid$x.mid,s=1)
+
+# original form
+pde.fn <- function (t,y,parms,...) {
+    tran <- orig.tran.1D(C=y, A=Avec, D=1/2, dx=thegrid)$dC
+    list( tran + (1-Avec) * y )
+}
+
+yinit <- rep(1.0,thegrid$N)
+times <- seq(0,1,length.out=100)
+soln <- ode.1D( y=yinit, times=times, func=pde.fn, nspec=1 )
+image(soln,legend=TRUE)
+
+logAvec <- tanh_cline(thegrid$x.mid,log=TRUE,s=1)
+
+pde.fn.log <- function (t,y,parms,...) {
+    tran <- tran.1D(C=y, A=logAvec, D=1/2, dx=thegrid, log.A=TRUE)$dC
+    list( tran + (1-Avec) * y )
+}
+
+soln <- ode.1D( y=yinit, times=times, func=pde.fn.log, nspec=1 )
+image(soln,legend=TRUE)
+```
