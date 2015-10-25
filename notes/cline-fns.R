@@ -120,8 +120,8 @@ cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     A.inds <- 1+(1:grid$N)
     B.inds <- 1+grid$N+(1:grid$N)
     sel.cline <- outer( grid$x.mid, soln[nrow(soln),1], clinefn )
-    pde.cline <- cbind( pde.soln[,1], pde.soln[,A.inds]*sel.cline[col(pde.soln[,A.inds])] + pde.soln[,B.inds]*(1-sel.cline)[col(pde.soln[,B.inds])] )
-    attributes(pde.cline) <- c( attributes(pde.cline), attributes(pde.soln)[setdiff(names(attributes(pde.soln)),c("dim","dimnames"))] )
+    pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
+    attributes(pde.cline) <- c( attributes(pde.cline), attributes(soln)[setdiff(names(attributes(soln)),c("dim","dimnames"))] )
     attr(pde.cline,"nspec")<-1
     return(pde.cline)
 }

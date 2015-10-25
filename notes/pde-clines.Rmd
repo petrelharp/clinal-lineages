@@ -45,9 +45,6 @@ which we denote by
 $$
 q(x,z,\tau,r) = \P^x\{ Z_\tau = A \} .
 $$
-(Note that this gives us linkage to the selected site,
-and for the cline shape we only need $p(x,\tau) q(x,A,\tau,r) + (1-p(x,\tau))q(x,B,\tau,r)$,
-but it is easier to compute this.)
 Also note that by symmetry, we should have that
 if $r>0$, then
 $$\begin{aligned}
@@ -80,6 +77,29 @@ $$\begin{aligned}
         &= 
         \grad \log(1-p(x)) \cdot \grad q_B(x,t) + \frac{\sigma^2}{2} \Delta q_B(x,t) + r p(x) (q_A(x,t)-q_B(x,t)) .
 \end{aligned}$$
+
+The cline shape
+---------------
+
+The PDE above gives probabilities given the initial background,
+so therefore *linkage* to the selected site.
+For the cline shape we need to average over choice of background,
+which we denote
+$$\begin{aligned}
+p(x,\tau,r) =  p(x,\tau) q(x,A,\tau,r) + (1-p(x,\tau))q(x,B,\tau,r) .
+\end{aligned}$$
+Note that
+$$\begin{aligned}
+q(x,A,\tau,r) &= 1-q(-x,B,\tau,r) \\
+p(x,\tau) &= 1-p(-x,\tau) 
+\end{aligned}$$
+and so
+$$\begin{aligned}
+p(x,\tau,r) =  p(x,\tau) q(x,A,\tau,r) + p(-x,\tau) (1-q(-x,A,\tau,r))A .
+\end{aligned}$$
+
+
+
 
 Paving the way for analytic approximations
 ------------------------------------------
@@ -147,7 +167,7 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d
 
 And, the cline flattens out *very* slowly:
 ```{r longer_t_sim}
-r <- 0.1
+r <- 1.0
 zone.age <- 2000  # this is tau
 tt <- seq(0,zone.age,length.out=100)
 pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
@@ -157,17 +177,6 @@ axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
 pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
 clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
-This should be symmetric.  Let's check:
-```{r check_symmetry}
-pde.soln <- solve.pde( um1=log_u, u=log_1mu, r=r, times=tt, 
-                yinit=c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) ),
-                s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
-image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
-axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
-pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
-clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
-```
-
 
 
 Comparison to simulation
@@ -191,7 +200,7 @@ sim.sums <- spBreaks(sim)
 and, postprocess:
 ```{r genotype_sims, cache=TRUE, depends="setup_sims"}
 rvals <- c(0,exp(seq(log(.001),log(0.5),length.out=10)))
-loci <- list(0.5+rvals)
+loci <- list(0.5+c(rev(rvals[-1]),rvals))
 genotypes <- data.frame(do.call(cbind,lapply(sim.sums$ind.ancest, geno.ind, loci)))
 freqs <- apply(genotypes,1,function(Z){
             tapply(Z,cut(1:ncol(genotypes),breaks=seq(0,ncol(genotypes),deme.size)),mean)/2
@@ -208,6 +217,7 @@ Looks pretty reasonable.
 
 Here's the PDE solution:
 ```{r match_pde,cache=TRUE,depends="solve_pde_setup"}
+zone.age <- sim$pars["n.gen"]
 tt <- seq(0,zone.age,length.out=100)
 pde.solns <- lapply(rvals, function (r) { solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                                                 s=s, sigma=sigma, grid=thegrid, log.u=TRUE ) } )
