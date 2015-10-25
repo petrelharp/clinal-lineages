@@ -71,7 +71,6 @@ solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE,
     v.vec <- v(x=grid$x.mid,t=t,...)
     if (log.u) { v.vec <- exp(v.vec) }
     yinit <- c( rep(0.0,grid$N), rep(1.0,grid$N) )
-    r <- 0.1
     pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
@@ -90,6 +89,7 @@ solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE,
             function(x,t) {u(x=x,...)} 
         }
     attr(soln,"v") <- vfn
+    attr(soln,"r") <- r
     return(soln)
 }
 cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u") ) {

@@ -15,6 +15,7 @@ $$
 fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 library(ReacTran)
+source("tran.1D.R") # fix for log.A
 ```
 
 *Useful functions used below:*
@@ -95,9 +96,11 @@ $$\begin{aligned}
 
 Here's a function to solve this numerically:
 ```{r solve_pde_setup, cache=TRUE}
-thegrid <- setup.grid.1D(x.up=-50, x.down=50, N = 5000)
-solve.pde
+thegrid <- setup.grid.1D(x.up=-100, x.down=100, N = 5000)
+log_u <- function(x,...){ tanh_cline(x=-x,...,log=TRUE) }
+log_1mu <- function(x,...){ tanh_cline(x=x,...,log=TRUE) }
 cline.from.soln
+solve.pde
 ```
 
 
@@ -106,18 +109,18 @@ Numerical solutions
 
 Let's solve this numerically.
 ```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
+r <- 0.1
 s <- 0.1
+sigma <- 10
 zone.age <- 100  # this is tau
 tt <- seq(0,zone.age,length.out=100)
-r <- 0.1
-log_u <- function(x,...){ tanh_cline(x=-x,...,log=TRUE) }
-log_1mu <- function(x,...){ tanh_cline(x=x,...,log=TRUE) }
-pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, s=s, grid=thegrid, log.u=TRUE )
+pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+                  s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
 These combine to give the predicted cline:
-```{r show_pde_cline,cache=TRUE,depends="solve_pde_setup"}
+```{r show_pde_cline,cache=TRUE,depends=c("solve_pde_setup","solve_pde")}
 pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
 # same thing, plotted with lines
@@ -134,17 +137,14 @@ We'll setup, run, and summarize simulations
 as described in [this file](../sims/run-sims.html).
 ```{r setup_sims, cache=TRUE}
 source("../sims/sim-fns.R")
-zone.age	= 20
 ndemes 		= 500
 deme.size 	= 5
 ninds 		= ndemes*deme.size
-SIGMA 		= 10
-s           = 0.1
-qtl         = list(chr1=data.frame(traits=c("underdominant"), s = s,pos=c(0.5)))
+qtl         = list(chr1=data.frame(traits=c("underdominant"), s = s, pos=c(0.5)))
 # spatial locations
 xx <- (1:ndemes)-0.5-ndemes/2
 # run the simulation
-sim <- sim.zone(n.gen=zone.age,n.ind=ninds,n.deme=ndemes,sigma=SIGMA,quiet=TRUE)
+sim <- sim.zone(n.gen=zone.age,n.ind=ninds,n.deme=ndemes,sigma=sigma,quiet=TRUE)
 # post-process
 sim.sums <- spBreaks(sim)
 ```
@@ -162,22 +162,23 @@ OK, now let's match the PDE solution to the simulation.
 First, does the cline at the selected locus match the the tanh cline?
 ```{r match_cline}
 plot(xx,freqs[,1],type='l',xlab="spatial location",ylab="proportion")
-lines(xx,1-tanh_cline(xx,s=s,sigma=SIGMA),col='red')
+lines(xx,1-tanh_cline(xx,s=s,sigma=sigma),col='red')
 ```
 Looks pretty reasonable.
 
 Here's the PDE solution:
-```{r match_pde}
+```{r match_pde,cache=TRUE,depends="solve_pde_setup"}
 tt <- seq(0,zone.age,length.out=100)
-pde.solns <- lapply(rvals, function (r) { solve.pde( u=function(...)1-tanh_cline(...), r=r, times=tt, s=s, grid=thegrid ) })
+pde.solns <- lapply(rvals, function (r) { solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+                                                s=s, sigma=sigma, grid=thegrid, log.u=TRUE ) } )
 pde.clines <- lapply( pde.solns, cline.from.soln, grid=thegrid )
-match.clines <- sapply(pde.clines,function(x)x[length(tt),])
+match.clines <- sapply(pde.clines,function(x)x[length(tt),-1])
 ```
 Now, comparing the PDE solution to the others:
 ```{r match_cline_pde}
 for (k in seq_along(rvals)) {
     plot(xx,freqs[,k],type='l',xlab="spatial location",ylab="proportion",main=sprintf("r=%0.3f",rvals[k]))
-    lines(xx,1-tanh_cline(xx,s=s,sigma=SIGMA),col='red',lwd=3)
-    lines(1-thegrid$x.mid*SIGMA,match.clines[,k],col='green',lwd=3)
+    lines(xx,1-tanh_cline(xx,s=s,sigma=sigma),col='red',lwd=3,lty=3)
+    lines(1-thegrid$x.mid,match.clines[,k],col='green',lwd=3)
 }
 ```
