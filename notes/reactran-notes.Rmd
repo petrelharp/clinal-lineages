@@ -3,6 +3,9 @@ title: "Using ReacTran"
 date: "`r date()`"
 ---
 
+The interface area
+------------------
+
 `ReacTran::tran.1D` returns the reaction-diffusion part of an equation that has a term like
 $$\begin{aligned}
     \frac{1}{A} \frac{d}{dx}  A f(x)  ,
@@ -87,3 +90,29 @@ pde.fn.log <- function (t,y,parms,...) {
 soln <- ode.1D( y=yinit, times=times, func=pde.fn.log, nspec=1 )
 image(soln,legend=TRUE)
 ```
+
+
+<!--
+Boundary conditions
+-------------------
+
+We want the function `tran.1D` to return the generator of a Markov process
+applied to a function
+-- not a sub-Markov process, with killing,
+as that appears in the reaction term.
+What should the boundary conditions be?
+Let $G$ be the generator,
+which we write in the form
+$$\begin{aligned}
+Gf = \frac{1}{A} \grad \cdot A D \grad f,
+\end{aligned}$$
+where $D \grad f$ is the *flux*.
+We know that $G\textbf{1}=0$,
+where $\textbf{1}$ is the constant function.
+Well,
+$$\begin{aligned}
+    G\textbf{1} 
+    &=
+\end{aligned}$$
+
+-->

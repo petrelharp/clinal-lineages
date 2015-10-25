@@ -60,22 +60,43 @@ cline_interp <- function (T,soln) {
     return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
 }
 
-solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, 
-                       um1=function(...){1-u(...)}, ... ) {
+forwards.pde <- function (s,times,grid) {
+    # solve the pde for frequencies, forwards in time
+    yinit <- ifelse( grid$x.mid>0, 0, 1 )
+    fwds.pde <- function (t,y,parms,...) {
+        tran <- tran.1D(C=y, D=1/2, dx=grid)$dC
+        list( tran + s * y * (1-y) * (2*y-1) )
+    }
+    soln <- ode.1D( y=yinit, times=times, func=fwds.pde, nspec=1 ) # note FIRST COLUMN IS TIME
+    attr(soln,"s") <- s
+    return(soln)
+}
+
+solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, 
+                yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), ... ) {
     # Solve the pde for a lineage 
+    #  moving between backgrounds
     #  where 'u' gives the drift and 'v' the rate of recombination.
     #  and if log.u is TRUE then u is actually log(proportion)
+    # Note that um1 should be provided if u is in log scale.
     vfn <- function(x,t){v(x=x,t=t,...)}
     u.vec <- u(x=grid$x.int,t=t,...)
+    if (missing(um1)) {
+        if (log.u) {
+            warning("Computing 1-u from u even though u is in log scale.")
+            um1 <- function(...){-expm1(u(...))}
+        } else {
+            um1 <- function(...) u(...)
+        }
+    }
     um1.vec <- um1(x=grid$x.int,t=t,...) # 1-u.vec, but maybe log(1-u)
     v.vec <- v(x=grid$x.mid,t=t,...)
     if (log.u) { v.vec <- exp(v.vec) }
-    yinit <- c( rep(0.0,grid$N), rep(1.0,grid$N) )
     pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
-        tran.A <- tran.1D(C=yA, A=u.vec, D=1/2, dx=grid, log.A=log.u)$dC
-        tran.B <- tran.1D(C=yB, A=um1.vec, D=1/2, dx=grid, log.A=log.u)$dC
+        tran.A <- tran.1D(C=yA, A=u.vec, D=1/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
+        tran.B <- tran.1D(C=yB, A=um1.vec, D=1/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
         # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
         list( c( 
                 tran.A + r * (1-v.vec) * (yB-yA),
@@ -92,6 +113,7 @@ solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE,
     attr(soln,"r") <- r
     return(soln)
 }
+
 cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     # convert the output from solve.pde to the cline
     # by averaging over which allele was sampled

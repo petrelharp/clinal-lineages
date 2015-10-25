@@ -43,11 +43,16 @@ a lineage which we sample at location $x$ on background $z$,
 derived from background $A$ $\tau$ units of time ago,
 which we denote by
 $$
-q(x,z,\tau,r) = \P\{ Z_\tau = A \} .
+q(x,z,\tau,r) = \P^x\{ Z_\tau = A \} .
 $$
 (Note that this gives us linkage to the selected site,
-and for the cline shape we only need $p(x,\tau) q(x,A,\tau,r) + (1-p(x,\tau) q(x,B,\tau,r)$,
+and for the cline shape we only need $p(x,\tau) q(x,A,\tau,r) + (1-p(x,\tau))q(x,B,\tau,r)$,
 but it is easier to compute this.)
+Also note that by symmetry, we should have that
+if $r>0$, then
+$$\begin{aligned}
+    q(x,z,\tau,r) \to \frac{1}{2} \qquad \text{as } \tau \to \infty .
+\end{aligned}$$
 
 Let $f$ be a function from $\R \times \{A,B\} \to \R$.
 The process above has generator
@@ -112,7 +117,7 @@ Let's solve this numerically.
 r <- 0.1
 s <- 0.1
 sigma <- 10
-zone.age <- 100  # this is tau
+zone.age <- 200  # this is tau
 tt <- seq(0,zone.age,length.out=100)
 pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                   s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
@@ -124,14 +129,49 @@ These combine to give the predicted cline:
 pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
 # same thing, plotted with lines
-clineplot(pde.cline,main=sprintf("clines, at r=%0.2f",r))
+clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
 **Note:** the range should be wide enough these are *going to zero*
 at the ends, or else we have to worry about the boundary conditions.
 
+The smaller $r$ is, the slower the per-background probabilities smooth out:
+```{r small_r_sim}
+r <- 0.01
+pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+                  s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
+image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
+clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
+```
+
+And, the cline flattens out *very* slowly:
+```{r longer_t_sim}
+r <- 0.1
+zone.age <- 2000  # this is tau
+tt <- seq(0,zone.age,length.out=100)
+pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+                  s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
+image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
+clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
+```
+This should be symmetric.  Let's check:
+```{r check_symmetry}
+pde.soln <- solve.pde( um1=log_u, u=log_1mu, r=r, times=tt, 
+                yinit=c( rep(1.0,thegrid$N), rep(0.0,thegrid$N) ),
+                s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
+image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
+clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
+```
+
+
 
 Comparison to simulation
-------------------------
+========================
 
 We'll setup, run, and summarize simulations
 as described in [this file](../sims/run-sims.html).
@@ -173,6 +213,9 @@ pde.solns <- lapply(rvals, function (r) { solve.pde( u=log_u, um1=log_1mu, r=r, 
                                                 s=s, sigma=sigma, grid=thegrid, log.u=TRUE ) } )
 pde.clines <- lapply( pde.solns, cline.from.soln, grid=thegrid )
 match.clines <- sapply(pde.clines,function(x)x[length(tt),-1])
+for (k in floor(seq(1,length(rvals),length.out=3))) {
+    image(pde.solns[[k]],legend=TRUE,main=sprintf("r=%f",rvals[k]))
+}
 ```
 Now, comparing the PDE solution to the others:
 ```{r match_cline_pde}

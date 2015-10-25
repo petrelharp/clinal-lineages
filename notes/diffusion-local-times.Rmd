@@ -248,7 +248,7 @@ Then, by setting $\sigma$ to be very small, the solution at $x$ should be $\exp(
 layout(t(1:2))
 test.hetfn <- setup.prop.1D(grid=thegrid, func=function(x){rep(1,length(x))})
 pde.fn <- function (t,y,parms,...) {
-    tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+    tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
     list( tran - r * test.hetfn$mid * y )
 }
 pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
@@ -256,7 +256,7 @@ matplot(pde.soln,type='l',ylab="probability of no recomb", col='black',log='y')
 lines(tt,exp(-r*tt),lwd=2,lty=2,col='red')
 ## no diffusion
 pde.fn <- function (t,y,parms,...) {
-    tran <- tran.1D(C=y, A=clinefn, D=1e-6, dx=thegrid)$dC
+    tran <- tran.1D(C=y, A=clinefn, D=1e-6, flux.up=0, flux.down=0, dx=thegrid)$dC
     list( tran - r * hetfn$mid * y )
 }
 pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 )
@@ -269,7 +269,7 @@ matpoints( exp(outer( tt, -r*hetfn$mid[plot.x], "*" )), lty=4, col=rainbow(lengt
 Now, to solve the real problem:
 ```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
 pde.fn <- function (t,y,parms,...) {
-    tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+    tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
     list( tran - r * hetfn$mid * y )
 }
 pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
@@ -333,7 +333,7 @@ yinit <- rep(1.0,thegrid$N)
 rev.pde <- function (t,y,parms,...) {
     p <- cline_interp(tau-t,soln=fwds.soln)
     # p <- setup.prop.1D(grid=thegrid, xy=cbind(thegrid$x.mid,cline_interp(tau-t)), interp="linear")
-    tran <- tran.1D(C=y, A=p, D=1/2, dx=thegrid)$dC
+    tran <- tran.1D(C=y, A=p, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
     list( tran - r * (1-p) * y )
 }
 rev.soln <- ode.1D( y=yinit, times=tt, func=rev.pde, nspec=1, tcrit=tau ) # note FIRST COLUMN IS TIME
@@ -666,7 +666,7 @@ First note that the solution depends on where we put the boundaries:
 # NOTE: must install ReacTran from R-forge, e.g. 
 #   install.packages("ReacTran",repos="http://r-forge.r-project.org")
 # or else
-#   source("tran.1D.R")
+source("tran.1D.R")
 # to fix bug in using convective boundary conditions.
 x.eps <- 5*mean(thegrid$dx)
 solve.reflected <- function (x.up=-20) {
@@ -752,7 +752,7 @@ $$
 
 Here's the cline shape:
 ```{r show_cline, cache=TRUE}
-zeta.pcline <- function (x,r) { pcline(x,r,recombfn=function(x,r){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1) }
+zeta.pcline <- function (x,r) { pcline(x,r,recombfn=function(x,r,...){zeta.reflected(x=x/sqrt(tau*sigma^2),r=r*tau)},tau=1,sigma=1) }
 xx <- seq(-15,15,length.out=500)
 for (tau in c(5,50)) {
     plot(xx, zeta.pcline(xx,r=1), type='n', 
@@ -872,7 +872,7 @@ yinit <- rep(1.0,thegrid$N)
 tt <- seq(0,tau,length.out=100)
 pde.solns <- lapply( rvals, function (r) {
         pde.fn <- function (t,y,parms,...) {
-            tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+            tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
             if (any(is.na(tran))) { browser() }
             list( tran - r * hetfn$mid * y )
         }
@@ -904,7 +904,7 @@ tau <- 100
 tt <- seq(0,tau,length.out=100)
 pde.solns <- lapply( rvals, function (r) {
         pde.fn <- function (t,y,parms,...) {
-            tran <- tran.1D(C=y, A=clinefn, D=1/2, dx=thegrid)$dC
+            tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
             if (any(is.na(tran))) { browser() }
             list( tran - r * hetfn$mid * y )
         }

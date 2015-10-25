@@ -104,6 +104,7 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
                 stop("error: A$mid should be a vector of length 1 or N")
         }
         if ( (any(A$int <= 0) || any(A$mid <= 0)) || (!log.A && ( any(A$int==0) || any(A$mid==0) )) )
+        if ( !log.A && (any(A$int < 0) || any(A$mid < 0)) )
             stop("error: the area A should always be positive")
         gn <- names(grid)
         if (!"dx" %in% gn) 
@@ -274,13 +275,14 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
         flux[1] <- flux.up
     if (!is.null(flux.down)) 
         flux[N + 1] <- flux.down
-    
+
     if (!log.A) {
         dC <- -diff(A$int * flux)/A$mid/VF$mid/grid$dx
     } else {
         # (e^x f(x) - e^y f(y))/e^z = e^(x-z) f(x) - e^(y-z) f(y)
-        dC <- -( exp(A$int[-1]-A$mid)*flux[-1] - exp(A$int[-grid$N]-A$mid)*flux[-grid$N] )/VF$mid/grid$dx
+        dC <- -( exp(A$int[-1]-A$mid)*flux[-1] - exp(A$int[-(grid$N+1)]-A$mid)*flux[-(grid$N+1)] )/VF$mid/grid$dx
     }
+
     # if (any(is.na(dC))) { browser() }
     if (!full.output) {
         return(list(dC = dC, flux.up = flux[1], flux.down = flux[length(flux)]))
