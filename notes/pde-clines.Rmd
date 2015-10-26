@@ -124,8 +124,8 @@ Here's a function to solve this numerically:
 thegrid <- setup.grid.1D(x.up=-100, x.down=100, N = 5000)
 log_u <- function(x,...){ tanh_cline(x=-x,...,log=TRUE) }
 log_1mu <- function(x,...){ tanh_cline(x=x,...,log=TRUE) }
-cline.from.soln
-solve.pde
+cline_from_soln
+solve_pde
 ```
 
 
@@ -136,18 +136,19 @@ Let's solve this numerically.
 ```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
 r <- 0.1
 s <- 0.1
-sigma <- 10
+sigma <- 5
 zone.age <- 200  # this is tau
 tt <- seq(0,zone.age,length.out=100)
-pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+pde.soln <- solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                   s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
 These combine to give the predicted cline:
 ```{r show_pde_cline,cache=TRUE,depends=c("solve_pde_setup","solve_pde")}
-pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
-image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r))
+pde.cline <- cline_from_soln(pde.soln,grid=thegrid)
+image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r),yaxt='n')
+axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 # same thing, plotted with lines
 clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
@@ -157,11 +158,12 @@ at the ends, or else we have to worry about the boundary conditions.
 The smaller $r$ is, the slower the per-background probabilities smooth out:
 ```{r small_r_sim}
 r <- 0.01
-pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+pde.soln <- solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                   s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
-pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
+pde.cline <- cline_from_soln(pde.soln,grid=thegrid)
+layout(1)
 clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
 
@@ -170,11 +172,12 @@ And, the cline flattens out *very* slowly:
 r <- 1.0
 zone.age <- 2000  # this is tau
 tt <- seq(0,zone.age,length.out=100)
-pde.soln <- solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+pde.soln <- solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                   s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
 image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yaxt='n', ylab='space',zlim=c(0,1))
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
-pde.cline <- cline.from.soln(pde.soln,grid=thegrid)
+pde.cline <- cline_from_soln(pde.soln,grid=thegrid)
+layout(1)
 clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
 
@@ -186,6 +189,7 @@ We'll setup, run, and summarize simulations
 as described in [this file](../sims/run-sims.html).
 ```{r setup_sims, cache=TRUE}
 source("../sims/sim-fns.R")
+zone.age    = 50
 ndemes 		= 500
 deme.size 	= 5
 ninds 		= ndemes*deme.size
@@ -219,11 +223,11 @@ Here's the PDE solution:
 ```{r match_pde,cache=TRUE,depends="solve_pde_setup"}
 zone.age <- sim$pars["n.gen"]
 tt <- seq(0,zone.age,length.out=100)
-pde.solns <- lapply(rvals, function (r) { solve.pde( u=log_u, um1=log_1mu, r=r, times=tt, 
+pde.solns <- lapply(rvals, function (r) { solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                                                 s=s, sigma=sigma, grid=thegrid, log.u=TRUE ) } )
-pde.clines <- lapply( pde.solns, cline.from.soln, grid=thegrid )
+pde.clines <- lapply( pde.solns, cline_from_soln, grid=thegrid )
 match.clines <- sapply(pde.clines,function(x)x[length(tt),-1])
-for (k in floor(seq(1,length(rvals),length.out=3))) {
+for (k in floor(seq(2,length(rvals),length.out=3))) {
     image(pde.solns[[k]],legend=TRUE,main=sprintf("r=%f",rvals[k]))
 }
 ```

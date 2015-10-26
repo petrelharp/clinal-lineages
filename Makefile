@@ -7,10 +7,11 @@ else
 endif
 PANDOC_OPTS =  --to html --from markdown-implicit_figures --self-contained --standalone --section-divs --template $(THIS_DIR)/resources/rmarkdown-template.html --variable 'theme:bootstrap' --include-in-header $(THIS_DIR)/resources/header-scripts.html --mathjax --variable 'mathjax-url:$(MATHJAX)?config=TeX-AMS-MML_HTMLorMML' --variable 'libraries-url:$(THIS_DIR)/resources' --no-highlight --variable highlightjs=$(THIS_DIR)/resources/highlight 
 
+
 .PHONY : test
 
 %.md : %.Rmd
-	cd $(dir $<) && Rscript -e 'knitr::knit(basename("$<"),output=basename("$@"))'
+	cd $(dir $<) && Rscript -e 'knitr::opts_chunk$$set(fig.path=file.path("figure","$*",""),cache.path=file.path("cache","$*",""));knitr::knit(basename("$<"),output=basename("$@"))'
 
 %.html : %.md
 	cd $(dir $<) && pandoc $(notdir $<) $(PANDOC_OPTS) --output $(notdir $@)

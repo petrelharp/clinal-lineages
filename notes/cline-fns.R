@@ -60,11 +60,11 @@ cline_interp <- function (T,soln) {
     return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
 }
 
-forwards.pde <- function (s,times,grid) {
+forwards_pde <- function (s,times,grid,sigma=1) {
     # solve the pde for frequencies, forwards in time
     yinit <- ifelse( grid$x.mid>0, 0, 1 )
     fwds.pde <- function (t,y,parms,...) {
-        tran <- tran.1D(C=y, D=1/2, dx=grid)$dC
+        tran <- tran.1D(C=y, D=sigma^2/2, dx=grid)$dC
         list( tran + s * y * (1-y) * (2*y-1) )
     }
     soln <- ode.1D( y=yinit, times=times, func=fwds.pde, nspec=1 ) # note FIRST COLUMN IS TIME
@@ -72,14 +72,38 @@ forwards.pde <- function (s,times,grid) {
     return(soln)
 }
 
-solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, 
+forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
+        fwds.soln=forwards_pde(s=s,times=times,grid=grid),
+        yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), ... ) {
+    # solve the pde for a lineage 
+    # run backwards in the forwards-time profile
+    rev.pde.fn <- function (t,y,parms,...) {
+        yA <- y[1:grid$N]
+        yB <- y[grid$N+(1:grid$N)]
+        p <- cline_interp(max(times)-t,soln=fwds.soln)
+        tran.A <- tran.1D(C=yA, A=p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+        tran.B <- tran.1D(C=yB, A=1-p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+        # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
+        list( c( 
+                tran.A + r * (1-p) * (yB-yA),
+                tran.B + r * p * (yA-yB)
+                ) )
+    }
+    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(times) ) # note FIRST COLUMN IS TIME
+    attr(rev.soln,"r") <- r
+    attr(rev.soln,"s") <- s
+    attr(rev.soln,"s") <- s
+}
+
+solve_pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, sigma=1,
                 yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), ... ) {
     # Solve the pde for a lineage 
     #  moving between backgrounds
     #  where 'u' gives the drift and 'v' the rate of recombination.
     #  and if log.u is TRUE then u is actually log(proportion)
     # Note that um1 should be provided if u is in log scale.
-    vfn <- function(x,t){v(x=x,t=t,...)}
+    more.args <- c(list(sigma=sigma),list(...))
+    vfn <- function(x,t){do.call(v,c(list(x=x,t=t),more.args))}
     u.vec <- u(x=grid$x.int,t=t,...)
     if (missing(um1)) {
         if (log.u) {
@@ -95,8 +119,8 @@ solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1,
     pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
-        tran.A <- tran.1D(C=yA, A=u.vec, D=1/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
-        tran.B <- tran.1D(C=yB, A=um1.vec, D=1/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
+        tran.A <- tran.1D(C=yA, A=u.vec, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
+        tran.B <- tran.1D(C=yB, A=um1.vec, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=log.u)$dC
         # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
         list( c( 
                 tran.A + r * (1-v.vec) * (yB-yA),
@@ -105,17 +129,19 @@ solve.pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1,
     }
     soln <- ode.1D( y=yinit, times=times, func=pde.fn, nspec=2 ) # note FIRST COLUMN IS TIME
     attr(soln,"u") <- if (log.u) { 
-            function(x,t) {exp(u(x=x,...))} 
+            function(x,t) {exp(do.call(u,c(list(x=x),more.args)))}
         } else {
-            function(x,t) {u(x=x,...)} 
+            function(x,t) {do.call(u,c(list(x=x),more.args))}
         }
     attr(soln,"v") <- vfn
     attr(soln,"r") <- r
+    attr(soln,"sigma") <- sigma
+    attr(soln,"args") <- list(...)
     return(soln)
 }
 
-cline.from.soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
-    # convert the output from solve.pde to the cline
+cline_from_soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
+    # convert the output from solve_pde to the cline
     # by averaging over which allele was sampled
     A.inds <- 1+(1:grid$N)
     B.inds <- 1+grid$N+(1:grid$N)
