@@ -184,7 +184,7 @@ The cline is in green and the local probability of being in a heterozygote is in
 the drift (multiplied by $-1$) is in red.
 
 Now let's get local times for those walks.
-```{r lineage_local_times,cache=TRUE,depends="sim_lineage"}
+```{r lineage_local_times,cache=TRUE,dependson="sim_lineage"}
 xx <- seq( min(rws), max(rws), length.out=200 )
 xmids <- xx[-1]-diff(xx)/2
 lts <- attr(rws,"dt")*apply( matrix(findInterval(rws,xx),nrow=nrow(rws)), 2, tabulate, nbins=length(xx)-1 )
@@ -196,7 +196,7 @@ lines( (1-s)*(1-tanh_cline(xx,s=s))/(1-s*(1-tanh_cline(xx,s=s))), xx, lwd=2 )
 
 
 Here is the distribution of $T=\int_0^{`r tau`} f_H(X_t) dt$:
-```{r dist_het_time, cache=TRUE, depends="sim_het_time"}
+```{r dist_het_time, cache=TRUE, dependson="sim_het_time"}
 het.time <- weighted_time( rws, tanh_het, s=s )
 layout(1:2)
 hist( het.time, breaks=50, xlab="time in hets", freq=FALSE, main="histogram of T" ) 
@@ -244,7 +244,7 @@ r <- 1
 First, two quick checks: First, by setting $f_H=1$,
 we should have the solution $u(x,t,r) = \exp(-tr)$.
 Then, by setting $\sigma$ to be very small, the solution at $x$ should be $\exp(-trf_H(x))$.
-```{r solve_pde_check, cache=TRUE, depends="solve_pde_setup"}
+```{r solve_pde_check, cache=TRUE, dependson="solve_pde_setup"}
 layout(t(1:2))
 test.hetfn <- setup.prop.1D(grid=thegrid, func=function(x){rep(1,length(x))})
 pde.fn <- function (t,y,parms,...) {
@@ -267,7 +267,7 @@ matpoints( exp(outer( tt, -r*hetfn$mid[plot.x], "*" )), lty=4, col=rainbow(lengt
 **Looks good.**
 
 Now, to solve the real problem:
-```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
+```{r solve_pde, cache=TRUE, dependson="solve_pde_setup"}
 pde.fn <- function (t,y,parms,...) {
     tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
     list( tran - r * hetfn$mid * y )
@@ -292,7 +292,7 @@ check.t <- function (alpha) {
 check.t(1)
 ```
 and, at other values of $t$:
-```{r check_pde_soln_2, cache=TRUE, depends="check_pde_soln"}
+```{r check_pde_soln_2, cache=TRUE, dependson="check_pde_soln"}
 layout(t(1:2))
 check.t(0.1)
 check.t(0.2)
@@ -328,7 +328,7 @@ image(fwds.soln,legend=TRUE,main="mean cline development", yaxt='n', ylab='space
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
 Now, let's run the killed lineage backwards in it:
-```{r fwds_back_pde, cache=TRUE, depends="fwds_pde"}
+```{r fwds_back_pde, cache=TRUE, dependson="fwds_pde"}
 yinit <- rep(1.0,thegrid$N)
 rev.pde <- function (t,y,parms,...) {
     p <- cline_interp(tau-t,soln=fwds.soln)
@@ -342,7 +342,7 @@ axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
 ```
 
 Let's compare the case where the cline is set up instantly or not:
-```{r compare_rightness, cache=TRUE,depends=c("fwds_back_pde","solve_pde_setup","setup_fns")}
+```{r compare_rightness, cache=TRUE,dependson=c("fwds_back_pde","solve_pde_setup","setup_fns")}
 layout(t(1:2))
 fb.p <- clineplot(rev.soln,main="forwards-backwards")
 st.p <- clineplot(pde.soln,main="stationary cline")
@@ -413,7 +413,7 @@ Of course, we aren't actually trying to estimate the distribution of $T$ itself,
 but rather the probabilities of recombination (the Laplace transform).
 Here are these probabilities, as a function of $r$
 (the second plots are on a log-log scale):
-```{r recomb_prob_comparisons, cache=TRUE, depends="sim_general"}
+```{r recomb_prob_comparisons, cache=TRUE, dependson="sim_general"}
 rvals <- exp(seq(log(.001),log(0.5),length.out=400))
 precombs <- lapply( lt.comparison, function (lts) {
         sapply( lts, function (lt) sapply( rvals, function (r) { mean((-1)*expm1(-r*lt)) } ) )
@@ -534,7 +534,7 @@ The number of steps the random walk spends at position $k$ on a grid with spacin
 and a time step of \gamma
 should be $\epsilon \times \ell(k\epsilon) / \gamma$.
 First, the local time at 0:
-```{r local_times_0, cache=TRUE, depends="sim_rw"}
+```{r local_times_0, cache=TRUE, dependson="sim_rw"}
 xh <- hist(colSums(abs(rws)<=1.5*eps)/ntimes/(3*eps),main="local time at 0", breaks=30)
 lines( xh$mids, sum(xh$counts)*diff( 2*pnorm(xh$breaks)-1 ), col='red' )
 ```
@@ -543,7 +543,7 @@ Note there is an atom at 0 now
 (that is depicted by the dots in the figures below),
 and that the discretization could trip us up;
 the colors (red/green/blue) use the (mid/upper/lower) points of the interval that we count in.
-```{r local_times, cache=TRUE, depends="sim_rw"}
+```{r local_times, cache=TRUE, dependson="sim_rw"}
 layout(matrix(1:4,nrow=2))
 for (loc in c(0.1, 0.2, 0.4, 0.6)) {
     lts <- colSums(abs(rws-loc)<=1.5*eps)/ntimes/(3*eps)
@@ -596,7 +596,7 @@ which goes to 1, as it should.
 
 
 Let's check that, too: why not?
-```{r killing, cache=TRUE, depends="sim_rw"}
+```{r killing, cache=TRUE, dependson="sim_rw"}
 zeta.reflected
 loc <- 0.1
 compare.rates <- as.data.frame( t( sapply( c(0.25,0.5,1,1.5,2,2.5,3), function (rate) {
@@ -886,7 +886,7 @@ for (k in c(6,10)) {
 
 Here are the two compared,
 by smoothing the probabilities for the simulation:
-```{r sim_clines, cache=TRUE, depends=c("sim_pushed","pushed_pde")}
+```{r sim_clines, cache=TRUE, dependson=c("sim_pushed","pushed_pde")}
 prob.no.recomb <- sapply( rvals, function (r) { fitted(loess( exp(-r*sim.wt) ~ xinit, span=0.1)) } )
 matplot(xinit,prob.no.recomb,type='l',ylab="prob of no recomb",
         xlab="space",col=rainbow(length(rvals)),lty=1,main=sprintf("t=%d",tau))
@@ -899,7 +899,7 @@ for (k in seq_along(rvals)) {
 Well, that looks reasonable, but hard to tell if the discrepancy is due to the loess or not.
 
 And, finally, here's some actual clines predicted by this model:
-```{r pushed_cline,cache=TRUE,depends="pushed_pde"}
+```{r pushed_cline,cache=TRUE,dependson="pushed_pde"}
 tau <- 100
 tt <- seq(0,tau,length.out=100)
 pde.solns <- lapply( rvals, function (r) {

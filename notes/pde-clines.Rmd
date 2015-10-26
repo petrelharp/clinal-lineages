@@ -133,7 +133,7 @@ Numerical solutions
 -------------------
 
 Let's solve this numerically.
-```{r solve_pde, cache=TRUE, depends="solve_pde_setup"}
+```{r solve_pde, cache=TRUE, dependson="solve_pde_setup"}
 r <- 0.1
 s <- 0.1
 sigma <- 5
@@ -145,7 +145,7 @@ image(pde.soln,legend=TRUE,main=sprintf("q for z=%s, r=%0.3f",c("A","B"),r), yax
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
 ```
 These combine to give the predicted cline:
-```{r show_pde_cline,cache=TRUE,depends=c("solve_pde_setup","solve_pde")}
+```{r show_pde_cline,cache=TRUE,dependson=c("solve_pde_setup","solve_pde")}
 pde.cline <- cline_from_soln(pde.soln,grid=thegrid)
 image(pde.cline,legend=TRUE,zlim=c(0,1),main=sprintf("clines, at r=%0.2f",r),yaxt='n')
 axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
@@ -202,9 +202,9 @@ sim <- sim.zone(n.gen=zone.age,n.ind=ninds,n.deme=ndemes,sigma=sigma,quiet=TRUE)
 sim.sums <- spBreaks(sim)
 ```
 and, postprocess:
-```{r genotype_sims, cache=TRUE, depends="setup_sims"}
+```{r genotype_sims, cache=TRUE, dependson="setup_sims"}
 rvals <- c(0,exp(seq(log(.001),log(0.5),length.out=10)))
-loci <- list(0.5+c(rev(rvals[-1]),rvals))
+loci <- list(0.5+c(rev(rvals[-1]),-rvals))
 genotypes <- data.frame(do.call(cbind,lapply(sim.sums$ind.ancest, geno.ind, loci)))
 freqs <- apply(genotypes,1,function(Z){
             tapply(Z,cut(1:ncol(genotypes),breaks=seq(0,ncol(genotypes),deme.size)),mean)/2
@@ -220,7 +220,7 @@ lines(xx,1-tanh_cline(xx,s=s,sigma=sigma),col='red')
 Looks pretty reasonable.
 
 Here's the PDE solution:
-```{r match_pde,cache=TRUE,depends="solve_pde_setup"}
+```{r match_pde,cache=TRUE,dependson="solve_pde_setup"}
 zone.age <- sim$pars["n.gen"]
 tt <- seq(0,zone.age,length.out=100)
 pde.solns <- lapply(rvals, function (r) { solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
@@ -234,7 +234,8 @@ for (k in floor(seq(2,length(rvals),length.out=3))) {
 Now, comparing the PDE solution to the others:
 ```{r match_cline_pde}
 for (k in seq_along(rvals)) {
-    plot(xx,freqs[,k],type='l',xlab="spatial location",ylab="proportion",main=sprintf("r=%0.3f",rvals[k]))
+    matplot(xx,freqs[,which(abs(rvals[k]-loci[[1]]+0.5)<1e-9)],type='l',
+            xlab="spatial location",ylab="proportion",main=sprintf("r=%0.3f",rvals[k]))
     lines(xx,1-tanh_cline(xx,s=s,sigma=sigma),col='red',lwd=3,lty=3)
     lines(1-thegrid$x.mid,match.clines[,k],col='green',lwd=3)
 }
