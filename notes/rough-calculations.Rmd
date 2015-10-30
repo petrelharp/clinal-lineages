@@ -1,5 +1,5 @@
 ---
-title: "Clines from PDE"
+title: "Rough calculations"
 date: "`r date()`"
 ---
 
@@ -44,3 +44,25 @@ We would like to know:
     match the cline obtained by a high population density, i.e., the PDE?
 
 5.  What about the variance??
+
+6.  For a pair of sites, what is the correlation in ancestral state at those loci,
+    given the state at the selected locus
+    (and, also, averaged over choice of selected locus).
+
+    a.  Allow for ascertainment of SNPs in extremal individuals
+        by estimating probability of coalescence in ancestral populations
+        from the extremal individuals.
+        For each pair of loci, correlation of these two loci with extremal individuals.
+
+
+
+How a neutral cline flattens
+============================
+
+
+1.  *What is the width of the cline at a linked, neutral locus?*
+    *How long does it take to flatten out?*
+    *How far from the cline do you have to go to find mostly one type?*
+
+
+
