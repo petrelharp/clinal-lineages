@@ -1,0 +1,46 @@
+---
+title: "Clines from PDE"
+date: "`r date()`"
+---
+
+$$
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\grad}{\nabla}
+$$
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
+library(ReacTran)
+source("tran.1D.R") # fix for log.A
+```
+
+*Useful functions used below:*
+```{r setup_fns}
+source("cline-fns.R")
+```
+
+In the following, $x$ is the distance from the cline center,
+$r$ is the recombination rate to the selected locus,
+$\tau$ is the time since secondary contact.
+The two alleles are $A$ and $B$.
+We would like to know:
+
+1.  What is the width of the cline at a linked, neutral locus?
+    How long does it take to flatten out?
+    How far from the cline do you have to go to find mostly one type?
+
+2.  How long are the haplotypes around the rare $B$ alleles on the $A$ side?
+    This should be constant in time.
+    
+3.  How long, and how common, are chunks of $B$ haplotype *not* linked to $B$ alleles on the $A$ side?
+    These will accumulate as time progresses.
+
+4.  How does neighborhood size affect the results?
+    Does the mean cline, averaged across low-population-density simulations,
+    match the cline obtained by a high population density, i.e., the PDE?
+
+5.  What about the variance??

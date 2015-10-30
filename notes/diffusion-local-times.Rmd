@@ -898,29 +898,6 @@ for (k in seq_along(rvals)) {
 ```
 Well, that looks reasonable, but hard to tell if the discrepancy is due to the loess or not.
 
-And, finally, here's some actual clines predicted by this model:
-```{r pushed_cline,cache=TRUE,dependson="pushed_pde"}
-tau <- 100
-tt <- seq(0,tau,length.out=100)
-pde.solns <- lapply( rvals, function (r) {
-        pde.fn <- function (t,y,parms,...) {
-            tran <- tran.1D(C=y, A=clinefn, D=1/2, flux.up=0, flux.down=0, dx=thegrid)$dC
-            if (any(is.na(tran))) { browser() }
-            list( tran - r * hetfn$mid * y )
-        }
-        ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
-      } )
-plot.tvals <- floor(seq(0,tau,length.out=7))[-1]
-layout(t(1:2))
-for (tval in plot.tvals) {
-    matplot( thegrid$x.mid, 
-            pcline(thegrid$x.mid, p=sapply( pde.solns, cline_interp, T=tval ) ), 
-                   type='l', main=sprintf("t=%d",tval) 
-        )
-    legend("bottomleft",lty=1:5,col=1:6,legend=paste("r=",round(rvals/2,digits=2)))
-}
-```
-
 
 Analytical form
 ---------------
