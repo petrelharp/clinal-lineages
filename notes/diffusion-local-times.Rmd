@@ -6,6 +6,7 @@ date: "`r date()`"
 $$
 \newcommand{\E}{\mathbb{E}}
 \renewcommand{\P}{\mathbb{P}}
+\newcommand{\calE}{\mathcal{E}}
 \DeclareMathOperator{\sgn}{sgn}
 \newcommand{\grad}{\nabla}
 $$
@@ -973,3 +974,21 @@ p_t(x,z)
 \end{aligned}
 $$
 Also, $p_t(x,z;\theta)=p_t(-x,-z;-\theta)$ gets the same expressions for $x<0$.
+
+
+Notes on excursion theory
+=========================
+
+Let $n(e)$ denote the excursion measure of Brownian motion,
+on $\calE = \{ f : [0,\infty) \to [0,\infty) \, \text{s.t.} f(s)=0, t>s \Rightarrow f(t)=0 \}$.
+For $f \in \calE$ denote $\zeta(f) = \sup\{ t : f(t)>0\}$.
+Then [Rogers 1989](http://www.bibsonomy.org/bibtex/201686d46785a10af443e4d48a5196088/peter.ralph)
+$$\begin{aligned}
+n(f : \sup_t f(t) > a ) = \frac{1}{2a} .
+\end{aligned}$$
+and
+$$\begin{aligned}
+n(f : \zeta f > t ) = \sqrt{\frac{2}{\pi t}} .
+\end{aligned}$$
+
+

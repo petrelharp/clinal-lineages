@@ -61,8 +61,78 @@ How a neutral cline flattens
 
 
 1.  *What is the width of the cline at a linked, neutral locus?*
-    *How long does it take to flatten out?*
-    *How far from the cline do you have to go to find mostly one type?*
+    *How long does it take to flatten out?* *How far from the cline do you have to go to find mostly one type?*
 
+**Answer:**
 
+a.  Maximum cline width $\sigma \sqrt{\tau}$, even at unlinked loci.
+b.  The selected cline takes time $s$ to spread out to its full width.
+c.  Cline behaves like the selected cline for $r < 1/\tau$ (more tentatively, for $r < \sqrt{\frac{2}{s\tau}}$).
+d.  Cline is flattening for $x<\sigma\sqrt{\tau}$ and $r > \sqrt{\frac{2}{s\tau}}$.
+
+*Rationale:*
+
+a.  The maximum of Brownian motion until time $t$ has mean $\sqrt{2t/\pi}$,
+    and has the same marginal distribution as the absolute value of Brownian motion.
+    Therefore, the probability a lineage from $x$ hasn't got to the center of the cline *at all* by time $\tau$ 
+    is about $2\Phi(x/\sqrt{\sigma^2 \tau})-1$;
+    and therefore, if $x/\sigma > 2\sqrt{\tau}$ then the cline cannot have started to form, regardless of $r$.
+
+b.  The selected cline spreads out (in forwards time!) with diffusion,
+    and so will reach maximum width $\sigma/\sqrt{s}$ in time $s$.
+    Let $q(t,x)$ be the solution to
+    $$\begin{aligned}
+    \dot q = \frac{1}{2} q'' + q (1-q) (2q-1) .
+    \end{aligned}$$
+    If $u=at$ and $y=bx$ and let $p(t,x) = q(at,bx)$ then
+    $$\begin{aligned}
+    \dot p(t,x)
+        &= \partial_t q(at,bx) \\
+        &= a \dot q(at,bx) \\
+        &= a \left\{ \frac{1}{2} q''(at,bx) + q (1-q) (2q-1) \right\} \\
+        &= a \left\{ \frac{1}{2b^2} \partial^2_x q(at,bx) + q (1-q) (2q-1) \right\} \\
+        &= \frac{a}{2b^2} p''(t,x) + a p (1-p) (2p-1)  .
+    \end{aligned}$$
+    If we choose $a=s$ and $b=\sigma/\sqrt{s}$ then $a/b^2=\sigma^2$, so
+    $$\begin{aligned}
+    \dot p = \frac{\sigma^2}{2} p'' + s p (1-p) (2p-1) .
+    \end{aligned}$$
+    We know that the unitless cline $q$ will spread out in time 1;
+    so our cline will spread out in time $s$.
+
+c.  The cline will be narrower if $r$ is small.
+    Consider a lineage begun near the center of the cline.
+    The most time it can spend in heterozygotes is $\tau$,
+    so if $r \ll 1/\tau$, the chance of recombining is small.
+    So, the cline will look like the cline at the selected locus if $r < 1/\tau$.
+
+d.  By L\'evy's identity, the local time of a Brownian motion at zero
+    has the same distribution (pathwise!) as the running maximum of Brownian motion.
+    Therefore, the local time at zero up until $\tau$ grows like $\sqrt{\tau}$.
+    The same is true for Brownian motion reflected at zero.
+    The time a lineage spends in heterozygotes should be roughly proportional to the local time
+    (each time it visits zero from the left, it spends some time in hets before leaving again; 
+    the constant of proportionality is the mean time spent per visit).
+    Therefore, there will be appreciable chance of recombination if $r C \sqrt{\tau}>1$,
+    where $C$ is the constant;
+    this says that if clines down to $r$ are flat at $\tau$, then at time $2\tau$ they'll be flat down to $r/4$.
+
+    But, what is the constant $C$?
+    Consider the approximation of a lineage that acts like Brownian motion with a constant drift $s$ above zero.
+    As noted in [this file](diffusion-local-times.html),
+    the excursion measure of Brownian motion assigns mass $\sqrt{\frac{1}{2 \pi t^3}}$ to excursions of length $t$;
+    we must tilt this by $e^{-ts}$ for the selection above zero;
+    so that the mean rate at which this semi-pushed motion accumulates time above zero,
+    with respect to local time at zero,
+    is  (letting $x=\sqrt{2st}$)
+    $$\begin{aligned}
+    \int_0^\infty t \frac{e^{-st}}{ \sqrt{2 \pi t^3 } } dt 
+    &=
+    \int_0^\infty \frac{e^{-st}}{ \sqrt{2 \pi t } } dt \\
+    &=
+    \sqrt{2s} \int_0^\infty \frac{e^{-x^2/2}}{ \sqrt{2 \pi} } dx \\
+    &=
+    \sqrt{\frac{s}{2}} .
+    \end{aligned}$$
+    This suggests taking $C=\sqrt{s/2}$.
 
