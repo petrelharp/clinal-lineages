@@ -43,11 +43,14 @@ weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
     colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
 }
 
-clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,ylab="probability",ylim=c(0,1),legend=TRUE,...) {
+clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,
+                       ylab="probability", ylim=c(0,1), legend=TRUE, lty=1,
+                       col=rainbow(length(times)),
+                       ...) {
     # plot output of deSolve as clines in a nice way
-    graphics::matplot( x, t(soln[times,-1]), type='l', col=rainbow(length(times)), lty=1, 
+    graphics::matplot( x, t(soln[times,-1]), type='l', col=col, lty=lty, 
             xlab="space", ylab=ylab, ylim=ylim, ...)
-    if (legend) legend("bottomleft", lty=1, col=rainbow(length(times)), legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
+    if (legend) legend("bottomleft", lty=lty, col=col, legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
     return( invisible( t(soln[times,-1]) ) )
 }
 
@@ -74,15 +77,26 @@ forwards_pde <- function (s,times,grid,sigma=1) {
 
 forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
         fwds.soln=forwards_pde(s=s,times=times,grid=grid),
-        yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), ... ) {
+        yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), 
+        log.p=TRUE, eps=1e-16, ... ) {
     # solve the pde for a lineage 
     # run backwards in the forwards-time profile
+    #   ... note that we solve the PDE in the forwards-time direction in *both* cases.
+    # HOWEVER: note that this becomes singular near t=0,
+    #   to deal with this we introduce 'eps'
     rev.pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
-        p <- cline_interp(max(times)-t,soln=fwds.soln)
-        tran.A <- tran.1D(C=yA, A=p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
-        tran.B <- tran.1D(C=yB, A=1-p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+        p <- cline_interp(t,soln=fwds.soln)
+        if (log.p) {
+            log.p <- log(pmax(p,min(eps,min(p[p>0]))))
+            log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
+            tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+            tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+        } else {
+            tran.A <- tran.1D(C=yA, A=p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+            tran.B <- tran.1D(C=yB, A=1-p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+        }
         # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
         list( c( 
                 tran.A + r * (1-p) * (yB-yA),
@@ -92,7 +106,18 @@ forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
     rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(times) ) # note FIRST COLUMN IS TIME
     attr(rev.soln,"r") <- r
     attr(rev.soln,"s") <- s
-    attr(rev.soln,"s") <- s
+    attr(rev.soln,"sigma") <- sigma
+    ufun <- function (x,t) { approx(grid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+    # not vectorized in t, so...
+    attr(rev.soln,"u") <- function (x,t) {
+        ans <- numeric(length(x))
+        for (tval in unique(t)) {
+            dothese <- (rep_len(t,length(x))==tval)
+            ans[dothese] <- ufun(x[dothese],t=tval)
+        }
+        return(ans)
+    }
+    return(rev.soln)
 }
 
 solve_pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, sigma=1,

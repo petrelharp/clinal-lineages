@@ -18,11 +18,6 @@ library(ReacTran)
 source("tran.1D.R") # fix for log.A
 ```
 
-*Useful functions used below:*
-```{r setup_fns}
-source("cline-fns.R")
-```
-
 In the following, $x$ is the distance from the cline center,
 $r$ is the recombination rate to the selected locus,
 $\tau$ is the time since secondary contact.
@@ -67,7 +62,7 @@ How a neutral cline flattens
 
 a.  Maximum cline width $\sigma \sqrt{\tau}$, even at unlinked loci.
 b.  The selected cline takes time $s$ to spread out to its full width.
-c.  Cline behaves like the selected cline for $r < 1/\tau$ (more tentatively, for $r < \sqrt{\frac{2}{s\tau}}$).
+c.  Cline behaves like the selected cline for $r < 1/\tau$ (or, for $r < \sqrt{\frac{2}{s\tau}}$ if $\tau>1/s$).
 d.  Cline is flattening for $x<\sigma\sqrt{\tau}$ and $r > \sqrt{\frac{2}{s\tau}}$.
 
 *Rationale:*
@@ -106,7 +101,7 @@ c.  The cline will be narrower if $r$ is small.
     so if $r \ll 1/\tau$, the chance of recombining is small.
     So, the cline will look like the cline at the selected locus if $r < 1/\tau$.
 
-d.  By L\'evy's identity, the local time of a Brownian motion at zero
+d.  By Lévy's identity, the local time of a Brownian motion at zero
     has the same distribution (pathwise!) as the running maximum of Brownian motion.
     Therefore, the local time at zero up until $\tau$ grows like $\sqrt{\tau}$.
     The same is true for Brownian motion reflected at zero.
@@ -136,3 +131,55 @@ d.  By L\'evy's identity, the local time of a Brownian motion at zero
     \end{aligned}$$
     This suggests taking $C=\sqrt{s/2}$.
 
+
+Simulation check
+----------------
+
+We'll check these with the PDE solutions
+(and, then with simulations):
+
+```{r setup_fns}
+source("cline-fns.R")
+```
+
+
+
+a.  Look at space-time frequency images at $r=1$ and check they spread out as $\sqrt{t}$.
+    
+    ```{r unlinked_clines, cache=TRUE}
+    thegrid <- setup.grid.1D(x.up=-50, x.down=50, N = 5000)
+    s <- 0.01
+    r <- 1.0
+    tt <- seq(0,1000,length.out=250)
+    unlinked.solns <- forwards_backwards_pde(s=s,times=tt,grid=thegrid,r=r,log.p=TRUE)
+    # image(unlinked.solns,legend=TRUE,zlim=c(0,1),yaxt='n')
+    # axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+    unlinked.cline  <- cline_from_soln( unlinked.solns, grid=thegrid )
+    image(unlinked.cline,legend=TRUE,zlim=c(0,1),yaxt='n',main=sprintf("r=%f, s=%f",r,s))
+    axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+    matlines(tt,0.5+outer(sqrt(tt)/diff(range(thegrid$x.mid)),(1:4)/2,"*"),lwd=2,col='green')
+    matlines(tt,0.5-outer(sqrt(tt)/diff(range(thegrid$x.mid)),(1:4)/2,"*"),lwd=2,col='green')
+    ```
+
+b.  Look at space-time frequency images at $r=0$ and several values of $s$
+    to check they become stationary after about $1/s$.
+    The clines are colored red for times less than $1/s$, and black afterwards;
+    the green dotted lines are at $\pm 1/\sqrt{s}$.
+    Indeed, cline flattening has slowed considerably by $1/s$, 
+    and the limiting cline reaches $(1/4,3/4)$ at $\pm 1/\sqrt{s}$.
+    
+    ```{r forwards_selected_cline,cache=TRUE}
+    thegrid <- setup.grid.1D(x.up=-100, x.down=100, N = 5000)
+    svals <- exp(seq(log(1e-4),log(0.5),length.out=6))
+    fwds.solns <- lapply(svals, function(s) {
+            tt <- seq(0,3/s,length.out=40)
+            forwards_pde(s=s,times=tt,grid=thegrid) 
+        } )
+    for (k in seq_along(svals)) {
+        clineplot( fwds.solns[[k]], main=sprintf("s=%f",svals[k]), col=ifelse( fwds.solns[[k]][,1]>1/svals[k], adjustcolor("black",0.5), adjustcolor("red",0.5) ) )
+        abline(v=c(-1,1)/sqrt(svals[k]),lty=3,col='green',lwd=2)
+    }
+    ```
+
+c.  Look at space-recombination frequency images at a bunch of times
+    to check that flattening occurs around $r=\sqrt{2/s\tau}$.
