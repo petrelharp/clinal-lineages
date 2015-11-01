@@ -63,9 +63,11 @@ cline_interp <- function (T,soln) {
     return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
 }
 
-forwards_pde <- function (s,times,grid,sigma=1) {
-    # solve the pde for frequencies, forwards in time
-    yinit <- ifelse( grid$x.mid>0, 0, 1 )
+forwards_pde <- function (s,times,grid,sigma=1,
+                      yinit=ifelse( grid$x.mid>0, 0, 1 )) {
+    # Solve the pde for frequencies, forwards in time:
+    #   by default, yinit=1 to the *left* of zero;
+    #   so finds the probability the selected site initiates on the left
     fwds.pde <- function (t,y,parms,...) {
         tran <- tran.1D(C=y, D=sigma^2/2, dx=grid)$dC
         list( tran + s * y * (1-y) * (2*y-1) )
@@ -76,26 +78,35 @@ forwards_pde <- function (s,times,grid,sigma=1) {
 }
 
 forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
-        fwds.soln=forwards_pde(s=s,times=times,grid=grid),
-        yinit=c( rep(0.0,grid$N), rep(1.0,grid$N) ), 
+        fwds.soln=forwards_pde(s=s,times=times,grid=grid,yinit=ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])),
+        yinit=c( rep(1.0,grid$N), rep(0.0,grid$N) ), 
         log.p=TRUE, eps=1e-16, ... ) {
-    # solve the pde for a lineage 
-    # run backwards in the forwards-time profile
+    # solve the pde for a lineage run backwards in the forwards-time profile
     #   ... note that we solve the PDE in the forwards-time direction in *both* cases.
     # HOWEVER: note that this becomes singular near t=0,
-    #   to deal with this we introduce 'eps'
+    #   so we push p away from the boundary by 'eps'.
+    # By default
+    #  - when the cline forms, A is on the left and B is on the right
+    #  - fwds.soln is the frequency of the type A selected locus,
+    #          i.e., the prob the selected lineage begins on the *left*
+    #  - yA, the first N numbers, is the probability that a locus linked to a type A selected locus
+    #          originally was linked to a type A
+    #          i.e., linked to a 'left' allele, and originates from the left side
+    #  - yB, the second N numbers, is the probability that a locus linked to a type B selected locus
+    #          originally was linked to a type A
+    #          i.e., linked to a 'right' allele, but originates from the left side
     rev.pde.fn <- function (t,y,parms,...) {
         yA <- y[1:grid$N]
         yB <- y[grid$N+(1:grid$N)]
-        p <- cline_interp(t,soln=fwds.soln)
+        p <- cline_interp(t,soln=fwds.soln) # freq of B
         if (log.p) {
             log.p <- log(pmax(p,min(eps,min(p[p>0]))))
             log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
             tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
             tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
         } else {
-            tran.A <- tran.1D(C=yA, A=p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
-            tran.B <- tran.1D(C=yB, A=1-p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+            tran.A <- tran.1D(C=yA, A=pmax(eps,p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+            tran.B <- tran.1D(C=yB, A=pmax(eps,1-p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
         }
         # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
         list( c( 
@@ -103,7 +114,7 @@ forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
                 tran.B + r * p * (yA-yB)
                 ) )
     }
-    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(times) ) # note FIRST COLUMN IS TIME
+    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(fwds.soln[,1]), ... ) # note FIRST COLUMN IS TIME
     attr(rev.soln,"r") <- r
     attr(rev.soln,"s") <- s
     attr(rev.soln,"sigma") <- sigma
@@ -168,9 +179,14 @@ solve_pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, sigma=1,
 cline_from_soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     # convert the output from solve_pde to the cline
     # by averaging over which allele was sampled
+    # Here:
+    #  - clinefn returns the local frequency of As
+    #  - the first column is the time,
+    #  - the next N numbers gives the value linked to As
+    #  - and the next N numbers gives the value linked to Bs
     A.inds <- 1+(1:grid$N)
     B.inds <- 1+grid$N+(1:grid$N)
-    sel.cline <- outer( grid$x.mid, soln[nrow(soln),1], clinefn )
+    sel.cline <- outer( grid$x.mid, soln[,1], clinefn )
     pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
     attributes(pde.cline) <- c( attributes(pde.cline), attributes(soln)[setdiff(names(attributes(soln)),c("dim","dimnames"))] )
     attr(pde.cline,"nspec")<-1

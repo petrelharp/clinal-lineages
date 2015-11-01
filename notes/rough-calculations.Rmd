@@ -62,8 +62,8 @@ How a neutral cline flattens
 
 a.  Maximum cline width $\sigma \sqrt{\tau}$, even at unlinked loci.
 b.  The selected cline takes time $s$ to spread out to its full width.
-c.  Cline behaves like the selected cline for $r < 1/\tau$ (or, for $r < \sqrt{\frac{2}{s\tau}}$ if $\tau>1/s$).
-d.  Cline is flattening for $x<\sigma\sqrt{\tau}$ and $r > \sqrt{\frac{2}{s\tau}}$.
+c.  Cline behaves like the selected cline for $r < 1/\tau$ (or, for $r < \sqrt{\frac{2s}{\tau}}$ if $\tau>1/s$).
+d.  Cline is flattening for $x<\sigma\sqrt{\tau}$ and $r > \sqrt{\frac{2s}{\tau}}$.
 
 *Rationale:*
 
@@ -127,7 +127,7 @@ d.  By Lévy's identity, the local time of a Brownian motion at zero
     &=
     \sqrt{2s} \int_0^\infty \frac{e^{-x^2/2}}{ \sqrt{2 \pi} } dx \\
     &=
-    \sqrt{\frac{s}{2}} .
+    \frac{1}{2\sqrt{2s}} .
     \end{aligned}$$
     This suggests taking $C=\sqrt{s/2}$.
 
@@ -145,6 +145,7 @@ source("cline-fns.R")
 
 
 a.  Look at space-time frequency images at $r=1$ and check they spread out as $\sqrt{t}$.
+    The green lines are at multiples of $\pm \sqrt{t}$.
     
     ```{r unlinked_clines, cache=TRUE}
     thegrid <- setup.grid.1D(x.up=-50, x.down=50, N = 5000)
@@ -182,4 +183,27 @@ b.  Look at space-time frequency images at $r=0$ and several values of $s$
     ```
 
 c.  Look at space-recombination frequency images at a bunch of times
-    to check that flattening occurs around $r=\sqrt{2/s\tau}$.
+    to check that flattening occurs around $r=\sqrt{2s/\tau}$.
+    Note that the system is [stiff](https://en.wikipedia.org/wiki/Stiff_equation), 
+    as diffusive systems [usually are](http://scicomp.stackexchange.com/questions/891/the-definition-of-stiff-ode-system),
+    particularly for small $r$ at the times when each set of probabilities becomes steep;
+    setting $s=0.1$ this is a problem, but not with smaller (less steep) $s$.
+    
+    ```{r space_recomb, cache=TRUE}
+    s <- 0.01
+    rvals <- exp(seq(log(1e-3),log(0.5),length.out=20))
+    tt <- seq(0,200,length.out=10)
+    thegrid <- setup.grid.1D(x.up=-100, x.down=100, N = 5000)
+    fwds.soln <- forwards_pde(s=s,times=seq(0,1.2*max(tt),length.out=1000),grid=thegrid)
+    r.solns <- lapply(rvals, function(r) {
+            forwards_backwards_pde(s=s,times=tt,grid=thegrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
+        } )
+    unlinked.clines  <- lapply(r.solns, cline_from_soln, grid=thegrid )
+    xr <- lapply( seq_along(tt), function (k) { do.call( cbind, lapply( unlinked.clines, function (x) x[k,-1] ) ) } )
+    ```
+    ```{r plot_sr}
+    for (k in 2:length(xr)) {
+        matplot(thegrid$x.mid, xr[[k]], type='l', col=rainbow(2*length(rvals)), lty=1, main=sprintf("t=%f",tt[k]) )
+        legend("bottomright",lty=1, col=rainbow(2*length(rvals)), legend=sprintf("r=%f : %f",rvals,rvals*sqrt(tt[k]/2/s)))
+    }
+    ```
