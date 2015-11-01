@@ -203,7 +203,7 @@ c.  Look at space-recombination frequency images at a bunch of times
     ```
     ```{r plot_sr}
     for (k in 2:length(xr)) {
-        matplot(thegrid$x.mid, xr[[k]], type='l', col=rainbow(2*length(rvals)), lty=1, main=sprintf("t=%f",tt[k]) )
-        legend("bottomright",lty=1, col=rainbow(2*length(rvals)), legend=sprintf("r=%f : %f",rvals,rvals*sqrt(tt[k]/2/s)))
+        matplot(thegrid$x.mid, xr[[k]], type='l', col=rainbow(2*length(rvals)), lty=1, main=sprintf("t=%f",tt[k]), ylab='probability' )
+        legend("bottomright",lty=1, col=rainbow(2*length(rvals)), legend=sprintf("r=%f : %f",rvals,rvals*sqrt(tt[k]/2/s)),cex=0.5)
     }
     ```
