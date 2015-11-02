@@ -24,23 +24,21 @@ $\tau$ is the time since secondary contact.
 The two alleles are $A$ and $B$.
 We would like to know:
 
-1.  What is the width of the cline at a linked, neutral locus?
+1.  **How a neutral cline flattens:**  
+    What is the width of the cline at a linked, neutral locus?
     How long does it take to flatten out?
     How far from the cline do you have to go to find mostly one type?
 
-2.  How long are the haplotypes around the rare $B$ alleles on the $A$ side?
+2.  **How do haplotypes look around the selected locus in the cline:**
+    How long are the haplotypes around the rare $B$ alleles on the $A$ side?
     This should be constant in time.
-    
-3.  How long, and how common, are chunks of $B$ haplotype *not* linked to $B$ alleles on the $A$ side?
+
+3.  **How does introgression happen:**
+    How long, and how common, are chunks of $B$ haplotype *not* linked to $B$ alleles on the $A$ side?
     These will accumulate as time progresses.
 
-4.  How does neighborhood size affect the results?
-    Does the mean cline, averaged across low-population-density simulations,
-    match the cline obtained by a high population density, i.e., the PDE?
-
-5.  What about the variance??
-
-6.  For a pair of sites, what is the correlation in ancestral state at those loci,
+4.  **What can we learn from linkage?**
+    For a pair of sites, what is the correlation in ancestral state at those loci,
     given the state at the selected locus
     (and, also, averaged over choice of selected locus).
 
@@ -48,6 +46,12 @@ We would like to know:
         by estimating probability of coalescence in ancestral populations
         from the extremal individuals.
         For each pair of loci, correlation of these two loci with extremal individuals.
+
+5.  How does neighborhood size affect the results?
+    Does the mean cline, averaged across low-population-density simulations,
+    match the cline obtained by a high population density, i.e., the PDE?
+
+6.  What about the variance??
 
 
 
@@ -61,11 +65,14 @@ How a neutral cline flattens
 **Answer:**
 
 a.  Maximum cline width $\sigma \sqrt{\tau}$, even at unlinked loci.
-b.  The selected cline takes time $s$ to spread out to its full width.
-c.  Cline behaves like the selected cline for $r < 1/\tau$ (or, for $r < \sqrt{\frac{2s}{\tau}}$ if $\tau>1/s$).
-d.  Cline is flattening for $x<\sigma\sqrt{\tau}$ and $r > \sqrt{\frac{2s}{\tau}}$.
+b.  The selected cline takes time $1/s$ to spread out to its full width.
+c.  Cline behaves like the selected cline for $r < 1/\tau$, and begin to flatten for $r>1/\tau$.
+d.  For large distances and times (but with $x<\sigma\sqrt{\tau}$),
+    the cline may stay steep out to
+    $r = \sqrt{\frac{2s}{\tau}}$ rather than $r=1/\tau$,
+    but this seems hard to actually observe.
 
-*Rationale:*
+**Rationale:**
 
 a.  The maximum of Brownian motion until time $t$ has mean $\sqrt{2t/\pi}$,
     and has the same marginal distribution as the absolute value of Brownian motion.
@@ -74,7 +81,7 @@ a.  The maximum of Brownian motion until time $t$ has mean $\sqrt{2t/\pi}$,
     and therefore, if $x/\sigma > 2\sqrt{\tau}$ then the cline cannot have started to form, regardless of $r$.
 
 b.  The selected cline spreads out (in forwards time!) with diffusion,
-    and so will reach maximum width $\sigma/\sqrt{s}$ in time $s$.
+    and so will reach maximum width $\sigma/\sqrt{s}$ in time $1/s$.
     Let $q(t,x)$ be the solution to
     $$\begin{aligned}
     \dot q = \frac{1}{2} q'' + q (1-q) (2q-1) .
@@ -93,7 +100,7 @@ b.  The selected cline spreads out (in forwards time!) with diffusion,
     \dot p = \frac{\sigma^2}{2} p'' + s p (1-p) (2p-1) .
     \end{aligned}$$
     We know that the unitless cline $q$ will spread out in time 1;
-    so our cline will spread out in time $s$.
+    so our cline will spread out in time $1/s$.
 
 c.  The cline will be narrower if $r$ is small.
     Consider a lineage begun near the center of the cline.
@@ -182,28 +189,76 @@ b.  Look at space-time frequency images at $r=0$ and several values of $s$
     }
     ```
 
-c.  Look at space-recombination frequency images at a bunch of times
-    to check that flattening occurs around $r=\sqrt{2s/\tau}$.
-    Note that the system is [stiff](https://en.wikipedia.org/wiki/Stiff_equation), 
+c.  To check that flattening occurs around $r=1/\tau$ (i.e., at $\tau=1/r$)
+    we'll look at when a neutral allele linked to the $A$ allele
+    near the center starts to get close to 1/2.
+    
+    (*Technical note:* the system of ODE is [stiff](https://en.wikipedia.org/wiki/Stiff_equation), 
     as diffusive systems [usually are](http://scicomp.stackexchange.com/questions/891/the-definition-of-stiff-ode-system),
     particularly for small $r$ at the times when each set of probabilities becomes steep;
-    setting $s=0.1$ this is a problem, but not with smaller (less steep) $s$.
+    setting $s=0.1$ this is a problem, but not with smaller (less steep) $s$.)
     
     ```{r space_recomb, cache=TRUE}
     s <- 0.01
-    rvals <- exp(seq(log(1e-3),log(0.5),length.out=20))
-    tt <- seq(0,200,length.out=10)
-    thegrid <- setup.grid.1D(x.up=-100, x.down=100, N = 5000)
+    rvals <- c(0,exp(seq(log(.0025),log(0.05),length.out=8)))
+    tt <- seq(0,1000,length.out=100)
+    thegrid <- setup.grid.1D(x.up=-50, x.down=50, N = 2000)
     fwds.soln <- forwards_pde(s=s,times=seq(0,1.2*max(tt),length.out=1000),grid=thegrid)
     r.solns <- lapply(rvals, function(r) {
             forwards_backwards_pde(s=s,times=tt,grid=thegrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
         } )
-    unlinked.clines  <- lapply(r.solns, cline_from_soln, grid=thegrid )
-    xr <- lapply( seq_along(tt), function (k) { do.call( cbind, lapply( unlinked.clines, function (x) x[k,-1] ) ) } )
+    linked.clines  <- lapply(r.solns, cline_from_soln, grid=thegrid )
+    xr <- lapply( seq_along(tt), function (k) { do.call( cbind, lapply( linked.clines, function (x) x[k,-1] ) ) } )
     ```
+    The vertical lines are at $1/r$ (only on the righthand plots, due to the limitations of `filled.contour`):
     ```{r plot_sr}
-    for (k in 2:length(xr)) {
-        matplot(thegrid$x.mid, xr[[k]], type='l', col=rainbow(2*length(rvals)), lty=1, main=sprintf("t=%f",tt[k]), ylab='probability' )
-        legend("bottomright",lty=1, col=rainbow(2*length(rvals)), legend=sprintf("r=%f : %f",rvals,rvals*sqrt(tt[k]/2/s)),cex=0.5)
+    for (k in seq_along(rvals)) {
+        image( r.solns[[k]], legend=TRUE, zlim=c(0,1), yaxt='n', ylab='position', main=sprintf("r=%f, s=%f",rvals[k],s=s) )
+        axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),labels=pretty(thegrid$x.mid))
+        abline(v=1/rvals[k],lwd=2,lty=3)
     }
     ```
+
+d.  To look for the $r=1/\sqrt{\tau}$ behaviour, we could look at positions outside the selected cline 
+    ($x$ larger than $C/\sqrt{2s}$, for C=4, say) 
+    and times large enough that unlinked clines have started to flatten out there 
+    and that the selected cline has got to full width
+    ($\tau$ larger than $C^2/s$).
+    But: if $\tau=C^2/s$ then the critical value is $r=(s/C)^2$,
+    which at $s=0.01$ is $r=6.25\times10^{-6}$
+    **Moral:** the narrower cline due to linkage may be only visible only very nearby to the selected site.
+    *To-do:* figure out parameter values where this behaviour becomes visible: need to be much further away?
+
+<!--
+    ```{r long_time,cache=TRUE}
+    s <- 0.01
+    r <- 0.0001
+    tt <- seq(0,30000,length.out=500)
+    thegrid <- setup.grid.1D(x.up=-200, x.down=200, N = 2000)
+    fwds.soln <- forwards_pde(s=s,times=seq(0,1.2*max(tt),length.out=1000),grid=thegrid)
+    rev.soln <- forwards_backwards_pde(s=s,times=tt,grid=thegrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
+    linked.cline  <- cline_from_soln( rev.soln, grid=thegrid )
+    ```
+-->
+
+
+
+How do haplotypes look around the selected locus in the cline
+=============================================================
+
+2.  How long are the haplotypes around the rare $B$ alleles on the $A$ side?
+
+**Answer:**
+
+a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of length about $\sigma/(sx)$.
+
+
+**Rationale:**
+
+a.  This is (probably) the Laplace transform of the time since the $B$ allele
+    last had an ancestor on the $B$ side,
+    i.e., for a $B$ lineage to make it back to the $B$ side.
+    Since lineages on the wrong side move at speed $\sigma/s$,
+    if the allele is at position $x$, 
+    this will take about $sx/\sigma$;
+    and so the haplotype should be about $\sigma/(sx)$.

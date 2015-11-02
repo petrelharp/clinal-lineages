@@ -343,7 +343,7 @@ axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
 ```
 
 Let's compare the case where the cline is set up instantly or not:
-```{r compare_rightness, cache=TRUE,dependson=c("fwds_back_pde","solve_pde_setup","setup_fns")}
+```{r compare_rightness, cache=TRUE,dependson=c("fwds_back_pde","solve_pde_setup")}
 layout(t(1:2))
 fb.p <- clineplot(rev.soln,main="forwards-backwards")
 st.p <- clineplot(pde.soln,main="stationary cline")

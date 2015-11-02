@@ -64,8 +64,8 @@ $$\begin{aligned}
 
 We know that 
 $$\begin{aligned}
-q(x,A,0,r) = 1  \\
-q(x,B,0,r) = 0  \\
+q(x,A,0,r) &= 1  \\
+q(x,B,0,r) &= 0  \\
 \end{aligned}$$
 and that $\partial_t q = G q$, i.e.,
 (writing $q(x,A,t,r) = q_A(x,t)$ for the moment):
@@ -180,6 +180,37 @@ pde.cline <- cline_from_soln(pde.soln,grid=thegrid)
 layout(1)
 clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d",r,zone.age))
 ```
+
+
+Haplotype lengths
+=================
+
+There are various haplotype-related statistics we could compute:
+
+1.  Distance to closest recombination in a heterozygote
+
+
+
+Distance to closest recombination in a heterozygote
+---------------------------------------------------
+
+The first haplotype-related statistic
+is the distance along the chromosome from an $A$ allele until the closest recombination
+that occurred in an $AB$ heterozygote.
+Let $H$ be this distance;
+then, 
+$$\begin{aligned}
+    u(x,\tau,r)=\P^(x,\tau)\{H>r\}
+\end{aligned}$$
+solves the following PDE:
+$$\begin{aligned}
+    u(x,0,r) &= 1  \\
+    \partial_t u(x,t,r)
+        &= 
+        \grad \log(p(x)) \cdot \grad u(x,t,r) + \frac{\sigma^2}{2} \Delta u(x,t,r) - r (1-p(x)) u(x,t,r) .
+\end{aligned}$$
+
+
 
 
 Comparison to simulation
