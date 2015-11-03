@@ -15,6 +15,7 @@ $$
 fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 library(ReacTran)
+library(Matrix)
 source("tran.1D.R") # fix for log.A
 ```
 
@@ -95,7 +96,7 @@ p(x,\tau) &= 1-p(-x,\tau)
 \end{aligned}$$
 and so
 $$\begin{aligned}
-p(x,\tau,r) =  p(x,\tau) q(x,A,\tau,r) + p(-x,\tau) (1-q(-x,A,\tau,r))A .
+p(x,\tau,r) =  p(x,\tau) q(x,A,\tau,r) + p(-x,\tau) (1-q(-x,A,\tau,r)) .
 \end{aligned}$$
 
 
@@ -156,7 +157,7 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d
 at the ends, or else we have to worry about the boundary conditions.
 
 The smaller $r$ is, the slower the per-background probabilities smooth out:
-```{r small_r_sim}
+```{r small_r_sim,cache=TRUE}
 r <- 0.01
 pde.soln <- solve_pde( u=log_u, um1=log_1mu, r=r, times=tt, 
                   s=s, sigma=sigma, grid=thegrid, log.u=TRUE )
@@ -168,7 +169,7 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d
 ```
 
 And, the cline flattens out *very* slowly:
-```{r longer_t_sim}
+```{r longer_t_sim,cache=TRUE}
 r <- 1.0
 zone.age <- 2000  # this is tau
 tt <- seq(0,zone.age,length.out=100)
@@ -185,22 +186,164 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d
 Haplotype lengths
 =================
 
-There are various haplotype-related statistics we could compute:
+Consider a genomic region $[a,b]$, with $a\le 0\le b$,
+with the selected site at 0.
+Recombination without coalescence makes the history of this region
+a branching process with conserved branching rates.
+Each branch is labeled by a region of the genome,
+and moves independently according to generator $G_r$, 
+where $r$ is the distance from the region to the selected site,
+and branches at rate $w$, where $w$ is its width.
+We would like to know the probability that 
+*all* branches end up on the same side of the barrier at time $\tau$ in the past.
 
-1.  Distance to closest recombination in a heterozygote
+Suppose that the region includes a type $A$ allele,
+and we want the probability that it inherits entirely from the $A$ side.
+Let
+$$\begin{aligned}
+    g(x,A,a,b,\tau) = \P^{x,A}\{ [a,b] \text{ inherits from $A$, $\tau$ generations ago }\} .
+\end{aligned}$$
+If $W(t)=\{W_1(t),W_2(t),\ldots,W_{n(t)}(t)\}$ is the state of the process $t$ generations ago,
+where $W_k=(x_k,z_k,a_k,b_k)$,
+with $x_k$ the position and $W_k\in\{A,B\}$ the allele,
+then by independence of branches,
+$$\begin{aligned}
+    g(x,A,a,b,0) &= 1 \\
+    g(x,B,a,b,0) &= 0 \\
+    g(x,B,a,b,\tau) &= 0 \qquad \text{if } 0 \in [a,b] \\
+    g(x,A,a,b,\tau)
+    &=
+    \E\left[
+        \prod_{i=1}^{n(t)} g(x_k,z_k,a_k,b_k,\tau-t)
+    \right] \qquad \text{for each } t \le \tau .
+\end{aligned}$$
+Taking $t = \epsilon$ in the last equation,
+so that the probability of branching is $1-e^{-(b-a)\epsilon}=\epsilon(b-a)+O(\epsilon^2)$,
+if $0\le a < b$ this is
+$$\begin{aligned}
+g(x,A,a,b,\tau)
+    &=
+    \epsilon 
+    \left\{
+    G_{r(a,b)} g(x,A,a,b,\tau)
+    +
+     \int_a^b g(x,A,a,\theta,\tau-\epsilon)
+     \left(
+     p(x,\tau-\epsilon)g(x,A,\theta,b,\tau-\epsilon) 
+     + (1-p(x,\tau-\epsilon))g(x,B,\theta,b,\tau-\epsilon) 
+     \right)d\theta
+    \right\}
+    + O(\epsilon^2),
+\end{aligned}$$
+where 
+$$\begin{aligned}
+r(a,b)=\begin{cases}
+    \min(|a|,|b|) \qquad &\text{if } ab \ge 0 \\
+    0 \qquad &\text{if } 0 \in [a,b] .
+\end{cases}
+\end{aligned}$$
+and $G_r f(x,z)$ is defined above.
+On the other hand, if $a<0<b$, then
+$$\begin{aligned}
+g(x,A,a,b,\tau)
+    &=
+    \epsilon 
+    \left\{
+    G_{r(a,b)} g(x,A,a,b,\tau)
+    +
+     \int_0^b g(x,A,a,\theta,\tau-\epsilon)
+     \left(
+     p(x,\tau-\epsilon)g(x,A,\theta,b,\tau-\epsilon)
+     + (1-p(x,\tau-\epsilon))g(x,B,\theta,b,\tau-\epsilon) 
+     \right)d\theta
+    +
+     \int_a^0 \left(
+     p(x,\tau-\epsilon)g(x,A,a,\theta,\tau-\epsilon)
+     + (1-p(x,\tau-\epsilon))g(x,B,a,\theta,\tau-\epsilon) 
+     \right) g(x,A,\theta,b,\tau-\epsilon) d\theta
+    \right\}
+    + O(\epsilon^2),
+\end{aligned}$$
+
+
+Therefore, assuming $G$ is sufficiently nice,
+$$\begin{aligned}
+\frac{d}{d\tau} g(x,z,a,b,\tau)
+&=
+G_{r(a,b)} g(x,z,a,b,\tau)
++
+\int_a^b
+\left(
+    g(x,z,a,\theta,\tau)g(x,z,\theta,b,\tau) 
+    - g(x,z,a,b,\tau)
+\right)
+d\theta
+\end{aligned}$$
+Since $z \in \{A,B\}$, this is a system of two integro-differential equations 
+in three variables plus time ($x$, $a$, $b$, and $\tau$; four if $x\in\R^2$).
+
+Numerical solutions will discretize; what discretization of the genome might be good?
+If we want to solve out to time $\tau$,
+then on a chromosome of length 1 there will be about $\tau$ breakpoints,
+each of which approximately Exponential($\tau$),
+and so the smallest distance will have mean $1/\tau^2$.
+But, suppose we've solved it for time $\tau$, and want to solve it to time $2\tau$.
+We can use the same discretization, with initial conditions from the first round.
+<!--
+Quick check:
+```{r smallest_check}
+f <- function (t) { min(diff(c(0,sort(runif(rpois(1,lambda=t))),1))) }
+fk <- sapply( 2:200, function (k) { replicate(n=100,f(k)) } )
+plot(1+col(fk),fk,col=rainbow(300)[col(fk)],log='y',ylab='smallest interval')
+points(2:200,colMeans(fk),pch=20,cex=2)
+lines(2:200,1/(2:200)^2,col='purple',lwd=2)
+```
+-->
+
+Note that if we think of $u(a,b)$ as a kernel, 
+then the map $u(a,b) \mapsto \int_a^b u(a,\theta) u(\theta,b) d\theta$
+is just the product of the kernel to itself;
+on discretization this becomes a matrix power,
+so the operator $u(a,b) \mapsto \int_a^b u(a,\theta)u(\theta,b) - u(a,b) d\theta$
+```{r solve_branching}
+xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=100)
+agrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=30)
+# determines the order the solution is in:
+xab <- subset( expand.grid( x=xgrid$x.mid, a=agrid$x.mid, b=agrid$x.mid ), ( b>0 ) & (abs(a)<=abs(b)) )
+find_ab <- function (ab) {
+    # map into the subset of (a,b) contained in xab
+    flip <- ab[,1]>ab[,2] 
+    ab[flip,] <- ab[flip,] %*% cbind( c(0,1), c(1,0) )
+    flop <- ( ab[,1]<0 & abs(ab[,1])>=abs(ab[,2]) )
+    ab[flop,] <- ab[flop,] %*% cbind( c(0,-1), c(-1,0) )
+    return(ab)
+}
+integral_map <- function (y,ab) {
+    # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
+    # The key step is to do something like:
+    #     1 | x y .
+    #   a 2 | . . u
+    #     3 | . . v
+    #       +------
+    #     b   1 2 3
+    # --> should  return x*u + y*v,
+    # the inner product of a partial row with a partial column
+
+}
+```
 
 
 
 Distance to closest recombination in a heterozygote
 ---------------------------------------------------
 
-The first haplotype-related statistic
+A simpler statistic, that might approximate the correct quantity well,
 is the distance along the chromosome from an $A$ allele until the closest recombination
 that occurred in an $AB$ heterozygote.
 Let $H$ be this distance;
 then, 
 $$\begin{aligned}
-    u(x,\tau,r)=\P^(x,\tau)\{H>r\}
+    u(x,\tau,r)=\P^{(x,\tau)}\{H>r\}
 \end{aligned}$$
 solves the following PDE:
 $$\begin{aligned}
