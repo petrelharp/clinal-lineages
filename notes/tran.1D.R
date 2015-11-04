@@ -1,3 +1,9 @@
+##
+#
+# Trivially modified from ReacTran::tran.1D
+# to allow passing in A in log scale.
+#
+##
 
 tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL, 
     flux.down = NULL, a.bl.up = NULL, a.bl.down = NULL, D = 0, 
