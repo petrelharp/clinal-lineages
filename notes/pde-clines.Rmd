@@ -302,12 +302,24 @@ lines(2:200,1/(2:200)^2,col='purple',lwd=2)
 
 Note that if we think of $u(a,b)$ as a kernel, 
 then the map $u(a,b) \mapsto \int_a^b u(a,\theta) u(\theta,b) d\theta$
-is just the product of the kernel to itself;
-on discretization this becomes a matrix power,
-so the operator $u(a,b) \mapsto \int_a^b u(a,\theta)u(\theta,b) - u(a,b) d\theta$
+is similar to the product of the kernel to itself;
+on discretization this becomes like a matrix power.
+This is implemented in some C code.
 ```{r solve_branching}
+source("unifprod.R")  # for the C part
+integral_map <- function (x,eps) {
+    # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
+    # x is a square matrix,
+    #   eps is the grid spacing between locations
+    x2 <- eps*unifprod(x)
+}
 xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=100)
 agrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=30)
+# we'll save the solution as an array,
+#  with dimensions (x,a,b)
+# Note we only use the upper triangle a<=b, but oh well.
+soln.array <- array(0.0,dim=c(xgrid$N,agrid$N,agrid$N))
+
 # determines the order the solution is in:
 xab <- subset( expand.grid( x=xgrid$x.mid, a=agrid$x.mid, b=agrid$x.mid ), ( b>0 ) & (abs(a)<=abs(b)) )
 find_ab <- function (ab) {
@@ -317,18 +329,6 @@ find_ab <- function (ab) {
     flop <- ( ab[,1]<0 & abs(ab[,1])>=abs(ab[,2]) )
     ab[flop,] <- ab[flop,] %*% cbind( c(0,-1), c(-1,0) )
     return(ab)
-}
-integral_map <- function (y,ab) {
-    # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
-    # The key step is to do something like:
-    #     1 | x y .
-    #   a 2 | . . u
-    #     3 | . . v
-    #       +------
-    #     b   1 2 3
-    # --> should  return x*u + y*v,
-    # the inner product of a partial row with a partial column
-
 }
 ```
 
