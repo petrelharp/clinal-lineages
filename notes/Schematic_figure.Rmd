@@ -1,0 +1,52 @@
+---
+title: "Thinking about ancestry in real data"
+date: "`r date()`"
+---
+
+The Model
+========
+This is to make a figure of the ancestry of a haplotype. Recombinations within h haplotype fragment is depicted as a branching event, producing two smaller haplotype fragments. Recombinations between the fragment and selected locus can occur along the branch, and can result in a change in which selected locus the fragment is linked to. All recombinations are depicted as red dots.
+
+If a fragment is colored blue, it is linked to allele B (ancestrally RHS), and orange if linked to A. If a fragment is linked to ancestry B, it moves with drift D if it is on the RHS, and with no drift otherwise. The reverse is true for a fragment linked to ancestry A. A recombination event will put a fragment on ancestry A if it happens on the LHS, and on B if on the RHS of the zone center.
+
+```{r plot}
+split_times = c(15,50,70)
+recombinations = c(30,60,90,70,100)
+
+make.path = function(LENGTH,START,BACKGROUND,D=0.5){ #BACKGROUND = 1 for LHS ancestry
+	path = vector(length=LENGTH)
+	path[1] = START
+	
+	
+	for(i in 2:LENGTH){
+		if ((path[i-1]<0 & BACKGROUND>0) | (path[i-1]>0 & BACKGROUND<0)){path[i]=rnorm(1,BACKGROUND*D,0.5)+path[i-1] } else{path[i] = rnorm(1,0,0.5)+path[i-1]}
+	}
+	
+	return(path)
+}
+
+
+plot.path = function(START_TIME, STOP_TIME,START_POS){
+	path = make.path(STOP_TIME-START_TIME+1,START_POS,sign(START_POS))
+	points(path,START_TIME:STOP_TIME,type="l",col=ifelse(START_POS<0,"orange","blue"),lwd=1.2)
+	points(START_POS,START_TIME,pch=19,col="red")
+	return(path)
+}
+
+backbone = make.path(100,-5,1)
+plot(backbone,1:100,type="l",xlim=c(-10,10))
+
+branch1 = plot.path(split_times[1],recombinations[1],backbone[split_times[1]])
+rec1.1 = plot.path(recombinations[1],recombinations[2],branch1[length(branch1)])
+rec1.2 = plot.path(recombinations[2],recombinations[3],rec1.1[length(rec1.1)])
+rec1.3 = plot.path(recombinations[3],recombinations[5],rec1.2[length(rec1.2)])
+
+branch2 = plot.path(split_times[2],recombinations[4],backbone[split_times[2]])
+rec2.1 = plot.path(recombinations[4],recombinations[5],branch2[length(branch2)])
+
+abline(v=0,lty=2,col="grey",lwd=0.8)
+legend("bottomright",legend = c("selected locus","linked to A", "linked to B","rec. event"),col=c("black","orange","blue","red"),lty=c(rep(1,3),NA),pch=c(rep(NA,3),19))
+
+
+```
+In practice, the drift parameter, and probability of recombining on a particular ancestry is a function in space of the selected allele frequency.

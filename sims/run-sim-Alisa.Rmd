@@ -8,6 +8,7 @@ output: html_document
 ```{r doc_setup, include=FALSE}
 fig.dim <- 5
 knitr::opts_chunk$set(fig.height=fig.dim,fig.width=2*fig.dim,fig.align='center')
+source("sim-fns.R")
 ```
 
 Setting up the simulation
@@ -25,14 +26,13 @@ Start off with simulation of 50 generation zone with 50 demes of 500 individuals
 	ninds 		= ndemes*deme_size
 	SIGMA 		= 1
 ```
-note that `zone_age` above can be a vector of times.
+note that zone_age above can be a vector of times.
 
-Now to define selection. 
+Now to define selection. Here we selection against heterozygotes to be strong (0.5).
 ```{r set_selection}
 	S  = 0.5
 	qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)))
 ```
-Here we selection against heterozygotes to be strong (`r S`).
 `qtl` is a named list, one element per chromosome,
 and each element of the list is a data frame
 whose columns give the name of the locus,
@@ -43,34 +43,28 @@ Running the simulation
 -------------------------
 
 This is a two-step process. First we simulate genotypes:
-```{r run_sim_step1,cache=TRUE,depends="set_selection"}
+```{r run_sim_step1}
 	sims.s0.1 = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
 	#This can take a while, 
 ```
-The output is: a list with hierarchy: `[[zone_age]][[c("inds","sp.inds","deme","pars","QTL")]]` where:
-
-	- `inds` is a list of length `ninds`, such that each `[[ind]][[chr]][[X1/X2]]` is a data.frame with columns
-        * `pos` : coordinates of rec.,  (*what does this mean?*)
-        * `ancest` : ancestor ID
-	- `sp.ids` is a character vector of length `ninds`, giving the ancestry given an ancestor ID
-	- `deme` is an integer vector of length `ninds`, giving the deme number of an ancestor, given their ancestor ID
-	- `pars` is an integer that gives the number of generations of the simulation
-	- `QTL` is the QTL vector used in the simulation
+The output is: a list with hierarchy: [[zone_age]][[c("inds","sp.inds","deme","pars","QTL")]]
+	where:
+		"inds" is a list of length ninds, such that [[ind]][[chr]][[X1/X2]][[data.frame where col1 = coordinates of rec., col2 = ancestor ID]]
+		"sp.inds" is a character vector of length ninds, giving the ancestry given an ancestor ID
+		"deme" is an integer vector of length ninds, giving the deme number of an ancestor, given their ancestor ID
+		"pars" is an integer that gives the number of generatsion of the simulation
+		"QTL" returns the QTL vector used in the simulation
 
 The second step is to parse the simulated genotypes:
-```{r run_sim_step2,cache=TRUE,depends="run_sim_step1"}
+```{r run_sim_step2}
 	sims.sums = lapply(sims.s0.1,spBreaks)
 ```
-The output here is a list: `[[zone_age]][[c("ind.ancestry","ancest.prop")]]`
-
-    * `ind.ancestry` is a list of length ninds: each `[[ind][[chr]]][[X1/X2]]` is a data.frame with columns
-        * `starts` = (chunk) starts, 
-        * `stops` = (chunk) stops, 
-        * `sp2` = sp2(T/F) (*what is this?*)
-    * `ancest.prop` is a $2 \times$`ninds` matrix giving the ancestry proportion of each individual on each of their two copies of the chromosome.
+The output here is a list: [[zone_age]][[c("ind.ancestry","ancest.prop")]]
+		"ind.ancestry" is a list of length ninds: [[ind][[chr]]][[X1/X2]][[data.frame where col1 = (chunk)starts, col2 = (chunk)stops, col3 = sp2(T/F)]]
+		"ancest.prop" is a ninds*2 matrix giving the ancestry proportion of each individual on each of their two copies of the chromosome.
 		
 This resulting files can get quite large, but we've saved them here
-```{r save_file,cache=TRUE,depends="run_sim_step1"}
+```{r save_file,cache=TRUE}
 	save(sims.s0.1,file="sims_sums_s0.5_sigma1_50by500_tau50.Robj")
 ```
 
@@ -92,27 +86,31 @@ first by getting genotypes at all loci, then using those to calculate an allele 
 		matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
 		legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
 		matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
+	
 ```
-(`genotypes` is a list of `nloci`$\times$`ninds` dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.)
+(`genotypes` is a list of nloci*ninds dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.)
 Each line in the plot represents a locus a given distance from the selected locus.
 
 We can compare these frequencies to predictions made by theory :
 
 ```{r peters_predictions}
-    zeta <- function(x,r){
-        2*pnorm(abs(x)) - 1 + 2 * exp(r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE))	
-    }
-    pcline <- function(x,r,tau=zone_age,sigma=SIGMA){
-        (1/2)*(1-sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau))	
-    }
+	zeta <- function(x,r){
+	2*pnorm(abs(x)) - 1 + 2 * exp(r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE))	
+	}
+
+	pcline <- function(x,r,tau=zone_age,sigma=SIGMA){
+	(1/2)*(1-sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau))	
+	}
 
 	rr=(loci[[1]]-0.5)*SIGMA/sqrt(S) # loci at which frequency is measured
 	xx <- (1:ndemes)-0.5-ndemes/2	 # deme positions
 	pp <- do.call(cbind,lapply(rr,function(R){pcline(xx,r=R,tau=zone_age,sigma=SIGMA)})) #allele frequency
 
-        matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
-        legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
-        matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
+		matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
+		legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
+		matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
 
 ```
 
@@ -145,14 +143,23 @@ the output of get.deme.chunks is a nind*2 matrix, where each column is a chromos
 
 ```{r get_tract_lengths}
 	tracts = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F)})
-
-	transparent_rainbow = adjustcolor(rainbow(ndemes),0.75)
 	
-    D = 1 
-    hist(tracts[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
-    for (D in seq(1,ndemes,5)) {
-        hist(tracts[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.05),ylim=c(0,50),add=T)	
-    }
+		#function to increase transparency of colors
+		add.alpha <- function(col, alpha=1){
+		if(missing(col))
+		stop("Please provide a vector of colours.")
+		apply(sapply(col, col2rgb)/255, 2, 
+		function(x) 
+		rgb(x[1], x[2], x[3], alpha=alpha)) 
+		}
+		
+	transparent_rainbow = add.alpha(rainbow(ndemes),0.75)
+	
+		D = 1; hist(tracts[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+
+		for(D in seq(1,ndemes,5)){
+		hist(tracts[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.05),ylim=c(0,50),add=T)	
+		}
 ```
 To get LD in these populations, we define `get.genotype` to get the genotypes at two loci in individuals, and `get.LD` to calculate LD in a deme:
 ```{r LD_functions}
@@ -176,7 +183,7 @@ To get LD in these populations, we define `get.genotype` to get the genotypes at
 We can just calculate LD over demes and loci pairs. Here's an example of LD between pairs of loci where one member of the
 pair is selected on. This gives a plot of decay in population LD as we get further away from the center of the zone.
 
-```{r ld_matrix}
+```
 LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
 	matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
 
