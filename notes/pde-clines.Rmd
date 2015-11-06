@@ -186,7 +186,7 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf("clines, at r=%0.2f, up to t=%d
 Haplotype lengths
 =================
 
-Consider a genomic region $[a,b]$, with $a\le 0\le b$,
+Consider a genomic region $[a,b]$,
 with the selected site at 0.
 Recombination without coalescence makes the history of this region
 a branching process with conserved branching rates.
@@ -266,19 +266,15 @@ g(x,A,a,b,\tau)
 \end{aligned}$$
 
 
-Therefore, assuming $G$ is sufficiently nice,
+Therefore, assuming $g$ is sufficiently nice,
 $$\begin{aligned}
 \frac{d}{d\tau} g(x,z,a,b,\tau)
 &=
 G_{r(a,b)} g(x,z,a,b,\tau)
 +
-\int_a^b
-\left(
-    g(x,z,a,\theta,\tau)g(x,z,\theta,b,\tau) 
-    - g(x,z,a,b,\tau)
-\right)
-d\theta
+I g(x,z,a,b,\tau),
 \end{aligned}$$
+where $I$ is the integral operator defined above.
 Since $z \in \{A,B\}$, this is a system of two integro-differential equations 
 in three variables plus time ($x$, $a$, $b$, and $\tau$; four if $x\in\R^2$).
 
