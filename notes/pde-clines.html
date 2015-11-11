@@ -68,7 +68,7 @@ img {
 
 <div id="header">
 <h1 class="title">Clines from PDE</h1>
-<h4 class="date"><em>Wed Nov 11 12:16:32 2015</em></h4>
+<h4 class="date"><em>Wed Nov 11 12:42:03 2015</em></h4>
 </div>
 
 
@@ -266,44 +266,38 @@ clineplot(pde.cline,x=thegrid$x.mid,main=sprintf(&quot;clines, at r=%0.2f, up to
     \E\left[
         \prod_{i=1}^{n(t)} g(x_k,z_k,a_k,b_k,\tau-t)
     \right] \qquad \text{for each } t \le \tau .
-\end{aligned}\]</span> Taking <span class="math inline">\(t = \epsilon\)</span> in the last equation, so that the probability of branching is <span class="math inline">\(1-e^{-(b-a)\epsilon}=\epsilon(b-a)+O(\epsilon^2)\)</span>, if <span class="math inline">\(0\le a &lt; b\)</span> this is <span class="math display">\[\begin{aligned}
+\end{aligned}\]</span> Taking <span class="math inline">\(t = \epsilon\)</span> in the last equation, so that the probability of branching is <span class="math inline">\(1-e^{-(b-a)\epsilon}=\epsilon(b-a)+O(\epsilon^2)\)</span>, if <span class="math inline">\(0\le a &lt; b\)</span> this implies that <span class="math display">\[\begin{aligned}
+\frac{d}{d\tau} 
 g(x,A,a,b,\tau)
     &amp;=
-    \epsilon 
-    \left\{
     G_{r(a,b)} g(x,A,a,b,\tau)
     +
-     \int_a^b g(x,A,a,\theta,\tau-\epsilon)
+     \int_a^b g(x,A,a,\theta,\tau)
      \left(
-     p(x,\tau-\epsilon)g(x,A,\theta,b,\tau-\epsilon) 
-     + (1-p(x,\tau-\epsilon))g(x,B,\theta,b,\tau-\epsilon) 
+     p(x,\tau)g(x,A,\theta,b,\tau) 
+     + (1-p(x,\tau))g(x,B,\theta,b,\tau) 
      \right)d\theta
-    \right\}
-    + O(\epsilon^2),
 \end{aligned}\]</span> where <span class="math display">\[\begin{aligned}
 r(a,b)=\begin{cases}
     \min(|a|,|b|) \qquad &amp;\text{if } ab \ge 0 \\
     0 \qquad &amp;\text{if } 0 \in [a,b] .
 \end{cases}
 \end{aligned}\]</span> and <span class="math inline">\(G_r f(x,z)\)</span> is defined above. On the other hand, if <span class="math inline">\(a&lt;0&lt;b\)</span>, then <span class="math display">\[\begin{aligned}
+\frac{d}{d\tau} 
 g(x,A,a,b,\tau)
     &amp;=
-    \epsilon 
-    \left\{
     G_{r(a,b)} g(x,A,a,b,\tau)
     +
-     \int_0^b g(x,A,a,\theta,\tau-\epsilon)
+     \int_0^b g(x,A,a,\theta,\tau)
      \left(
-     p(x,\tau-\epsilon)g(x,A,\theta,b,\tau-\epsilon)
-     + (1-p(x,\tau-\epsilon))g(x,B,\theta,b,\tau-\epsilon) 
+     p(x,\tau)g(x,A,\theta,b,\tau)
+     + (1-p(x,\tau))g(x,B,\theta,b,\tau) 
      \right)d\theta
     +
      \int_a^0 \left(
-     p(x,\tau-\epsilon)g(x,A,a,\theta,\tau-\epsilon)
-     + (1-p(x,\tau-\epsilon))g(x,B,a,\theta,\tau-\epsilon) 
-     \right) g(x,A,\theta,b,\tau-\epsilon) d\theta
-    \right\}
-    + O(\epsilon^2),
+     p(x,\tau)g(x,A,a,\theta,\tau)
+     + (1-p(x,\tau))g(x,B,a,\theta,\tau) 
+     \right) g(x,A,\theta,b,\tau) d\theta
 \end{aligned}\]</span></p>
 <p>Therefore, assuming <span class="math inline">\(g\)</span> is sufficiently nice, <span class="math display">\[\begin{aligned}
 \frac{d}{d\tau} g(x,z,a,b,\tau)
