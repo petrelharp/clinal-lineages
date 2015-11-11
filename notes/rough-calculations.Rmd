@@ -250,7 +250,7 @@ How do haplotypes look around the selected locus in the cline
 
 **Answer:**
 
-a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of length about $\sigma/(sx)$.
+a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of length about $\sigma/(sx)$, as long as this is less than $1/\tau$. (this is fairly restrictive)
 
 
 **Rationale:**
@@ -262,3 +262,6 @@ a.  This is (probably) the Laplace transform of the time since the $B$ allele
     if the allele is at position $x$, 
     this will take about $sx/\sigma$;
     and so the haplotype should be about $\sigma/(sx)$.
+    This gives the size of the chunk carried with it on this excursion;
+    this will be of the same type with high probability at least if the length is less than $1/\tau$,
+    as above.
