@@ -12,9 +12,11 @@ library(Rcpp)
 # --> should  return x*u + y*v
 # the inner product of a partial row with a partial column
 
+# makes unifprod(), which works on matrices
 unifprod.cpp <- paste(readLines("unifprod.cpp"),collapse="\n")
-'
 
+# makes unifprod_ut(), which works on vectors derived from column-ordered 
+# upper-triangular portions of matrices, with diagonals
 unifprod.ut.cpp <- paste(readLines("unifprod_ut.cpp"),collapse="\n")
 
 

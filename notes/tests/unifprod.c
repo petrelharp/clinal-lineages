@@ -3,6 +3,8 @@
 
 /* modified from ./src/main/array.c in R-3.2.2 source */
 
+/* Alternative to the rcpp versions in unifprod.cpp and unifprod_ut.cpp */
+
 SEXP unifprod2(SEXP x, SEXP Rnrx, SEXP Rncx)
 {
     /* compute the matrix transformation A -> C where

@@ -1,6 +1,10 @@
 ## test unifprod
 
-source("unifprod.R")
+source("../unifprod.R",chdir=TRUE)
+
+
+###
+# Test correctness
 
     unifprod_R <- function (x,subtract=TRUE) {
         z <- matrix(0,nrow=NROW(x),ncol=NCOL(x))
@@ -73,6 +77,10 @@ source("unifprod.R")
 
     x <- matrix(rnorm(1e4),nrow=100)
     xut <- x[upper.tri(x,diag=TRUE)]
+
+
+###
+# Test speed, comparing different versions
 
     library(microbenchmark)
     microbenchmark(unifprod_R(x),times=100)
