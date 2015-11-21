@@ -7,6 +7,7 @@ $$
 \newcommand{\E}{\mathbb{E}}
 \renewcommand{\P}{\mathbb{P}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\one}{\mathbf{1}}
 \DeclareMathOperator{\sgn}{sgn}
 \newcommand{\grad}{\nabla}
 $$
@@ -210,7 +211,6 @@ then by independence of branches,
 $$\begin{aligned}
     g(x,A,a,b,0) &= 1 \\
     g(x,B,a,b,0) &= 0 \\
-    g(x,B,a,b,\tau) &= 0 \qquad \text{if } 0 \in [a,b] \\
     g(x,A,a,b,\tau)
     &=
     \E\left[
@@ -231,6 +231,7 @@ g(x,A,a,b,\tau)
      p(x,\tau)g(x,A,\theta,b,\tau) 
      + (1-p(x,\tau))g(x,B,\theta,b,\tau) 
      \right)d\theta
+     -(b-a)g(x,A,a,b,\tau)
 \end{aligned}$$
 where 
 $$\begin{aligned}
@@ -251,14 +252,56 @@ g(x,A,a,b,\tau)
      \left(
      p(x,\tau)g(x,A,\theta,b,\tau)
      + (1-p(x,\tau))g(x,B,\theta,b,\tau) 
-     \right)d\theta
+     \right)d\theta \\
+   &\qquad {}
     +
      \int_a^0 \left(
      p(x,\tau)g(x,A,a,\theta,\tau)
      + (1-p(x,\tau))g(x,B,a,\theta,\tau) 
-     \right) g(x,A,\theta,b,\tau) d\theta
+     \right) g(x,A,\theta,b,\tau) d\theta  \\
+   &\qquad {}
+     -(b-a)g(x,A,a,b,\tau)
 \end{aligned}$$
 
+Writing $g_A$ and $g_B$ for the moment, and dropping $x$ and $\tau$,
+the generator of the recombination part is, 
+where $x\wedge y=\max(x,y)$ and $x \vee y = \min(x,y)$,
+$$\begin{aligned}
+Ig_A(a,b)
+    &= 
+        p \int_{a\wedge 0}^b g_A(a,\theta) g_A(\theta,b) d\theta
+        + (1-p) \int_{a\wedge 0}^b g_A(a,\theta) g_B(\theta,b) d\theta
+        + p \int_{a}^{b \vee 0} g_A(a,\theta) g_A(\theta,b) d\theta
+        + (1-p) \int_{a\wedge 0}^b g_B(a,\theta) g_A(\theta,b) d\theta 
+       \\ &\qquad {}
+         -(b-a)g_A(a,b) \\
+    &= 
+    \int_a^b
+        p \one_{\theta>0} g_A(a,\theta) g_A(\theta,b) 
+        + (1-p) \one_{\theta>0} g_A(a,\theta) g_B(\theta,b) 
+        + p \one_{\theta\le0} g_A(a,\theta) g_A(\theta,b) 
+        + (1-p) \one_{\theta\le0} g_B(a,\theta) g_A(\theta,b) d\theta
+       \\ &\qquad {}
+         -(b-a)g_A(a,b) \\
+    &= 
+    \int_a^b
+    \left\{
+        p g_A(a,\theta) g_A(\theta,b) 
+        + (1-p) \left( 
+            \one_{\theta>0} g_A(a,\theta) g_B(\theta,b) 
+            + \one_{\theta\le0} g_B(a,\theta) g_A(\theta,b) 
+        \right) 
+        -g_A(a,b) \right\}
+        d\theta   \\
+    &= 
+    p \int_a^b
+        \left( g_A(a,\theta) g_A(\theta,b)  - g_A(a,b) \right) d\theta 
+    \\ &\qquad {}
+    + (1-p) \int_a^b \one_{\theta>0} \left( g_A(a,\theta) g_B(\theta,b) - g_A(a,b) \right) d\theta
+    \\ &\qquad {}
+    + (1-p) \int_a^b \one_{\theta\le0} \left( g_B(a,\theta) g_A(\theta,b) - g_A(a,b) \right) d\theta  .
+\end{aligned}$$
+$Ig_B$ is the same after exchanging $A$ with $B$, and $p$ with $1-p$.
 
 Therefore, assuming $g$ is sufficiently nice,
 $$\begin{aligned}
@@ -271,6 +314,12 @@ I g(x,z,a,b,\tau),
 where $I$ is the integral operator defined above.
 Since $z \in \{A,B\}$, this is a system of two integro-differential equations 
 in three variables plus time ($x$, $a$, $b$, and $\tau$; four if $x\in\R^2$).
+
+*Note:* We also know that
+$$\begin{aligned}
+    g(x,B,a,b,\tau) &= 0 \qquad \text{if } 0 \in [a,b] \\
+\end{aligned}$$
+but this will have to be arranged by the cline function.
 
 Numerical solutions will discretize; what discretization of the genome might be good?
 If we want to solve out to time $\tau$,
@@ -295,20 +344,62 @@ then the map $u(a,b) \mapsto \int_a^b u(a,\theta) u(\theta,b) d\theta$
 is similar to the product of the kernel to itself;
 on discretization this becomes like a matrix power.
 This is implemented in some C code.
+<!--
 ```{r solve_branching}
 source("unifprod.R")  # for the C part
-integral_map <- function (x,eps) {
+recomb_generator <- function (x,eps) {
     # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
-    # x is a square matrix,
+    # x is the upper triangular part of a square matrix
     #   eps is the grid spacing between locations
-    x2 <- eps*unifprod(x)
+    x2 <- eps*unifprod_ut(x)
 }
-xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=100)
-agrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=30)
+xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=10)
+agrid <- setup.grid.1D(x.up=0.0, x.down=0.5, N=5)
+# function to find a,b coordinates from the upper triangular coordinates
+ab.ord <- matrix( 0, nrow=agrid$N, ncol=agrid$N )
+avals <- agrid$x.mid[row(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
+bvals <- agrid$x.mid[col(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
+rvals <- ifelse( avals*bvals<0, 0, pmin(avals,bvals) )
+ab.coord <- function (ab) { cbind( a=avals[ab], b=bvals[ab] ) }
 # we'll save the solution as an array,
-#  with dimensions (x,a,b)
-# Note we only use the upper triangle a<=b, but oh well.
-soln.array <- array(0.0,dim=c(xgrid$N,agrid$N,agrid$N))
+#  with dimensions (x,ab)
+# Here ab is upper-triangular ordered
+
+s <- 0.1
+tt <- seq(0,3,length.out=5)
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+
+soln.array <- matrix(0.0,nrow=2*xgrid$N,ncol=agrid$N*(agrid$N+1)/2)
+
+    sigma=1
+    yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), ncol(soln.array) )
+
+    eps <- 1e-16
+    rev.pde.fn <- function (t,y,parms,...) {
+        # need to apply tran.1D to columns
+        # and recomb_generator to rows
+        dim(y) <- dim(soln.array)
+        p <- cline_interp(t,soln=fwds.soln) # freq of B
+        log.p <- log(pmax(p,min(eps,min(p[p>0]))))
+        log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
+        diffusion <- sapply( 1:ncol(y), function (kcol) {
+                r <- rvals[kcol]
+                yA <- y[1:xgrid$N,kcol]
+                yB <- y[xgrid$N+(1:xgrid$N),kcol]
+                tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+                tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+                c( 
+                        tran.A + r * (1-p) * (yB-yA),
+                        tran.B + r * p * (yA-yB)
+                        )
+             } )
+        recombination <- apply( y, 1, recomb_generator, p=p )
+        return( list( diffusion + recombination ) )
+    }
+    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2*ncol(soln.array), tcrit=max(fwds.soln[,1]) )
+
+
+
 
 # determines the order the solution is in:
 xab <- subset( expand.grid( x=xgrid$x.mid, a=agrid$x.mid, b=agrid$x.mid ), ( b>0 ) & (abs(a)<=abs(b)) )
@@ -322,6 +413,7 @@ find_ab <- function (ab) {
 }
 ```
 
+-->
 
 
 Distance to closest recombination in a heterozygote
