@@ -17,6 +17,7 @@ fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 library(ReacTran)
 library(Matrix)
+library(parallel)
 source("tran.1D.R") # fix for log.A
 ```
 
@@ -292,14 +293,7 @@ Ig_A(a,b)
             + \one_{\theta\le0} g_B(a,\theta) g_A(\theta,b) 
         \right) 
         -g_A(a,b) \right\}
-        d\theta   \\
-    &= 
-    p \int_a^b
-        \left( g_A(a,\theta) g_A(\theta,b)  - g_A(a,b) \right) d\theta 
-    \\ &\qquad {}
-    + (1-p) \int_a^b \one_{\theta>0} \left( g_A(a,\theta) g_B(\theta,b) - g_A(a,b) \right) d\theta
-    \\ &\qquad {}
-    + (1-p) \int_a^b \one_{\theta\le0} \left( g_B(a,\theta) g_A(\theta,b) - g_A(a,b) \right) d\theta  .
+        d\theta   
 \end{aligned}$$
 $Ig_B$ is the same after exchanging $A$ with $B$, and $p$ with $1-p$.
 
@@ -344,76 +338,26 @@ then the map $u(a,b) \mapsto \int_a^b u(a,\theta) u(\theta,b) d\theta$
 is similar to the product of the kernel to itself;
 on discretization this becomes like a matrix power.
 This is implemented in some C code.
-<!--
-```{r solve_branching}
-source("unifprod.R")  # for the C part
-recomb_generator <- function (x,eps) {
-    # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
-    # x is the upper triangular part of a square matrix
-    #   eps is the grid spacing between locations
-    x2 <- eps*unifprod_ut(x)
-}
-xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=10)
-agrid <- setup.grid.1D(x.up=0.0, x.down=0.5, N=5)
-# function to find a,b coordinates from the upper triangular coordinates
-ab.ord <- matrix( 0, nrow=agrid$N, ncol=agrid$N )
-avals <- agrid$x.mid[row(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
-bvals <- agrid$x.mid[col(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
-rvals <- ifelse( avals*bvals<0, 0, pmin(avals,bvals) )
-ab.coord <- function (ab) { cbind( a=avals[ab], b=bvals[ab] ) }
-# we'll save the solution as an array,
-#  with dimensions (x,ab)
-# Here ab is upper-triangular ordered
+```{r solve_branching, cache=TRUE}
+recomb_generator
 
 s <- 0.1
-tt <- seq(0,3,length.out=5)
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+tt <- seq(0,10,length.out=20)
 
-soln.array <- matrix(0.0,nrow=2*xgrid$N,ncol=agrid$N*(agrid$N+1)/2)
+xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=10)
+rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=50)
 
-    sigma=1
-    yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), ncol(soln.array) )
-
-    eps <- 1e-16
-    rev.pde.fn <- function (t,y,parms,...) {
-        # need to apply tran.1D to columns
-        # and recomb_generator to rows
-        dim(y) <- dim(soln.array)
-        p <- cline_interp(t,soln=fwds.soln) # freq of B
-        log.p <- log(pmax(p,min(eps,min(p[p>0]))))
-        log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
-        diffusion <- sapply( 1:ncol(y), function (kcol) {
-                r <- rvals[kcol]
-                yA <- y[1:xgrid$N,kcol]
-                yB <- y[xgrid$N+(1:xgrid$N),kcol]
-                tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
-                tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
-                c( 
-                        tran.A + r * (1-p) * (yB-yA),
-                        tran.B + r * p * (yA-yB)
-                        )
-             } )
-        recombination <- apply( y, 1, recomb_generator, p=p )
-        return( list( diffusion + recombination ) )
-    }
-    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2*ncol(soln.array), tcrit=max(fwds.soln[,1]) )
-
-
-
-
-# determines the order the solution is in:
-xab <- subset( expand.grid( x=xgrid$x.mid, a=agrid$x.mid, b=agrid$x.mid ), ( b>0 ) & (abs(a)<=abs(b)) )
-find_ab <- function (ab) {
-    # map into the subset of (a,b) contained in xab
-    flip <- ab[,1]>ab[,2] 
-    ab[flip,] <- ab[flip,] %*% cbind( c(0,1), c(1,0) )
-    flop <- ( ab[,1]<0 & abs(ab[,1])>=abs(ab[,2]) )
-    ab[flop,] <- ab[flop,] %*% cbind( c(0,-1), c(-1,0) )
-    return(ab)
-}
+# took 24min with xgrid$N=10, rgrid$N=20 and 50 time steps up to t=3, :(
+hap.soln <- forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=rgrid)
 ```
 
--->
+```{r plot_hap_probs, cache=TRUE, depends="solve_branching"}
+hap.probs <- get_hap_probs( hap.soln, left=-.025, right=.025 )
+image( hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n', 
+      main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+```
+
 
 
 Distance to closest recombination in a heterozygote

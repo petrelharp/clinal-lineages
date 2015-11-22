@@ -1,3 +1,5 @@
+source("unifprod.R")  # for the C part
+
 pcline <- function (x,r,p=recombfn(x,2*r,...),recombfn,...) {
     (1/2)*( 1 - sign(x)*p )
 }
@@ -193,3 +195,100 @@ cline_from_soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     return(pde.cline)
 }
 
+
+####
+## Linkage-related things
+####
+
+recomb_generator <- function (yA,yB,p,zeroind,nabvals,eps) {
+    # the discretization of the map y(a,b) -> \int_a^b (h(a,u)*h(u,b)-h(a,b)) du
+    # yA and yA is the upper triangular part of square matrices
+    #   of dimensions nabvals x nabvals
+    #   eps is the grid spacing between locations
+    #   and zeroind is the index corresponding to the marker at zero
+    eps * ( 
+      p * unifprod_ut(y=yA,ncx=nabvals)
+      + (1-p) * biprod_ut(yA=yA,yB=yB,zeroind=zeroind,ncx=nabvals)
+    )
+}
+
+forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
+        fwds.soln=forwards_pde(s=s,times=times,grid=xgrid,yinit=ifelse(xgrid$x.mid<0,yinit[1:xgrid$N],yinit[xgrid$N+(1:xgrid$N)])),
+        yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), rgrid$N*(rgrid$N+1)/2 ),
+        eps=1e-16, ... ) {
+    ###
+    # solves the system of PDE for the probability that a haplotype across genomic region [a,b]
+    # sampled at time t and location x and linked to selected allele z
+    # derives entirely from side A at time 0.
+    ###
+    # s = selection coefficient
+    # times = times to solve at
+    # xgrid = grid of spatial locations
+    # rgrid = grid of recombination values
+    ###
+    this.lapply <- if ("parallel" %in% .packages() && parallel::detectCores()>1) { function (...) mclapply(...,mc.cores=detectCores()) } else { lapply }
+
+    # precompute some things
+    rgrid$eps <- unique(rgrid$dx)
+    rgrid$zeroind <- which(rgrid$x.mid>0)[1]
+
+    # function to find a,b coordinates from the upper triangular coordinates
+    ab.ord <- matrix( 0, nrow=rgrid$N, ncol=rgrid$N )
+    avals <- rgrid$x.mid[row(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
+    bvals <- rgrid$x.mid[col(ab.ord)[upper.tri(ab.ord,diag=TRUE)]]
+    ab.coord <- function (ab) { cbind( a=avals[ab], b=bvals[ab] ) }
+    # distance from the closest end of the segment [a,b] to zero
+    rvals <- ifelse( avals*bvals<0, 0, pmin(abs(avals),abs(bvals)) )
+
+    # we'll save the solution as an array,
+    #  with dimensions (x,ab)
+    # Here ab is upper-triangular ordered
+    soln.dims <- c( nrow=2*xgrid$N, ncol=rgrid$N*(rgrid$N+1)/2 )
+
+    # the gradient function
+    rev.pde.fn <- function (t,y,parms,...) {
+        # need to apply tran.1D to columns
+        # and recomb_generator to rows
+        dim(y) <- soln.dims
+        p <- cline_interp(t,soln=fwds.soln) # freq of B
+        log.p <- log(pmax(p,min(eps,min(p[p>0]))))
+        log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
+        diffusion <- do.call( cbind, this.lapply( 1:ncol(y), function (kcol) {
+                r <- rvals[kcol]
+                yA <- y[1:xgrid$N,kcol]
+                yB <- y[xgrid$N+(1:xgrid$N),kcol]
+                tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+                tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+                c( 
+                        tran.A + r * (1-p) * (yB-yA),
+                        tran.B + r * p * (yA-yB)
+                        )
+             } ) )
+        recombination <- do.call( rbind, this.lapply( 1:nrow(y), function (krow) {
+                   if (krow<=xgrid$N) {
+                       recomb_generator( yA=y[krow,], yB=y[krow+xgrid$N,], p=p[krow], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
+                   } else {
+                       recomb_generator( yA=y[krow,], yB=y[krow-xgrid$N,], p=1-p[krow-xgrid$N], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
+                   }
+             } ) )
+        return( list( diffusion + recombination ) )
+    }
+    hap.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2*soln.dims[2], tcrit=max(fwds.soln[,1]) )
+    attr(hap.soln,"r") <- cbind(left=avals,right=bvals)
+    attr(hap.soln,"s") <- s
+    attr(hap.soln,"sigma") <- sigma
+    attr(hap.soln,"soln.dims") <- soln.dims
+    return(hap.soln)
+}
+
+get_hap_probs <- function ( hap.soln, left, right ) {
+    nx <- attr(hap.soln,"soln.dims")[1]/2
+    k.ab <- which.min( (attr(hap.soln,"r")[,"left"]-left)^2 + (attr(hap.soln,"r")[,"right"]-right)^2 )
+    kk <- which( 1+(((1:ncol(hap.soln))-2)%/%(2*nx)) == k.ab )
+    dummy.soln <- hap.soln[,c(1,kk)]
+    class(dummy.soln) <- class(hap.soln)
+    attr(dummy.soln,"r") <- attr(hap.soln,"r")[k.ab,]
+    attr(dummy.soln,"nspec") <- 2
+    attr(dummy.soln,"dimens") <- attr(hap.soln,"dimens")
+    return(dummy.soln)
+}

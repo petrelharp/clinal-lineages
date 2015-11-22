@@ -2,7 +2,7 @@ NumericVector biprod_ut(
         NumericVector yA, 
         NumericVector yB,
         int zeroind,
-        double ncx) {
+        int ncx) {
     NumericVector z(yA.size());
     int index = 0;
     int pindex, outindex;

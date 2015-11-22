@@ -1,4 +1,4 @@
-NumericVector unifprod_ut(NumericVector y, double ncx) {
+NumericVector unifprod_ut(NumericVector y, int ncx) {
     NumericVector z(y.size());
     int index = 0;
     int pindex, outindex;
