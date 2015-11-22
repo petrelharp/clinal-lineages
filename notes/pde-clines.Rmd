@@ -17,7 +17,6 @@ fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
 library(ReacTran)
 library(Matrix)
-library(parallel)
 source("tran.1D.R") # fix for log.A
 ```
 
@@ -351,19 +350,131 @@ rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=50)
 hap.soln <- forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=rgrid)
 ```
 
+
+Here are haplotype probabilities centered on the selected site:
 ```{r plot_hap_probs, cache=TRUE, depends="solve_branching"}
-hap.probs <- get_hap_probs( hap.soln, left=-.025, right=.025 )
-image( hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n', 
-      main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
-axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+for (haplen in c(0.02, 0.26, 0.46)) {
+    hap.probs <- get_hap_probs( hap.soln, left=-haplen/2, right=haplen/2 )
+    image( hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n', 
+          main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
+```
+
+And, here are haplotype probabilities for a fairly short haplotype moving away from the selected site:
+```{r plot_hap_probs_locs, cache=TRUE, depends="solve_branching"}
+haplen <- 0.04
+for (haploc in c(0.01, 0.09, 0.21, 0.31)) {
+    hap.probs <- get_hap_probs( hap.soln, left=haploc, right=haploc+haplen )
+    image( hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n', 
+          main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+    locator(1)
+}
+```
+
+Here's all the solution traces, i.e., how probabilities of inheriting an $A$ haplotype
+of all lengths, positions, and spatial locations changes with time
+```{r plot_hap_everything, cache=TRUE, depends="solve_branching"}
+matplot(hap.soln[,1],hap.soln[,-1],type='l',xlab='time',ylab='probability')
+```
+
+Here's how these look across space, at a fixed time,
+with line type showing haplotype length
+and color showing distance to the selected site.
+```{r plot_hap_clines, cache=TRUE, depends="solve_branching"}
+plot.t <- 3
+hap.clines <- hap.soln[which(hap.soln[,1]>=plot.t)[1],-1]
+dim(hap.clines) <- attr(hap.soln,"soln.dims")
+r.df <- data.frame(attr(hap.soln,"r"))
+r.df$length <- r.df$right-r.df$left
+r.df$dist <- ifelse(r.df$right*r.df$left>0,pmin(abs(r.df$right),abs(r.df$left)),0)
+r.df$col <- as.numeric(cut(r.df$dist,6))
+r.df$lty <- as.numeric(cut(r.df$length,5))
+matplot(xgrid$x.mid,hap.clines[1:xgrid$N,],type='l',main=paste("A: t=",plot.t),ylim=c(0,1),xlab="space",col=r.df$col,lty=r.df$lty,ylab="probability")
+legend("bottomleft",lty=unique(r.df$lty),legend=paste("length=",round(tapply(r.df$length,r.df$lty,mean),2)))
+matplot(xgrid$x.mid,hap.clines[xgrid$N+1:xgrid$N,],type='l',main=paste("B: t=",plot.t),ylim=c(0,1),xlab="space",col=r.df$col,lty=r.df$lty,ylab="probability")
+legend("topright",lty=1,col=unique(r.df$col),legend=paste("dist=",round(tapply(r.df$dist,r.df$col,mean),2)))
+```
+
+And, here's a heatmap of haplotype length across space and time:
+shown is the longest haplotype length that has probability of at least 50% of coming entirely from $A$:
+```{r plot_hap_lens, cache=TRUE, depends=c("solve_branching","plot_hap_clines")}
+xfac <- rep(1:xgrid$N,nrow(r.df))
+ABfac <- rep( rep(c("A","B"),each=xgrid$N), nrow(r.df) )
+hap.lens <- lapply( c(A="A",B="B"), function (allele) {
+    do.call( rbind, lapply( 1:nrow(hap.soln), function (k) {
+            tapply( hap.soln[k,1+which(ABfac==allele)], xfac, function (xx) {
+                   if(any(xx>0.5)) { max(r.df$length[xx>0.5]) } else { 0.0 }
+                } )
+        } ) )
+    } )
+filled.contour(hap.soln[,1],xgrid$x.mid,hap.lens$A,xlab="time",ylab="space",zlim=c(0,max(hap.lens$B)),main="A-linked A haplotype length")
+filled.contour(hap.soln[,1],xgrid$x.mid,hap.lens$B,xlab="time",ylab="space",zlim=c(0,max(hap.lens$B)),main="B-linked A haplotype length")
 ```
 
 
+Linkage
+=======
+
+The way the discretization for haplotypes is implemented
+effectively only keeps track of a finite number of markers.
+To do two-site ancestral LD, then,
+we just need to use the above code at only two sites on the genome.
+
+First, we compute per-allele solutions:
+```{r solve_LD, cache=TRUE}
+s <- 0.1
+tt <- seq(0,100,length.out=21)
+xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
+rr <- seq(0,0.5,length.out=20)[-1]
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid,yinit=ifelse(xgrid$x.mid<0,1,0))
+LD.solns <- lapply( rr, function (r) forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=c(0,r),N=2), fwds.soln=fwds.soln) )
+```
+... but then we must extract linkage from these.
+Below we report for recombination distance $r$,
+the probability that two markers at distance $r$ 
+sampled in one individual at that location and time
+(with one end fixed to the selected site)
+are both of the same ancestral type.
+If the local proportion of type $A$ is $p$ and the probability when linked to $A$ is $u_A$,
+we want $p u_A(r_0,r_0+r) + (1-p) u_B(r_0,r_0+r) - (p u_A(r_0) + (1-p) u_A(r_0))(p u_A(r_0+r) + (1-p) u_A(r_0+r))$:
+(**is that right?**)
+```{r compute_LD, cache=TRUE, depends="solve_LD"}
+pfun <- function (t,x) { 
+        fp <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+        ans <- numeric(length(x))
+        for (tval in unique(t)) {
+            dothese <- (rep_len(t,length(x))==tval)
+            ans[dothese] <- fp(x=x[dothese],t=tval)
+        }
+        return(ans)
+}
+ABfac <- rep( rep(c("A","B"),each=xgrid$N), 3 )  # three combinations of two recomb points
+rfac <- rep( c("11","12","22"), each=xgrid$N*2 )
+LDs <- lapply( LD.solns, function (lds) {
+            # returns a time x space matrix
+            pp <- outer( lds[,1], xgrid$x.mid, pfun )
+            return( 
+                   pp * lds[,1+which(ABfac=="A"&rfac=="12")] + (1-pp) * lds[,1+which(ABfac=="B"&rfac=="12")] 
+                   - ( pp * lds[,1+which(ABfac=="A"&rfac=="11")] + (1-pp) * lds[,1+which(ABfac=="B"&rfac=="11")] )
+                       * ( pp * lds[,1+which(ABfac=="A"&rfac=="22")] + (1-pp) * lds[,1+which(ABfac=="B"&rfac=="22")] )
+               )
+    } )
+plot.x <- xgrid$x.mid[which.min(abs(xgrid$x.mid))]
+matplot( tt, sapply( LDs, function (x) { x[,match(plot.x,xgrid$x.mid)] } ), type='l', ylab="ancestral LD", xlab="time" )
+plot.t <- tt[which.min(abs(tt-20))]
+matplot( xgrid$x.mid, sapply( LDs, function (x) { x[match(plot.t,tt),] } ), type='l', ylab="ancestral LD", xlab="space" )
+matplot( rr, t(sapply( LDs, function (x) { x[match(plot.t,tt),] } )), type='l', ylab="ancestral LD", xlab="recomb dist", main=paste("t=",round(plot.t,2)), col=rainbow(xgrid$N), lty=1 )
+legend("topright",lty=1,col=rainbow(xgrid$N)[floor(seq(1,xgrid$N,length.out=6))],legend=paste("x=",round(xgrid$x.mid[floor(seq(1,xgrid$N,length.out=6))],2)))
+```
+Hm, the right/left spatial positions should look the same, right?  Is something off?
+
 
 Distance to closest recombination in a heterozygote
----------------------------------------------------
+===================================================
 
-A simpler statistic, that might approximate the correct quantity well,
+A simpler statistic, that might approximate haplotype statistics well,
 is the distance along the chromosome from an $A$ allele until the closest recombination
 that occurred in an $AB$ heterozygote.
 Let $H$ be this distance;

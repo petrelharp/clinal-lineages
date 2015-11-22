@@ -226,10 +226,10 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     # xgrid = grid of spatial locations
     # rgrid = grid of recombination values
     ###
-    this.lapply <- if ("parallel" %in% .packages() && parallel::detectCores()>1) { function (...) mclapply(...,mc.cores=detectCores()) } else { lapply }
+    # note: doing parallel lapply below is actually a good bit slower.
 
     # precompute some things
-    rgrid$eps <- unique(rgrid$dx)
+    rgrid$eps <- unique(diff(rgrid$x.mid))
     rgrid$zeroind <- which(rgrid$x.mid>0)[1]
 
     # function to find a,b coordinates from the upper triangular coordinates
@@ -253,7 +253,7 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
         p <- cline_interp(t,soln=fwds.soln) # freq of B
         log.p <- log(pmax(p,min(eps,min(p[p>0]))))
         log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
-        diffusion <- do.call( cbind, this.lapply( 1:ncol(y), function (kcol) {
+        diffusion <- do.call( cbind, lapply( 1:ncol(y), function (kcol) {
                 r <- rvals[kcol]
                 yA <- y[1:xgrid$N,kcol]
                 yB <- y[xgrid$N+(1:xgrid$N),kcol]
@@ -264,7 +264,7 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
                         tran.B + r * p * (yA-yB)
                         )
              } ) )
-        recombination <- do.call( rbind, this.lapply( 1:nrow(y), function (krow) {
+        recombination <- do.call( rbind, lapply( 1:nrow(y), function (krow) {
                    if (krow<=xgrid$N) {
                        recomb_generator( yA=y[krow,], yB=y[krow+xgrid$N,], p=p[krow], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
                    } else {
@@ -278,6 +278,16 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     attr(hap.soln,"s") <- s
     attr(hap.soln,"sigma") <- sigma
     attr(hap.soln,"soln.dims") <- soln.dims
+    ufun <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+    # not vectorized in t, so...
+    attr(hap.soln,"u") <- function (x,t) {
+        ans <- numeric(length(x))
+        for (tval in unique(t)) {
+            dothese <- (rep_len(t,length(x))==tval)
+            ans[dothese] <- ufun(x[dothese],t=tval)
+        }
+        return(ans)
+    }
     return(hap.soln)
 }
 
