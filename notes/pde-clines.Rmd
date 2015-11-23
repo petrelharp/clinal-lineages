@@ -470,6 +470,8 @@ legend("topright",lty=1,col=rainbow(xgrid$N)[floor(seq(1,xgrid$N,length.out=6))]
 ```
 Hm, the right/left spatial positions should look the same, right?  Is something off?
 
+**Note:** do the same with fixed distance between the two and changing distance to selected locus.
+
 
 Distance to closest recombination in a heterozygote
 ===================================================
