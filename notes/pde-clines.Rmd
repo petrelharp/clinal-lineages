@@ -462,7 +462,7 @@ LDs <- lapply( LD.solns, function (lds) {
                )
     } )
 plot.x <- xgrid$x.mid[which.min(abs(xgrid$x.mid))]
-matplot( tt, sapply( LDs, function (x) { x[,match(plot.x,xgrid$x.mid)] } ), type='l', ylab="ancestral LD", xlab="time" )
+matplot( tt, sapply( LDs, function (x) { x[,match(plot.x,xgrid$x.mid)] } ), type='l', ylab="ancestral LD", xlab="time", main=paste("location=",round(plot.x,2)) )
 plot.t <- tt[which.min(abs(tt-20))]
 matplot( xgrid$x.mid, sapply( LDs, function (x) { x[match(plot.t,tt),] } ), type='l', ylab="ancestral LD", xlab="space" )
 matplot( rr, t(sapply( LDs, function (x) { x[match(plot.t,tt),] } )), type='l', ylab="ancestral LD", xlab="recomb dist", main=paste("t=",round(plot.t,2)), col=rainbow(xgrid$N), lty=1 )

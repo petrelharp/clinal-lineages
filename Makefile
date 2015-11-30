@@ -1,5 +1,5 @@
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-LOCAL_MATHJAX = /home/usr-share/javascript/mathjax/MathJax.js
+LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
 ifeq ($(wildcard $(LOCAL_MATHJAX)),)
 	MATHJAX = https://cdn.mathjax.org/mathjax/latest/MathJax.js
 else
