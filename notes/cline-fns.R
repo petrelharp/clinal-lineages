@@ -229,7 +229,7 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     # note: doing parallel lapply below is actually a good bit slower.
 
     # precompute some things
-    rgrid$eps <- unique(diff(rgrid$x.mid))
+    rgrid$eps <- unique(diff(rgrid$x.mid))[1]
     rgrid$zeroind <- which(rgrid$x.mid>0)[1]
 
     # function to find a,b coordinates from the upper triangular coordinates

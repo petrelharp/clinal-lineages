@@ -3,10 +3,12 @@
 \usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
 \geometry{a4paper} % or letter or a5paper or ... etc
 % \geometry{landscape} % rotated page geometry
-
+\usepackage{natbib}
+\usepackage{color}
 % See the ``Article customise'' template for come common customisations
+\newcommand{\alisa}[1]{{\em \color{red} #1}}
 
-\title{}
+\title{Ancestry linkage in hybrid zones}
 \author{}
 \date{} % delete this line to display the current date
 
@@ -17,11 +19,25 @@
 %\tableofcontents
 
 \section{Introduction}
-The process of speciation often involves allopatric divergence in relative isolation. When formerly isolated populations come back into contact, a hybrid zone can form, and may be maintained stably by selection. In such instances, selection on some subset of the genome prevents mixing of genotypes between species. We refer to such hybrid zones as tension zones (as opposed to contact zones which reflect a non-equilibrium gradient in ancestry that will eventually be eroded by migration throughout the whole genome). Because the population genetic signatures around loci experiencing selection is going to differ from other regions of the genome, natural hybrid zones present exciting opportunities to understand species maintenance and the process of speciation.\\
+The process of speciation commonly involves allopatric divergence in relative isolation \cite{Coyne2004}. When formerly isolated populations come back into contact, a gradient of ancestry can form in geographic space, resulting in a hybrid zone \cite{Barton1985}. Throughout the genome, clines in ancestry may diminish over time due to migration; however, subsets of the genome that are experiencing differential selection \alisa{better way to say this?} may be expected to maintain clines in ancestry as selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \cite{Barton1979a}. The influence of selection on linked loci also prevents the mixing of ancestry at regions surrounding these loci, the effect of which diminishes with physical genomic distance \cite{Barton1986}.\\
 
-Gene-flow across a hybrid zone is impeded by selection against migrant, or hybrid, genotypes, and as a result, produces a cline in ancestry that is expected to be steepest at and nearby the selected locus. Elsewhere in the genome, clines in ancestry are wider, and are more heavily influenced by hybrid zone age and rates of migration. Historically, this has been the most relied-upon population genetic signature, and it is only recently that abundant genomic data has opened the possibility of studying patterns of linkage within hybrid zones. For example, patterns of linkage disequilibrium (LD) or tract length distribution across geographic space can provide information about zone age \cite{Sedghifar2015}. In tensions zones geographic patterns of linkage at loci neighboring targets of selection can potentially be a powerful source of information.\\ 
+Many population genetic models of hybrid zones have focused on the equilibrium states of ancestry clines \cite{Barton1979a,Barton1986}. These models predict cline width to be narrowest at and nearby selected loci, with cline width at unliked loci to be wider and more heavily influenced by hybrid zone age and rates of gene flow. Population genetic patterns at these loci are important because, in practice, determining whether a hybrid zone has reached equilibrium can be challenging. In particular, even if clines at selected loci are stable, the rest of the genome may still contain additional information. 
 
-Many of the traditional models of genetic variation in hybrid zones to date have focused on the equilibrium state of hybrid zones, at both selected and linked loci (lots of Barton). 
+\alisa{Are we mainly just arguing that we get more robust information from looking at linkage around selected loci? Is there anything else?}
+
+In addition to patterns of allele frequency, the extent of linkage in hybrid zones can also provide information about important parameters, such as age and rates of gene flow, in hybrid zones. As denser genotype data becomes more readily available, it is now possible to utilize patterns of linkage in the analysis of hybrid zones. Genome-wide covariance in ancestry can provide information about the number of surviving recombination events that have taken place between ancestral genotypes and therefore can provide information about the age of the hybrid zone, and the strength of selection at nearby loci.\\
+
+
+
+Using an equilibrium model. We often don't know if hybrid zones are at equilibrium. 
+
+%In the absence of selection, genome-wide covariance in ancestry can be used to estimate timing and gene-flow in hybrid zones \cite{Sedghifar2015}. 
+
+%When formerly isolated populations come back into contact, a hybrid zone can form, and may be maintained stably by selection. In such instances, selection on some subset of the genome prevents mixing of genotypes between species. We refer to such hybrid zones as tension zones (as opposed to contact zones which reflect a non-equilibrium gradient in ancestry that will eventually be eroded by migration throughout the whole genome). Because the population genetic signatures around loci experiencing selection is going to differ from other regions of the genome, natural hybrid zones present exciting opportunities to understand species maintenance and the process of speciation.\\
+
+%Gene-flow across a hybrid zone is impeded by selection against migrant, or hybrid, genotypes, and as a result, produces a cline in ancestry that is expected to be steepest at and nearby the selected locus. Elsewhere in the genome, clines in ancestry are wider, and are more heavily influenced by hybrid zone age and rates of migration. Historically, this has been the most relied-upon population genetic signature, and it is only recently that abundant genomic data has opened the possibility of studying patterns of linkage within hybrid zones. For example, patterns of linkage disequilibrium (LD) or tract length distribution across geographic space can provide information about zone age \cite{Sedghifar2015}. In tensions zones geographic patterns of linkage at loci neighboring targets of selection can potentially be a powerful source of information.\\ 
+
+%Many of the traditional models of genetic variation in hybrid zones to date have focused on the equilibrium state of hybrid zones, at both selected and linked loci (lots of Barton). 
 
 %-Studying hybrid zones is a great opportunity to understand the maintenance of distinct species, and the process of speciation. Here we consider hybrid zones that are a cline that is maintained by selection against hybrids (so-called tension zone). \\
 %-Gene flow across a hybrid zone may be impeded by selection against migrants. In older contact zones, loci that are associated with reduced fitness in heterozygotes will have steeper clines than the rest of the genome. There is probably a lot to learn from geographic patterns at loci neighboring selected loci (e.g. small block lengths indicate that there has been plenty of opportunity for recombination in heterozygous backgrounds)\\ 
@@ -36,12 +52,17 @@ We consider a model in which two isolated subspecies, species $A$ and species $B
 We consider a lineage sampled in the present day, and determine its ancestry by its position at time $\tau$ generations in the past. The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that the two species are fixed for alternate alleles at this locus). For every other locus, we keep track of $a$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination is modeled as a poisson process with rate $r$. The identity $a$ at locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
 \\
 
-As an approximation, we consider a cline of narrow width (look up cline width for underdominance, Barton/May?), such that the frequency of migrant alleles is exponential and negligible at distance away from the center of the hybrid zone. This means that recombination events that occur away from the center of the zone do not result in a change in $a$.\\
+%As an approximation, we consider a cline of narrow width (look up cline width for underdominance, Barton/May?), such that the frequency of migrant alleles is exponential and negligible at distance away from the center of the hybrid zone. This means that recombination events that occur away from the center of the zone do not result in a change in $a$.\\
 
 
 \subsection{}
 
 \subsection{Simulations}
-Forward in time simulations were used to asses theoretical predictions. We simulate discrete demes with nearest-neighbor migration and non-overlapping generations. Each generation, an individual moves to a neighboring deme with probability $m$. The direction in which it moves is determined by a coin-flip, except at edge demes, where an individual moves in one direction with probability $m/2$. Following migration, the next generation is produced by replacing each individual in a deme by randomly choosing two parents with probability weighted by the fitness of their genotypes. The genotype of the new individual is generated by simulating a recombined chromosome from each parent. This simulation keeps track of the ancestry at each location in the chromosome for all individuals. Each individual has 1 pair of chromosomes of length 1 Morgan. 
+Forward in time simulations were used to assess theoretical predictions. We simulate discrete demes with nearest-neighbor migration and non-overlapping generations. Each generation, an individual moves to a neighboring deme with probability $m$. The direction in which it moves is determined by a coin-flip, except at edge demes, where an individual moves in one direction with probability $m/2$. Following migration, the next generation is produced by replacing each individual in a deme by randomly choosing two parents with probability weighted by the fitness of their genotypes. The genotype of the new individual is generated by simulating a recombined chromosome from each parent. This simulation keeps track of the ancestry at each location in the chromosome for all individuals. Each individual has 1 pair of chromosomes of length 1 Morgan. 
+
+\subsection{Data}
+We compare the predictions of our model to genomic data obtained from individuals sampled a naturally occurring hybrid zone between \emph{Mus m. musculus/M. m. domesticus} \cite{Turner2011,Turner2014}. The genomic data generated by \citep{Turner2014} was for a mapping population generated by mating wild-caught individuals. Because some individuals were mated multiple times, the mapping population comprises many closely related individuals. We approximate wild population samples by restricting our analysis to genotyped individuals that had both parents sampled in the same location in such a way that none of the individuals shared a parent (see table for list of individuals).\\
+
+Ancestry blocks were estimated using ChromopainterV2 \cite{Lawson2012}. 
 
 \end{document}

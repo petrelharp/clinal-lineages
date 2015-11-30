@@ -344,7 +344,7 @@ s <- 0.1
 tt <- seq(0,10,length.out=20)
 
 xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=10)
-rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=50)
+rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=40)
 
 # took 24min with xgrid$N=10, rgrid$N=20 and 50 time steps up to t=3, :(
 hap.soln <- forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=rgrid)
@@ -469,6 +469,8 @@ matplot( rr, t(sapply( LDs, function (x) { x[match(plot.t,tt),] } )), type='l', 
 legend("topright",lty=1,col=rainbow(xgrid$N)[floor(seq(1,xgrid$N,length.out=6))],legend=paste("x=",round(xgrid$x.mid[floor(seq(1,xgrid$N,length.out=6))],2)))
 ```
 Hm, the right/left spatial positions should look the same, right?  Is something off?
+
+**Note:** do the same with fixed distance between the two and changing distance to selected locus.
 
 
 Distance to closest recombination in a heterozygote
