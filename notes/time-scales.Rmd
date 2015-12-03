@@ -44,7 +44,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r fwds_soln_plot, cache=TRUE, depends="setup_tens"}
+```{r tens_fwds_soln_plot, cache=TRUE, depends="setup_tens"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(xgrid)
 ```
@@ -123,7 +123,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r fwds_soln_plot, cache=TRUE, depends="setup_hunds"}
+```{r hunds_fwds_soln_plot, cache=TRUE, depends="setup_hunds"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(xgrid)
 ```
@@ -202,7 +202,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r fwds_soln_plot, cache=TRUE, depends="setup_thous"}
+```{r thous_fwds_soln_plot, cache=TRUE, depends="setup_thous"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(xgrid)
 ```
