@@ -62,10 +62,20 @@ publish :
 	cp $$(find . -path ./htmls -prune -o -name '*html' -print) htmls
 	git checkout gh-pages
 	cp -r htmls/* .
+	# make index.html
+	echo '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title></title> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >index.html
+	echo '<h1>html files in this repository</h1><ul>' >> index.html
+	for x in $$(echo *html | sed -e 's/\<index.html\>//' | sed -e 's_\<__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> index.html; done
+	echo '</body></html>' >> index.html
+	# commit
 	git add *.html
-	git commit -a -m 'automatic update of html'
+	-git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
 sync : publish
 	git push github master gh-pages
+
+
+
+
 
