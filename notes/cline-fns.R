@@ -62,17 +62,33 @@ add_grid_axis <- function (thegrid,side=2,...) {
             labels=pretty(thegrid$x.mid))
 }
 
-cline_interp <- function (T,soln) {
+cline_interp <- function (t,soln) {
     # return the interpolated cline for a particular time
     # from the output of deSolve
-    which.t <- findInterval(T,soln[,1],rightmost.closed=TRUE)
-    lu <- soln[c(which.t,which.t+1),1]
-    alpha <- (T-lu[1])/diff(lu)
-    return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
+    sapply(t, function (TT) {
+            which.t <- findInterval(TT,soln[,1],rightmost.closed=TRUE)
+            lu <- soln[c(which.t,which.t+1),1]
+            alpha <- (TT-lu[1])/diff(lu)
+            return( (1-alpha)*soln[which.t,-1] + alpha*soln[which.t+1,-1]  )
+        } )
+}
+
+cline_fun <- function (soln) {
+    # return a function that interpolates the solution to (t,x)
+    function (t,x) { 
+            fp <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=soln),xout=x)$y }
+            ans <- numeric(length(x))
+            for (tval in unique(t)) {
+                dothese <- (rep_len(t,length(x))==tval)
+                ans[dothese] <- fp(x=x[dothese],t=tval)
+            }
+            return(ans)
+    }
 }
 
 forwards_pde <- function (s,times,grid,sigma=1,
-                      yinit=ifelse( grid$x.mid>0, 0, 1 )) {
+                      yinit=ifelse( grid$x.mid==0, 0.5, ifelse( grid$x.mid>0, 0, 1 )) 
+              ) {
     # Solve the pde for frequencies, forwards in time:
     #   by default, yinit=1 to the *left* of zero;
     #   so finds the probability the selected site initiates on the left
@@ -86,7 +102,8 @@ forwards_pde <- function (s,times,grid,sigma=1,
 }
 
 forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
-        fwds.soln=forwards_pde(s=s,times=times,grid=grid,yinit=ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])),
+        fwds.soln=forwards_pde(s=s,times=times,grid=grid,
+            yinit=ifelse(grid$x.mid==0,(yinit[1:grid$N]+yinit[grid$N+(1:grid$N)])/2,ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])) ),
         yinit=c( rep(1.0,grid$N), rep(0.0,grid$N) ), 
         log.p=TRUE, eps=1e-16, ... ) {
     # solve the pde for a lineage run backwards in the forwards-time profile
@@ -219,7 +236,8 @@ recomb_generator <- function (yA,yB,p,zeroind,nabvals,eps) {
 }
 
 forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
-        fwds.soln=forwards_pde(s=s,times=times,grid=xgrid,yinit=ifelse(xgrid$x.mid<0,yinit[1:xgrid$N],yinit[xgrid$N+(1:xgrid$N)])),
+        fwds.soln=forwards_pde(s=s,times=times,grid=xgrid,
+            yinit=ifelse(grid$x.mid==0,(yinit[1:grid$N]+yinit[grid$N+(1:grid$N)])/2,ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])) ),
         yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), rgrid$N*(rgrid$N+1)/2 ),
         eps=1e-16, ... ) {
     ###
@@ -296,6 +314,29 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     }
     return(hap.soln)
 }
+
+AD_from_soln <- function (soln,xgrid) {
+    # returns a time x space matrix of ancestral disequilibrium values
+    #  ** for only the first two loci in the solution **
+    # i.e.,
+    #   p u_A(r_0,r_0+r) + (1-p) u_B(r_0,r_0+r) - (p u_A(r_0) + (1-p) u_A(r_0))(p u_A(r_0+r) + (1-p) u_A(r_0+r))
+    rcombs <- attr(soln,"r")
+    this.rr <- sort( unique( as.vector(rcombs) ) )
+    # must interpret the coordinates of the solution:
+    #  factor saying if this coordinate is linked to A or to B
+    ABfac <- rep( rep(c("A","B"),each=xgrid$N), nrow(rcombs) ) 
+    #  factor saying which loci the coordinate covers
+    rfac <- rep( paste( match(rcombs[,1],this.rr), match(rcombs[,2],this.rr), sep="" ), each=xgrid$N*2 )
+    pp <- t( outer( xgrid$x.mid, soln[,1], attr(soln,"u") ) )
+    return
+    ( 
+           pp * soln[,1+which(ABfac=="A"&rfac=="12")] + (1-pp) * soln[,1+which(ABfac=="B"&rfac=="12")] 
+           - ( pp * soln[,1+which(ABfac=="A"&rfac=="11")] + (1-pp) * soln[,1+which(ABfac=="B"&rfac=="11")] )
+               * ( pp * soln[,1+which(ABfac=="A"&rfac=="22")] + (1-pp) * soln[,1+which(ABfac=="B"&rfac=="22")] )
+       )
+
+}
+
 
 get_hap_probs <- function ( hap.soln, left, right ) {
     nx <- attr(hap.soln,"soln.dims")[1]/2

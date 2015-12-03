@@ -38,7 +38,8 @@ tt <- seq(0,40,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.2,length.out=21)
 rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid,yinit=ifelse(xgrid$x.mid<0,1,0))
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+pfun <- cline_fun(fwds.soln)
 ```
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
@@ -64,7 +65,7 @@ Here are linked clines for a few time steps:
 ```{r plot_tens_linked_clines, cache=TRUE, depends="tens_linked_clines"}
 for (plot.t in c(4,10,20,40)) {
     k <- which.min(abs(tt-plot.t))
-    lclines <- sapply( linked.clines, cline_interp, T=tt[k] )
+    lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
     matplot( xgrid$x.mid, lclines, type='l', ylab="proportion", xlab='space', 
             main=sprintf("t=%0.0f",tt[k]),
            lty=1, col=rcols )
@@ -82,11 +83,20 @@ Now we'll look at ancestry disequilibrium across the region.
 ```{r tens_ld_solutions, cache=TRUE}
 rr <- seq(-0.2,0.2,length.out=21)
 rcols <- rainbow(length(unique(abs(rr)))*1.2)[match(abs(rr),unique(abs(rr)))]
-rpairs <- as.matrix(expand.grid(r1=rr,r2=rr))
-LD.solns <- parallel::mclapply( 1:nrow(rpairs), function (k) forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=rpairs[k,],N=2), fwds.soln=fwds.soln), mc.cores=parallel::detectCores() )
+rpairs <- as.matrix(subset(expand.grid(r1=rr,r2=rr),r1<r2))
+LD.solns <- parallel::mclapply( 1:nrow(rpairs), function (k) 
+               forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=rpairs[k,],N=2), fwds.soln=fwds.soln), 
+           mc.cores=parallel::detectCores() )
+LD.values <- lapply( LD.solns, AD_from_soln, xgrid=xgrid )
 ```
 
-Here are heatmaps of ancestry LD at a few different times.
+Here are heatmaps of ancestry LD at a few different times and locations
 The selected site is in the center.
-```{r tens_ld_heatmaps, cache=TRUE, depends="tens_ld_solutions"}
+```{r tens_ld_heatmaps, cache=TRUE, depends="tens_ld_solutions", fig.width=3*fig.dim}
+plot.x <- c(0,5,10)
+these.x <- 
+layout(t(1:3))
+for (plot.t in c(4,10,20,40)) {
+    image( 
+}
 ```

@@ -419,7 +419,7 @@ s <- 0.1
 tt <- seq(0,100,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.5,length.out=20)[-1]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid,yinit=ifelse(xgrid$x.mid<0,1,0))
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
 LD.solns <- lapply( rr, function (r) forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=c(0,r),N=2), fwds.soln=fwds.soln) )
 ```
 ... but then we must extract linkage from these.
@@ -430,7 +430,6 @@ sampled in one individual at that location and time
 are both of the same ancestral type.
 If the local proportion of type $A$ is $p$ and the probability when linked to $A$ is $u_A$,
 we want $p u_A(r_0,r_0+r) + (1-p) u_B(r_0,r_0+r) - (p u_A(r_0) + (1-p) u_A(r_0))(p u_A(r_0+r) + (1-p) u_A(r_0+r))$:
-(**is that right?**)
 ```{r compute_LD, cache=TRUE, depends="solve_LD"}
 pfun <- function (t,x) { 
         fp <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
