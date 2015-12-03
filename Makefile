@@ -1,5 +1,7 @@
 SHELL = /bin/bash
 
+.PHONY : test publish
+
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
 ifeq ($(wildcard $(LOCAL_MATHJAX)),)
@@ -22,8 +24,6 @@ else
 endif
 
 
-
-.PHONY : test
 
 %.md : %.Rmd
 	cd $(dir $<) && Rscript -e 'knitr::opts_chunk$$set(fig.path=file.path("figure","$*",""),cache.path=file.path("cache","$*",""));knitr::knit(basename("$<"),output=basename("$@"))'
@@ -49,3 +49,21 @@ endif
 
 test : 
 	echo "Directory of this makefile: $(THIS_DIR) ."
+
+# update html in the gh-pages branch
+#   add e.g. 'pdfs' to the next line to also make pdfs available there
+#
+# hope your head isn't detached
+GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
+
+publish :
+	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
+	-mkdir htmls
+	cp $$(find . -name '*html') htmls
+	git checkout gh-pages
+	cp -r htmls/* .
+	git add *.html
+	git commit -a -m 'automatic update of html'
+	git checkout $(GITBRANCH)
+
+
