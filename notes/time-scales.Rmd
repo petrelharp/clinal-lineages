@@ -105,3 +105,161 @@ for (plot.t in c(4,10,20,40)) {
     }
 }
 ```
+
+
+Hundreds of generations
+===================
+
+First, the setup:
+```{r setup_hunds, cache=TRUE}
+s <- 0.1
+tt <- seq(0,400,length.out=21)
+xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
+rr <- seq(0,0.2,length.out=21)
+rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+pfun <- cline_fun(fwds.soln)
+```
+We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
+
+Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
+```{r fwds_soln_plot, cache=TRUE, depends="setup_hunds"}
+image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
+add_grid_axis(xgrid)
+```
+
+
+
+Linked clines
+-------------
+
+```{r hunds_linked_clines, cache=TRUE, depends="setup_hunds"}
+linked.solns <- lapply( rr, function (r) {
+            forwards_backwards_pde(s=s,times=tt,grid=xgrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
+        } )
+linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
+```
+
+Here are linked clines for a few time steps:
+```{r plot_hunds_linked_clines, cache=TRUE, depends="hunds_linked_clines"}
+for (plot.t in 10*c(4,10,20,40)) {
+    k <- which.min(abs(tt-plot.t))
+    lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
+    matplot( xgrid$x.mid, lclines, type='l', ylab="proportion", xlab='space', 
+            main=sprintf("t=%0.0f",tt[k]),
+           lty=1, col=rcols )
+    legend("topright", lty=1, col=rcols, legend=sprintf("r=%0.2f",rr) )
+}
+```
+
+
+
+Ancestry disequilibrium
+-----------------------
+
+Now we'll look at ancestry disequilibrium across the region.
+
+```{r hunds_ld_solutions, cache=TRUE}
+rr <- seq(-0.2,0.2,length.out=21)
+rcols <- rainbow(length(unique(abs(rr)))*1.2)[match(abs(rr),unique(abs(rr)))]
+rpairs <- as.matrix(subset(expand.grid(r1=rr,r2=rr),r1<r2))
+AD.solns <- parallel::mclapply( 1:nrow(rpairs), function (k) 
+               forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=rpairs[k,],N=2), fwds.soln=fwds.soln), 
+           mc.cores=parallel::detectCores() )
+AD.values <- lapply( AD.solns, AD_from_soln, xgrid=xgrid )
+```
+
+Here are heatmaps of ancestry LD at a few different times and locations
+The selected site is in the center.
+```{r hunds_ld_heatmaps, cache=TRUE, depends="hunds_ld_solutions", fig.width=3*fig.dim}
+plot.x <- c(0,5,10)
+layout(t(1:3))
+for (plot.t in 10*c(4,10,20,40)) {
+    for (k in seq_along(plot.x)) {
+        this.t <- match(plot.t,tt)
+        this.x <- match(plot.x[k],xgrid$x.mid)
+        ADmat <- matrix(NA,nrow=length(rr),ncol=length(rr))
+        ADmat[cbind(match(rpairs[,1],rr),match(rpairs[,2],rr))] <- sapply( AD.values, "[", cbind(this.t,this.x) )
+        image(ADmat,zlim=c(0,max(unlist(AD.values))))
+    }
+}
+```
+
+
+Thousands of generations
+===================
+
+First, the setup:
+```{r setup_thous, cache=TRUE}
+s <- 0.1
+tt <- seq(0,4000,length.out=21)
+xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
+rr <- seq(0,0.2,length.out=21)
+rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
+fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+pfun <- cline_fun(fwds.soln)
+```
+We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
+
+Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
+```{r fwds_soln_plot, cache=TRUE, depends="setup_thous"}
+image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
+add_grid_axis(xgrid)
+```
+
+
+
+Linked clines
+-------------
+
+```{r thous_linked_clines, cache=TRUE, depends="setup_thous"}
+linked.solns <- lapply( rr, function (r) {
+            forwards_backwards_pde(s=s,times=tt,grid=xgrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
+        } )
+linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
+```
+
+Here are linked clines for a few time steps:
+```{r plot_thous_linked_clines, cache=TRUE, depends="thous_linked_clines"}
+for (plot.t in 100*c(4,10,20,40)) {
+    k <- which.min(abs(tt-plot.t))
+    lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
+    matplot( xgrid$x.mid, lclines, type='l', ylab="proportion", xlab='space', 
+            main=sprintf("t=%0.0f",tt[k]),
+           lty=1, col=rcols )
+    legend("topright", lty=1, col=rcols, legend=sprintf("r=%0.2f",rr) )
+}
+```
+
+
+
+Ancestry disequilibrium
+-----------------------
+
+Now we'll look at ancestry disequilibrium across the region.
+
+```{r thous_ld_solutions, cache=TRUE}
+rr <- seq(-0.2,0.2,length.out=21)
+rcols <- rainbow(length(unique(abs(rr)))*1.2)[match(abs(rr),unique(abs(rr)))]
+rpairs <- as.matrix(subset(expand.grid(r1=rr,r2=rr),r1<r2))
+AD.solns <- parallel::mclapply( 1:nrow(rpairs), function (k) 
+               forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=rpairs[k,],N=2), fwds.soln=fwds.soln), 
+           mc.cores=parallel::detectCores() )
+AD.values <- lapply( AD.solns, AD_from_soln, xgrid=xgrid )
+```
+
+Here are heatmaps of ancestry LD at a few different times and locations
+The selected site is in the center.
+```{r thous_ld_heatmaps, cache=TRUE, depends="thous_ld_solutions", fig.width=3*fig.dim}
+plot.x <- c(0,5,10)
+layout(t(1:3))
+for (plot.t in 100*c(4,10,20,40)) {
+    for (k in seq_along(plot.x)) {
+        this.t <- match(plot.t,tt)
+        this.x <- match(plot.x[k],xgrid$x.mid)
+        ADmat <- matrix(NA,nrow=length(rr),ncol=length(rr))
+        ADmat[cbind(match(rpairs[,1],rr),match(rpairs[,2],rr))] <- sapply( AD.values, "[", cbind(this.t,this.x) )
+        image(ADmat,zlim=c(0,max(unlist(AD.values))))
+    }
+}
+```
