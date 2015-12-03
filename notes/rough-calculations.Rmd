@@ -184,7 +184,7 @@ b.  Look at space-time frequency images at $r=0$ and several values of $s$
             forwards_pde(s=s,times=tt,grid=thegrid) 
         } )
     for (k in seq_along(svals)) {
-        clineplot( fwds.solns[[k]], main=sprintf("s=%f",svals[k]), col=ifelse( fwds.solns[[k]][,1]>1/svals[k], adjustcolor("black",0.5), adjustcolor("red",0.5) ) )
+        clineplot( fwds.solns[[k]], thegrid, main=sprintf("s=%f",svals[k]), col=ifelse( fwds.solns[[k]][,1]>1/svals[k], adjustcolor("black",0.5), adjustcolor("red",0.5) ) )
         abline(v=c(-1,1)/sqrt(svals[k]),lty=3,col='green',lwd=2)
     }
     ```
@@ -250,7 +250,7 @@ How do haplotypes look around the selected locus in the cline
 
 **Answer:**
 
-a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of length about $\sigma/(sx)$, as long as this is less than $1/\tau$. (this is fairly restrictive)
+a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of length about $s \sigma/x$, as long as this is less than $1/\tau$. (this is fairly restrictive)
 
 
 **Rationale:**
@@ -258,10 +258,10 @@ a.  The haplotype of a $B$ allele at distance $x$ into the $A$ side should be of
 a.  This is (probably) the Laplace transform of the time since the $B$ allele
     last had an ancestor on the $B$ side,
     i.e., for a $B$ lineage to make it back to the $B$ side.
-    Since lineages on the wrong side move at speed $\sigma/s$,
+    Since lineages on the wrong side move at speed $\sigma s$,
     if the allele is at position $x$, 
-    this will take about $sx/\sigma$;
-    and so the haplotype should be about $\sigma/(sx)$.
+    this will take about $x/(s\sigma)$;
+    and so the haplotype should be about $s\sigma/x$.
     This gives the size of the chunk carried with it on this excursion;
     this will be of the same type with high probability at least if the length is less than $1/\tau$,
     as above.

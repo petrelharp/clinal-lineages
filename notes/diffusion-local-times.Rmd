@@ -345,8 +345,8 @@ axis(2,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
 Let's compare the case where the cline is set up instantly or not:
 ```{r compare_rightness, cache=TRUE,dependson=c("fwds_back_pde","solve_pde_setup")}
 layout(t(1:2))
-fb.p <- clineplot(rev.soln,main="forwards-backwards")
-st.p <- clineplot(pde.soln,main="stationary cline")
+fb.p <- clineplot(rev.soln,thegrid,main="forwards-backwards")
+st.p <- clineplot(pde.soln,thegrid,main="stationary cline")
 layout(1)
 plot(fb.p,st.p,asp=1,pch=20,cex=0.5,xlab="forwards-backwards",ylab="stationary",col=rainbow(ncol(fb.p))[col(fb.p)])
 abline(0,1,lwd=3)
@@ -689,9 +689,9 @@ solve.reflected <- function (x.up=-20) {
 pde.soln.0 <- solve.reflected(x.up=-5)
 pde.soln.1 <- solve.reflected(x.up=-8)
 pde.soln.2 <- solve.reflected(x.up=-20)
-clineplot(pde.soln.0,x=attr(pde.soln.0,"x"),xlim=c(-5,0))
-clineplot(pde.soln.1,x=attr(pde.soln.1,"x"),add=TRUE)
-clineplot(pde.soln.2,x=attr(pde.soln.2,"x"),add=TRUE)
+clineplot(pde.soln.0,thegrid,x=attr(pde.soln.0,"x"),xlim=c(-5,0))
+clineplot(pde.soln.1,thegrid,x=attr(pde.soln.1,"x"),add=TRUE)
+clineplot(pde.soln.2,thegrid,x=attr(pde.soln.2,"x"),add=TRUE)
 ```
 
 And, the PDE solution doesn't agree with the simulations very well: 
@@ -710,7 +710,7 @@ pde.fn <- function (t,y,parms,...) {
     list( tran - r * hetfn$mid * y )
 }
 pde.soln <- ode.1D( y=yinit, times=tt, func=pde.fn, nspec=1 ) # note FIRST COLUMN IS TIME
-ps <- clineplot(pde.soln,times=seq_along(tt),xlim=c(-8,0),legend=FALSE)
+ps <- clineplot(pde.soln,thegrid,times=seq_along(tt),xlim=c(-8,0),legend=FALSE)
 matlines( thegrid$x.mid, outer( thegrid$x.mid, tt, function(x,t) { zeta.reflected(x/sqrt(t),r*t*x.eps) }), lty=3, col=rainbow(length(tt)) )
 legend("bottomleft",lty=1:2,legend=c("PDE","theory"))
 ```
@@ -881,7 +881,7 @@ pde.solns <- lapply( rvals, function (r) {
       } )
 layout(t(1:2))
 for (k in c(6,10)) {
-    clineplot(pde.solns[[k]],main=sprintf("r=%0.2f",tau,rvals[k]))
+    clineplot(pde.solns[[k]],thegrid,main=sprintf("r=%0.2f",tau,rvals[k]))
 }
 ```
 

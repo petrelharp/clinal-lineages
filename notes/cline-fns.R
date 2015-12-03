@@ -45,15 +45,21 @@ weighted_time <- function (rws, weight.fn, use.t=TRUE, ...) {
     colSums( weight.fn(rws[use.t,],...) ) * attr(rws,"dt")
 }
 
-clineplot <- function (soln,x=thegrid$x.mid,times=seq(1,nrow(soln),length.out=ntimes),ntimes=20,
-                       ylab="probability", ylim=c(0,1), legend=TRUE, lty=1,
-                       col=rainbow(length(times)),
-                       ...) {
+clineplot <- function (soln, thegrid, x=thegrid$x.mid,
+               times=seq(1,nrow(soln),length.out=ntimes), ntimes=20,
+               ylab="probability", ylim=c(0,1), legend=TRUE, lty=1,
+               col=rainbow(length(times)),
+           ...) {
     # plot output of deSolve as clines in a nice way
     graphics::matplot( x, t(soln[times,-1]), type='l', col=col, lty=lty, 
             xlab="space", ylab=ylab, ylim=ylim, ...)
     if (legend) legend("bottomleft", lty=lty, col=col, legend=paste("t=",round(soln[times,1],digits=2)), cex=0.5)
     return( invisible( t(soln[times,-1]) ) )
+}
+
+add_grid_axis <- function (thegrid,side=2,...) {
+    axis(side=side,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
+            labels=pretty(thegrid$x.mid))
 }
 
 cline_interp <- function (T,soln) {

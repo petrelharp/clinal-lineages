@@ -3,15 +3,6 @@ title: "Clines from PDE"
 date: "`r date()`"
 ---
 
-$$
-\newcommand{\E}{\mathbb{E}}
-\renewcommand{\P}{\mathbb{P}}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\one}{\mathbf{1}}
-\DeclareMathOperator{\sgn}{sgn}
-\newcommand{\grad}{\nabla}
-$$
-
 ```{r doc_setup, include=FALSE}
 fig.dim <- 5
 knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
