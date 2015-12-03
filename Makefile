@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-.PHONY : test publish
+.PHONY : test publish sync
 
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
@@ -50,7 +50,7 @@ endif
 test : 
 	echo "Directory of this makefile: $(THIS_DIR) ."
 
-# update html in the gh-pages branch
+# copy all html files (without directory structure) to the gh-pages branch
 #   add e.g. 'pdfs' to the next line to also make pdfs available there
 #
 # hope your head isn't detached
@@ -59,11 +59,13 @@ GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
 publish :
 	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
 	-mkdir htmls
-	cp $$(find . -name '*html') htmls
+	cp $$(find . -path ./htmls -prune -o -name '*html' -print) htmls
 	git checkout gh-pages
 	cp -r htmls/* .
 	git add *.html
 	git commit -a -m 'automatic update of html'
 	git checkout $(GITBRANCH)
 
+sync : publish
+	git push github master gh-pages
 
