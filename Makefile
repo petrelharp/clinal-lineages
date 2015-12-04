@@ -1,5 +1,7 @@
 SHELL = /bin/bash
 
+.PHONY : test publish sync
+
 THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 LOCAL_MATHJAX = /usr/share/javascript/mathjax/MathJax.js
 ifeq ($(wildcard $(LOCAL_MATHJAX)),)
@@ -22,8 +24,6 @@ else
 endif
 
 
-
-.PHONY : test
 
 %.md : %.Rmd
 	cd $(dir $<) && Rscript -e 'knitr::opts_chunk$$set(fig.path=file.path("figure","$*",""),cache.path=file.path("cache","$*",""));knitr::knit(basename("$<"),output=basename("$@"))'
@@ -49,3 +49,33 @@ endif
 
 test : 
 	echo "Directory of this makefile: $(THIS_DIR) ."
+
+# copy all html files (without directory structure) to the gh-pages branch
+#   add e.g. 'pdfs' to the next line to also make pdfs available there
+#
+# hope your head isn't detached
+GITBRANCH := $(shell git symbolic-ref -q --short HEAD)
+
+publish :
+	@if ! git diff-index --quiet HEAD --; then echo "Commit changes first."; exit 1; fi
+	-mkdir htmls
+	cp $$(find . -path ./htmls -prune -o -name '*html' -print) htmls
+	git checkout gh-pages
+	cp -r htmls/* .
+	# make index.html
+	echo '<html xmlns="http://www.w3.org/1999/xhtml"> <head> <title></title> <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/> <link rel="stylesheet" href="pandoc.css" type="text/css" /></head> <body>' >index.html
+	echo '<h1>html files in this repository</h1><ul>' >> index.html
+	for x in $$(echo *html | sed -e 's/\<index.html\>//' | sed -e 's_\<__g'); do echo "<li><a href=\"$${x}\">$${x}</a></li>" >> index.html; done
+	echo '</body></html>' >> index.html
+	# commit
+	git add *.html
+	-git commit -a -m 'automatic update of html'
+	git checkout $(GITBRANCH)
+
+sync : publish
+	git push github master gh-pages
+
+
+
+
+
