@@ -1,0 +1,48 @@
+---
+title: "Measures of correlation in ancestry"
+date: "`r date()`"
+---
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.width=2*fig.dim,fig.height=fig.dim,fig.align='center')
+```
+
+Goal
+=====
+
+Compute something like correlation in ancestry between nearby markers,
+in different locations,
+as a measure of typical haplotype length in the (spatial and/or genomic) region.
+
+**Nomenclature:** Yaniv followed John in calling it "ancestry disequilibrium".
+This admirably follows population genetics tradition
+in choosing a name that is in comprehensible to outsider.
+I propose calling it something that uses "correlation" instead of "disequilibrium"?
+(*Todo:* figure out what the measures below are correlations of, and say that.)
+
+
+Suggestion
+==========
+
+Fix spatial locations $x$, $y$, and $z$.
+and loci $i$ and $j$.
+Suppose we sample individuals at $x$, $y$, and $z$,
+and then in each of these samples, at each locus, pick a random allele;
+let $(X_i,X_j)$ be the alleles sampled thus at $x$, and likewise for $Y$ and $Z$.
+(If we have phased data, instead pick a random haplotype.)
+Then, define
+\begin{align} \label{eqn:Dx_defn}
+    D_x(i,j) = \P\{ X_i=Y_i\neq Z_i \and X_j=Y_j\neq Z_j\} - \P\{ X_i=Y_i \neq Z_i \} \P\{ X_j=Y_j \neq Z_j \} .
+\end{align}
+
+Now, how to estimate this?
+
+Suppose $I$ has alleles $a$ and $A$, and $J$ has alleles $b$ and $B$;
+and suppose that at location $x$ we have sampled $n_x$ individuals,
+of which $n_x(aa,bb)$ have diploid genotype $a/a$, $b/b$, etcetera.
+Define $p_x = n_x/n$, and so forth.
+The first term is
+\begin{align} \label{eqn:Dx_defn}
+    \P\{ X_i=Y_i\neq Z_i \and X_j=Y_j\neq Z_j\} 
+\end{align}
