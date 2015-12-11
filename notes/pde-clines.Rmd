@@ -419,7 +419,7 @@ s <- 0.1
 tt <- seq(0,100,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.5,length.out=20)[-1]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+fwds.soln <- forwards_pde(s=s,times=tt,grid=extend_grid(xgrid))
 LD.solns <- lapply( rr, function (r) forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=list(x.mid=c(0,r),N=2), fwds.soln=fwds.soln) )
 ```
 ... but then we must extract linkage from these.
