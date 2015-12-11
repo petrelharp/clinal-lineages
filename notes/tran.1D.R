@@ -32,7 +32,7 @@ tran.1D <- function (C, C.up = C[1], C.down = C[length(C)], flux.up = NULL,
                 1))[2:(N + 1)]))
     if (!is.list(A)) 
         A <- list(int = rep(A, length.out = (N + 1)), 
-                  mid = 0.5 * (rep(A, length.out = (length(C) + 1))[1:N] + rep(A, length.out = (N + 1))[2:(N + 1)]))
+                  mid = 0.5 * (rep(A, length.out = (N + 1))[1:N] + rep(A, length.out = (N + 1))[2:(N + 1)]))
     if (is.list(dx)) 
         grid <- dx
     if (!is.list(dx)) 

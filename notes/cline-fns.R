@@ -76,7 +76,7 @@ cline_interp <- function (t,soln) {
 cline_fun <- function (soln) {
     # return a function that interpolates the solution to (t,x)
     function (t,x) { 
-            fp <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=soln),xout=x)$y }
+            fp <- function (x,t) { approx(attr(soln,"grid")$x.mid,cline_interp(t,soln=soln),xout=x)$y }
             ans <- numeric(length(x))
             for (tval in unique(t)) {
                 dothese <- (rep_len(t,length(x))==tval)
@@ -98,12 +98,33 @@ forwards_pde <- function (s,times,grid,sigma=1,
     }
     soln <- ode.1D( y=yinit, times=times, func=fwds.pde, nspec=1 ) # note FIRST COLUMN IS TIME
     attr(soln,"s") <- s
+    attr(soln,"grid") <- grid
     return(soln)
 }
 
+extend_grid <- function (grid) {
+    # extend a given grid to have one more point on the outside
+    dx.up <- grid$dx[1]
+    dx.down <- grid$dx[grid$N]
+    newgrid <- list(
+                x.up = grid$x.up-dx.up,
+                x.down = grid$x.down+dx.down,
+                x.mid = c( grid$x.mid[1]-dx.up, grid$x.mid, grid$x.mid[grid$N]+dx.down ),
+                x.int = c( grid$x.int[1]-dx.up, grid$x.int, grid$x.int[grid$N+1]+dx.down ),
+                dx = rep_len(grid$dx,length.out=grid$N)[c(1,1:grid$N,grid$N)],
+                dx.aux = c( grid$dx.aux[1], dx.up, grid$dx.aux[2:grid$N], dx.down, grid$dx.aux[grid$N+1] ),
+                N =grid$N+2
+            )
+    class(newgrid) <- class(grid)
+    return(newgrid)
+}
+
 forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
-        fwds.soln=forwards_pde(s=s,times=times,grid=grid,
-            yinit=ifelse(grid$x.mid==0,(yinit[1:grid$N]+yinit[grid$N+(1:grid$N)])/2,ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])) ),
+        fwds.grid=extend_grid(grid),  
+        fwds.soln=forwards_pde(s=s,times=times,grid=fwds.grid, # needs to be on a *wider* grid
+            yinit=ifelse(fwds.grid$x.mid==0,(yinit[1:fwds.grid$N]+yinit[fwds.grid$N+(1:fwds.grid$N)])/2,
+                         ifelse(fwds.grid$x.mid<0,yinit[1:fwds.grid$N],yinit[fwds.grid$N+(1:fwds.grid$N)])) 
+        ),
         yinit=c( rep(1.0,grid$N), rep(0.0,grid$N) ), 
         log.p=TRUE, eps=1e-16, ... ) {
     # solve the pde for a lineage run backwards in the forwards-time profile
@@ -114,38 +135,21 @@ forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
     #  - when the cline forms, A is on the left and B is on the right
     #  - fwds.soln is the frequency of the type A selected locus,
     #          i.e., the prob the selected lineage begins on the *left*
+    #       * this must be provided on a somewhat *wider* grid.
     #  - yA, the first N numbers, is the probability that a locus linked to a type A selected locus
     #          originally was linked to a type A
     #          i.e., linked to a 'left' allele, and originates from the left side
     #  - yB, the second N numbers, is the probability that a locus linked to a type B selected locus
     #          originally was linked to a type A
     #          i.e., linked to a 'right' allele, but originates from the left side
-    rev.pde.fn <- function (t,y,parms,...) {
-        yA <- y[1:grid$N]
-        yB <- y[grid$N+(1:grid$N)]
-        p <- cline_interp(t,soln=fwds.soln) # freq of B
-        if (log.p) {
-            log.p <- log(pmax(p,min(eps,min(p[p>0]))))
-            log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
-            tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
-            tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
-        } else {
-            tran.A <- tran.1D(C=yA, A=pmax(eps,p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
-            tran.B <- tran.1D(C=yB, A=pmax(eps,1-p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
-        }
-        # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
-        list( c( 
-                tran.A + r * (1-p) * (yB-yA),
-                tran.B + r * p * (yA-yB)
-                ) )
+
+    if ( (min(attr(fwds.soln,"grid")$x.mid)>grid$x.up) || (max(attr(fwds.soln,"grid")$x.mid)<grid$x.down) ) {
+        stop("fwds.soln must be on a wider grid than 'grid' (use extend_grid( ))")
     }
-    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(fwds.soln[,1]), ... ) # note FIRST COLUMN IS TIME
-    attr(rev.soln,"r") <- r
-    attr(rev.soln,"s") <- s
-    attr(rev.soln,"sigma") <- sigma
-    ufun <- function (x,t) { approx(grid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
-    # not vectorized in t, so...
-    attr(rev.soln,"u") <- function (x,t) {
+
+    ufun <- function (x,t) { approx(attr(fwds.soln,"grid")$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+    # ufun is not vectorized in t, so...
+    u <- function (x,t) {
         ans <- numeric(length(x))
         for (tval in unique(t)) {
             dothese <- (rep_len(t,length(x))==tval)
@@ -153,6 +157,34 @@ forwards_backwards_pde <- function (s, times, grid, r, sigma=1,
         }
         return(ans)
     }
+    rev.pde.fn <- function (t,y,parms,...) {
+        yA <- y[1:grid$N]
+        yB <- y[grid$N+(1:grid$N)]
+        p <- list( 
+                  mid=u(x=grid$x.mid,t=t),
+                  int=u(x=grid$x.int,t=t)
+              )
+        if (log.p) {
+            log.p.vec <- log(pmax(p$int,min(eps,min(p$int[p$int>0]))))
+            log.1mp.vec <- log(pmax(1-p$int,min(eps,min((1-p$int)[p$int<1]))))
+            tran.A <- tran.1D(C=yA, A=log.p.vec, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+            tran.B <- tran.1D(C=yB, A=log.1mp.vec, D=sigma^2/2, dx=grid, flux.up=0, flux.down=0, log.A=TRUE)$dC
+        } else {
+            tran.A <- tran.1D(C=yA, A=pmax(eps,p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+            tran.B <- tran.1D(C=yB, A=pmax(eps,1-p), D=sigma^2/2, dx=grid, flux.up=0, flux.down=0)$dC
+        }
+        # if (any(is.na(tran.A)|is.na(tran.B))) { browser() }
+        list( c( 
+                tran.A + r * (1-p$mid) * (yB-yA),
+                tran.B + r * p$mid * (yA-yB)
+                ) )
+    }
+    rev.soln <- ode.1D( y=yinit, times=times, func=rev.pde.fn, nspec=2, tcrit=max(fwds.soln[,1]), ... ) # note FIRST COLUMN IS TIME
+    attr(rev.soln,"r") <- r
+    attr(rev.soln,"s") <- s
+    attr(rev.soln,"sigma") <- sigma
+    attr(rev.soln,"u") <- u
+    attr(rev.soln,"grid") <- grid
     return(rev.soln)
 }
 
@@ -198,6 +230,7 @@ solve_pde <- function ( u, v=u, r, times, grid, log.u=FALSE, um1, sigma=1,
     attr(soln,"r") <- r
     attr(soln,"sigma") <- sigma
     attr(soln,"args") <- list(...)
+    attr(soln,"grid") <- grid
     return(soln)
 }
 
@@ -236,8 +269,11 @@ recomb_generator <- function (yA,yB,p,zeroind,nabvals,eps) {
 }
 
 forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
-        fwds.soln=forwards_pde(s=s,times=times,grid=xgrid,
-            yinit=ifelse(grid$x.mid==0,(yinit[1:grid$N]+yinit[grid$N+(1:grid$N)])/2,ifelse(grid$x.mid<0,yinit[1:grid$N],yinit[grid$N+(1:grid$N)])) ),
+        fwds.grid=extend_grid(xgrid),  
+        fwds.soln=forwards_pde(s=s,times=times,grid=fwds.grid,
+            yinit=ifelse(fwds.grid$x.mid==0,(yinit[1:fwds.grid$N]+yinit[fwds.grid$N+(1:fwds.grid$N)])/2,
+                         ifelse(fwds.grid$x.mid<0,yinit[1:fwds.grid$N],yinit[fwds.grid$N+(1:fwds.fwds.grid$N)])) 
+        ),
         yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), rgrid$N*(rgrid$N+1)/2 ),
         eps=1e-16, ... ) {
     ###
@@ -269,14 +305,29 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     # Here ab is upper-triangular ordered
     soln.dims <- c( nrow=2*xgrid$N, ncol=rgrid$N*(rgrid$N+1)/2 )
 
+    # the local frequency of the selected allele
+    ufun <- function (x,t) { approx(attr(fwds.soln,"grid")$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+    # not vectorized in t, so...
+    u <- function (x,t) {
+        ans <- numeric(length(x))
+        for (tval in unique(t)) {
+            dothese <- (rep_len(t,length(x))==tval)
+            ans[dothese] <- ufun(x[dothese],t=tval)
+        }
+        return(ans)
+    }
+
     # the gradient function
     rev.pde.fn <- function (t,y,parms,...) {
         # need to apply tran.1D to columns
         # and recomb_generator to rows
         dim(y) <- soln.dims
-        p <- cline_interp(t,soln=fwds.soln) # freq of B
-        log.p <- log(pmax(p,min(eps,min(p[p>0]))))
-        log.1mp <- log(pmax(1-p,min(eps,min((1-p)[p<1]))))
+        p <- list( 
+                  mid=u(x=xgrid$x.mid,t=t),
+                  int=u(x=xgrid$x.int,t=t)
+              )
+        log.p <- log(pmax(p$int,min(eps,min(p$int[p$int>0]))))
+        log.1mp <- log(pmax(1-p$int,min(eps,min((1-p$int)[p$int<1]))))
         diffusion <- do.call( cbind, lapply( 1:ncol(y), function (kcol) {
                 r <- rvals[kcol]
                 yA <- y[1:xgrid$N,kcol]
@@ -284,15 +335,15 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
                 tran.A <- tran.1D(C=yA, A=log.p, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
                 tran.B <- tran.1D(C=yB, A=log.1mp, D=sigma^2/2, dx=xgrid, flux.up=0, flux.down=0, log.A=TRUE)$dC
                 c( 
-                        tran.A + r * (1-p) * (yB-yA),
-                        tran.B + r * p * (yA-yB)
+                        tran.A + r * (1-p$mid) * (yB-yA),
+                        tran.B + r * p$mid * (yA-yB)
                         )
              } ) )
         recombination <- do.call( rbind, lapply( 1:nrow(y), function (krow) {
                    if (krow<=xgrid$N) {
-                       recomb_generator( yA=y[krow,], yB=y[krow+xgrid$N,], p=p[krow], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
+                       recomb_generator( yA=y[krow,], yB=y[krow+xgrid$N,], p=p$mid[krow], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
                    } else {
-                       recomb_generator( yA=y[krow,], yB=y[krow-xgrid$N,], p=1-p[krow-xgrid$N], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
+                       recomb_generator( yA=y[krow,], yB=y[krow-xgrid$N,], p=1-p$mid[krow-xgrid$N], zeroind=rgrid$zeroind, nabvals=rgrid$N, eps=rgrid$eps )
                    }
              } ) )
         return( list( diffusion + recombination ) )
@@ -302,16 +353,8 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     attr(hap.soln,"s") <- s
     attr(hap.soln,"sigma") <- sigma
     attr(hap.soln,"soln.dims") <- soln.dims
-    ufun <- function (x,t) { approx(xgrid$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
-    # not vectorized in t, so...
-    attr(hap.soln,"u") <- function (x,t) {
-        ans <- numeric(length(x))
-        for (tval in unique(t)) {
-            dothese <- (rep_len(t,length(x))==tval)
-            ans[dothese] <- ufun(x[dothese],t=tval)
-        }
-        return(ans)
-    }
+    attr(hap.soln,"grid") <- xgrid
+    attr(hap.soln,"u") <- u
     return(hap.soln)
 }
 
