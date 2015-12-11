@@ -17,7 +17,7 @@ as a measure of typical haplotype length in the (spatial and/or genomic) region.
 
 **Nomenclature:** Yaniv followed John in calling it "ancestry disequilibrium".
 This admirably follows population genetics tradition
-in choosing a name that is in comprehensible to outsider.
+in choosing a name that is incomprehensible to outsider.
 I propose calling it something that uses "correlation" instead of "disequilibrium"?
 (*Todo:* figure out what the measures below are correlations of, and say that.)
 
@@ -41,8 +41,70 @@ Now, how to estimate this?
 Suppose $I$ has alleles $a$ and $A$, and $J$ has alleles $b$ and $B$;
 and suppose that at location $x$ we have sampled $n_x$ individuals,
 of which $n_x(aa,bb)$ have diploid genotype $a/a$, $b/b$, etcetera.
-Define $p_x = n_x/n$, and so forth.
-The first term is
-\begin{align} \label{eqn:Dx_defn}
+First, compute the two-locus haplotype probabilities:
+\begin{align}
+    p_x(a,b)
+    &=
+    \frac{1}{n_x} \left( 
+        n_x(aa,bb) 
+        + \frac{1}{2} n_x(aa,bB)
+        + \frac{1}{2} n_x(aA,bb)
+        + \frac{1}{4} n_x(aA,bB)
+     \right)
+\end{align}
+and so forth.
+We can get these by defining $p_x(a,b) = n_x(a,b)/n_x$, where expected haplotype counts are defined by:
+\begin{align}
+    \begin{bmatrix} n(a,b) \\ n(A,b) \\ n(a,B) \\ n(A,B) \end{bmatrix}
+    &=
+    \begin{bmatrix}     1    & \frac{1}{2} &    0     & \frac{1}{2} & \frac{1}{4} &    0        &    0      &    0        &     0   \\ % ab
+                        0    & \frac{1}{2} &    1     &    0        & \frac{1}{4} & \frac{1}{2} &    0      &    0        &     0   \\ % Ab
+                        0    &     0       &    0     & \frac{1}{2} & \frac{1}{4} &    0        &    1      & \frac{1}{2} &     0   \\ % aB
+                        0    &     0       &    0     &    0        & \frac{1}{4} & \frac{1}{2} &    0      & \frac{1}{2} &     1      % AB
+    \end{bmatrix}
+    \begin{bmatrix} n(aa,bb) \\ n(aA,bb)  \\ n(AA,bb) \\ n(aa,bB)  \\ n(aA,bB)   \\   n(AA,bB) \\ n(aa,BB) \\ n(aA,BB)   \\ n(AA,BB) \end{bmatrix}
+\end{align}
+Denote by $Q$ the matrix above, and note that columns of $Q$ sum to 1.
+
+The first term is estimated by
+\begin{align} 
     \P\{ X_i=Y_i\neq Z_i \and X_j=Y_j\neq Z_j\} 
+    &=
+    p_x(a,b) p_y(a,b) p_z(A,B)
+    + p_x(A,b) p_y(A,b) p_z(a,B)
+      \\ & \qquad {}
+    + p_x(a,B) p_y(a,B) p_z(A,b)
+    + p_x(A,B) p_y(A,B) p_z(a,b)
+\end{align}
+(In this ordering, reversing the vector complements it, so in R this would be `p[,x]*p[,y]*rev(p[,z])`.)
+
+We would like to estimate the probability in the second term
+by independent, i.e., *distinct* samples,
+so it is a bit more involved.
+First, suppose that we draw two individuals from our sample from $x$
+*without replacement*, and pick a haplotype in each.
+If the first genotype is $(aa,bB)$, for instance, then the probability of obtaining a $b$ on the second draw is
+$$ \frac{n_x(aa,bb) + n_x(aA,bb) + \frac{1}{2} (n_x(aa,bB)-1) + \frac{1}{2} n_x(aA,bB) }{ n_x } = \frac{ n_x(\cdot,b) - 1/2 }{ n_x-1 } . $$
+Similar calculations show that 
+the probability that we get an $a$ at the first locus in the first draw and a $b$ at the second locus in the second draw is
+$$
+    \tilde p_x(a,b) = \frac{n_x}{n_x-1} p_x(a,\cdot) p_x(\cdot,b) - \frac{1}{n_x-1} \sum_g p_x(g) H_g(b)^2,
+$$
+where the sum is over diploid genotypes $g$, and
+$H_g(b)$ is the first row of $H_g$, obtained by multiplying $Q$ on the left by a $2 \times 4$ matrix:
+\begin{align}
+H_g = \begin{bmatrix}
+    1 & 1 & 1 & 1/2 & 1/2 & 1/2 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1/2 & 1/2 & 1/2 & 1 & 1 & 1 
+\end{bmatrix} .
+\end{align}
+Using this definition, the second term is then estimated as
+\begin{align} 
+    \P\{ X_i=Y_i \neq Z_i \} \P\{ X_j=Y_j \neq Z_j \}
+    &=
+    \tilde p_x(a,b) \tilde p_y(a,b) \tilde p_z(A,B)
+    + \tilde p_x(A,b) \tilde p_y(A,b) \tilde p_z(a,B)
+      \\ & \qquad {}
+    + \tilde p_x(a,B) \tilde p_y(a,B) \tilde p_z(A,b)
+    + \tilde p_x(A,B) \tilde p_y(A,B) \tilde p_z(a,b)
 \end{align}
