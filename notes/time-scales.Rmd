@@ -38,7 +38,7 @@ tt <- seq(0,40,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.2,length.out=21)
 rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+fwds.soln <- forwards_pde(s=s,times=tt,grid=extend_grid(xgrid))
 pfun <- cline_fun(fwds.soln)
 ```
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
@@ -46,7 +46,7 @@ We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
 ```{r tens_fwds_soln_plot, cache=TRUE, depends="setup_tens"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
-add_grid_axis(xgrid)
+add_grid_axis(attr(fwds.soln,"grid"))
 ```
 
 
@@ -117,7 +117,7 @@ tt <- seq(0,400,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.2,length.out=21)
 rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+fwds.soln <- forwards_pde(s=s,times=tt,grid=extend_grid(xgrid))
 pfun <- cline_fun(fwds.soln)
 ```
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
@@ -147,7 +147,7 @@ for (plot.t in 10*c(4,10,20,40)) {
     lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
     matplot( xgrid$x.mid, lclines, type='l', ylab="proportion", xlab='space', 
             main=sprintf("t=%0.0f",tt[k]),
-           lty=1, col=rcols )
+           lty=1, col=rcols, ylim=c(0,1) )
     legend("topright", lty=1, col=rcols, legend=sprintf("r=%0.2f",rr) )
 }
 ```
@@ -196,7 +196,7 @@ tt <- seq(0,4000,length.out=21)
 xgrid <- setup.grid.1D(x.up=-20.5, x.down=20.5, N=41)
 rr <- seq(0,0.2,length.out=21)
 rcols <- rainbow(length(rr)*1.2)[seq_along(rr)]
-fwds.soln <- forwards_pde(s=s,times=tt,grid=xgrid)
+fwds.soln <- forwards_pde(s=s,times=tt,grid=extend_grid(xgrid))
 pfun <- cline_fun(fwds.soln)
 ```
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
