@@ -10,10 +10,12 @@ SIGMA = 1
 ndemes = 50
 deme_size = 500
 ninds = ndemes*deme_size
-S = 0.5
+S = 0.1
 
 
-zone_age = c(50)
+zone_age = c(100)
+
+outfile = sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_tau%s",SIGMA,ninds,ndemes,S,zone_age)
 
 #PARAMS for parsing:
 loci = list(seq(0.5,1,0.05))
@@ -33,6 +35,7 @@ sims.s0.1 = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
 			#"pars" is an integer that gives the number of generatsion of the simulation
 			#"QTL" returns the QTL vector used in the simulation
 
+save(sims.s0.1,file=paste(outfile,"_rawoutput.Robj",sep=""))
 			
 #PARSE the simulated chromosomes
 sims.sums = lapply(sims.s0.1,spBreaks)
@@ -41,7 +44,7 @@ sims.sums = lapply(sims.s0.1,spBreaks)
 		#"ancest.prop" is a ninds*2 matrix giving the ancestry proportion of each individual on each of their two copies of the chromosome.
 		
 
-#save(sims.sums,file="~/Projects/HybridZones/ClineProjects/sims_sums_s0.1.Robj")
+save(sims.sums,file=paste(outfile,"_simsums.Robj",sep=""))
 
 
 ######################
@@ -57,7 +60,7 @@ freqs = lapply(my.genos,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X)
 
 
 #pdf(file="freqplot.pdf")
-matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main="50 generations",ylab="freq",xlab="deme")
+matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main=paste(zone_age,"generations"),ylab="freq",xlab="deme")
 legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
 matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
 #dev.off()
@@ -65,6 +68,8 @@ matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
 ###########################
 ###########################
 #To get distribution of chunks of ancestry B to the (wlog) right of the selected locus:
+
+
 focal_sites = lapply(qtl,function(Z){Z$pos})
 
 get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE){
@@ -86,6 +91,9 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 #EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
 #D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
 
+testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
+testB_neut = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.1)})
+
 add.alpha <- function(col, alpha=1){
 if(missing(col))
 stop("Please provide a vector of colours.")
@@ -97,11 +105,32 @@ rgb(x[1], x[2], x[3], alpha=alpha))
 
 transparent_rainbow = add.alpha(rainbow(ndemes),0.75)
 
-D = 1; hist(testB[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+D = 1; hist(testB_neut[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,1000),xlab="length",main="Distribution of tracts")
 
-for(D in seq(3,ndemes,5)){
-	hist(testB[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.05),ylim=c(0,50),add=T)	
+for(D in rev(seq(3,ndemes,5))){
+	hist(testB_neut[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	
 }
+
+pdf(file = paste(outfile,"_selected_chunks.pdf",sep=""))
+
+D = 1; hist(testB[[D]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+for(D in rev(seq(3,ndemes,5))){
+	hist(testB[[D]][which(testB[[D]]>0 & testB[[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+
+dev.off()
+
+
+pdf(file = paste(outfile,"_neutral_chunks.pdf",sep=""))
+
+D = 1; hist(testB_neut[[D]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
+for(D in rev(seq(3,ndemes,5))){
+	hist(testB_neut[[D]][which(testB_neut[[D]]>0 & testB_neut[[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+
+
+dev.off()
+
+
+#Get distribution of chunk length around selected locus. 
 
 ######################
 ######################
