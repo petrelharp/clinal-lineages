@@ -44,7 +44,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r tens_fwds_soln_plot, cache=TRUE, depends="setup_tens"}
+```{r tens_fwds_soln_plot, cache=TRUE, dependson="setup_tens"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(attr(fwds.soln,"grid"))
 ```
@@ -54,7 +54,7 @@ add_grid_axis(attr(fwds.soln,"grid"))
 Linked clines
 -------------
 
-```{r tens_linked_clines, cache=TRUE, depends="setup_tens"}
+```{r tens_linked_clines, cache=TRUE, dependson="setup_tens"}
 linked.solns <- lapply( rr, function (r) {
             forwards_backwards_pde(s=s,times=tt,grid=xgrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
         } )
@@ -62,7 +62,7 @@ linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
 ```
 
 Here are linked clines for a few time steps:
-```{r plot_tens_linked_clines, cache=TRUE, depends="tens_linked_clines"}
+```{r plot_tens_linked_clines, cache=TRUE, dependson="tens_linked_clines"}
 for (plot.t in c(4,10,20,40)) {
     k <- which.min(abs(tt-plot.t))
     lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
@@ -92,7 +92,7 @@ AD.values <- lapply( AD.solns, AD_from_soln, xgrid=xgrid )
 
 Here are heatmaps of ancestry LD at a few different times and locations
 The selected site is in the center.
-```{r tens_ld_heatmaps, cache=TRUE, depends="tens_ld_solutions", fig.width=3*fig.dim}
+```{r tens_ld_heatmaps, cache=TRUE, dependson="tens_ld_solutions", fig.width=3*fig.dim}
 plot.x <- c(0,5,10)
 layout(t(1:3))
 for (plot.t in c(4,10,20,40)) {
@@ -123,7 +123,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r hunds_fwds_soln_plot, cache=TRUE, depends="setup_hunds"}
+```{r hunds_fwds_soln_plot, cache=TRUE, dependson="setup_hunds"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(xgrid)
 ```
@@ -133,7 +133,7 @@ add_grid_axis(xgrid)
 Linked clines
 -------------
 
-```{r hunds_linked_clines, cache=TRUE, depends="setup_hunds"}
+```{r hunds_linked_clines, cache=TRUE, dependson="setup_hunds"}
 linked.solns <- lapply( rr, function (r) {
             forwards_backwards_pde(s=s,times=tt,grid=xgrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
         } )
@@ -141,7 +141,7 @@ linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
 ```
 
 Here are linked clines for a few time steps:
-```{r plot_hunds_linked_clines, cache=TRUE, depends="hunds_linked_clines"}
+```{r plot_hunds_linked_clines, cache=TRUE, dependson="hunds_linked_clines"}
 for (plot.t in 10*c(4,10,20,40)) {
     k <- which.min(abs(tt-plot.t))
     lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
@@ -171,7 +171,7 @@ AD.values <- lapply( AD.solns, AD_from_soln, xgrid=xgrid )
 
 Here are heatmaps of ancestry LD at a few different times and locations
 The selected site is in the center.
-```{r hunds_ld_heatmaps, cache=TRUE, depends="hunds_ld_solutions", fig.width=3*fig.dim}
+```{r hunds_ld_heatmaps, cache=TRUE, dependson="hunds_ld_solutions", fig.width=3*fig.dim}
 plot.x <- c(0,5,10)
 layout(t(1:3))
 for (plot.t in 10*c(4,10,20,40)) {
@@ -202,7 +202,7 @@ pfun <- cline_fun(fwds.soln)
 We'll solve it up until time `r max(tt)` and on a grid of `r xgrid$N` sites from `r min(xgrid$x.mid)` to `r max(xgrid$x.mid)`.
 
 Here's the behaviour of the selected site that we use to describe the behaviour of the other sites:
-```{r thous_fwds_soln_plot, cache=TRUE, depends="setup_thous"}
+```{r thous_fwds_soln_plot, cache=TRUE, dependson="setup_thous"}
 image(fwds.soln, legend=TRUE, zlim=c(0,1), yaxt='n', main="selected site", ylab="space")
 add_grid_axis(xgrid)
 ```
@@ -212,7 +212,7 @@ add_grid_axis(xgrid)
 Linked clines
 -------------
 
-```{r thous_linked_clines, cache=TRUE, depends="setup_thous"}
+```{r thous_linked_clines, cache=TRUE, dependson="setup_thous"}
 linked.solns <- lapply( rr, function (r) {
             forwards_backwards_pde(s=s,times=tt,grid=xgrid,r=r,log.p=TRUE,fwds.soln=fwds.soln)
         } )
@@ -220,7 +220,7 @@ linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
 ```
 
 Here are linked clines for a few time steps:
-```{r plot_thous_linked_clines, cache=TRUE, depends="thous_linked_clines"}
+```{r plot_thous_linked_clines, cache=TRUE, dependson="thous_linked_clines"}
 for (plot.t in 100*c(4,10,20,40)) {
     k <- which.min(abs(tt-plot.t))
     lclines <- sapply( linked.clines, cline_interp, t=tt[k] )
@@ -250,7 +250,7 @@ AD.values <- lapply( AD.solns, AD_from_soln, xgrid=xgrid )
 
 Here are heatmaps of ancestry LD at a few different times and locations
 The selected site is in the center.
-```{r thous_ld_heatmaps, cache=TRUE, depends="thous_ld_solutions", fig.width=3*fig.dim}
+```{r thous_ld_heatmaps, cache=TRUE, dependson="thous_ld_solutions", fig.width=3*fig.dim}
 plot.x <- c(0,5,10)
 layout(t(1:3))
 for (plot.t in 100*c(4,10,20,40)) {
