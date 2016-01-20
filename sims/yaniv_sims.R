@@ -4,6 +4,16 @@
 
 source("sim-fns.R")
 
+add.alpha <- function(col, alpha=1){
+if(missing(col))
+stop("Please provide a vector of colours.")
+apply(sapply(col, col2rgb)/255, 2, 
+function(x) 
+rgb(x[1], x[2], x[3], alpha=alpha)) 
+
+}
+
+
 #PARAMS for simulation:
 
 SIGMA = 1
@@ -12,18 +22,20 @@ deme_size = 500
 ninds = ndemes*deme_size
 S = 0.1
 
+transparent_rainbow = add.alpha(rainbow(ndemes),0.7)
 
 zone_age = c(100)
 
 outfile = sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_tau%s",SIGMA,ninds,ndemes,S,zone_age)
 
 #PARAMS for parsing:
-loci = list(seq(0.5,1,0.05))
+loci = list(seq(0.5,1,0.05),seq(0.5,1,0.05))
+xx <- (1:ndemes)-0.5-ndemes/2
 
 
 
 #DEFINE selection against genotypes:
-qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)))
+qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)),chr2=data.frame(traits=c("underdominant"), s = 0,pos=c(0.5)))
 
 #SIMULATE the populations (NB: Can't make per-deme population size too small, otherwise deme may end up empty and throws up an error.)
 sims.s0.1 = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
@@ -54,15 +66,18 @@ save(sims.sums,file=paste(outfile,"_simsums.Robj",sep=""))
 ###NOW get frequencies at each site. 
 
 #GENOTYPE ALL MY INDS
-my.genos = lapply(sims.sums,function(Z){data.frame(do.call(cbind,lapply(Z$ind.ancest, geno.ind, loci)))})
-	#my.genos is a list of nloci*ninds dataframes where each entry is the number of ancestry B alleles in an individual at the given locus.
-freqs = lapply(my.genos,function(X){apply(X,1,function(Z){tapply(Z,cut(1:ncol(X),breaks=seq(0,ncol(X),deme_size)),mean)/2})})
+my.genos.list = lapply(sims.sums,function(Z){lapply(Z$ind.ancest, geno.ind, loci)})
+my.genos = lapply(my.genos.list,function(AGE){lapply(1:length(loci),function(CHR){data.frame(do.call(cbind,lapply(AGE,function(IND){IND[[CHR]]})))})})
+	#my.genos is a list of nloci*ninds dataframes where each entry is the number of ancestry B alleles in an individual at the given locus. [age][chr][data.frame]
+freqs = lapply(my.genos,function(X){lapply(X,function(CHR){apply(CHR,1,function(Z){tapply(Z,cut(1:ncol(CHR),breaks=seq(0,ncol(CHR),deme_size)),mean)/2})})})
 
 
 #pdf(file="freqplot.pdf")
-matplot(xx,freqs[[1]],col=rainbow(20),lty=1,type="l", main=paste(zone_age,"generations"),ylab="freq",xlab="deme")
+matplot(xx,freqs[[1]][[1]],col=rainbow(20),lty=1,type="l", main=paste(zone_age,"generations"),ylab="freq",xlab="deme")
+matpoints(xx,freqs[[1]][[2]],col="grey",lty=1,type="l", main=paste(zone_age,"generations","neutral"),ylab="freq",xlab="deme")
+
 legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
-matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+#matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
 #dev.off()
 
 ###########################
@@ -91,46 +106,94 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 #EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
 #D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
 
-testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
-testB_neut = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.1)})
+testB = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F)})
+testB_far = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.01)})
+testB_unlinked = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.5,CHR=2)})
 
-add.alpha <- function(col, alpha=1){
-if(missing(col))
-stop("Please provide a vector of colours.")
-apply(sapply(col, col2rgb)/255, 2, 
-function(x) 
-rgb(x[1], x[2], x[3], alpha=alpha)) 
+chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
+save(chunks,file = paste(outfile,"simsums_chunks.Robj",sep=""))
 
+empty_deme = rep(0,2*deme_size)
+
+chunks_ecdf = lapply(chunks,function(X){
+	lapply(X,function(D){
+		segregating =which(D<1 & D>0)
+		if(length(segregating)>0){
+		return(ecdf(D[segregating]))}else return(ecdf(D))	
+	})})
+	
+pdf(file = paste(outfile,"_chunks_ecdf.pdf",sep=""))
+for(type in names(chunks_ecdf)){
+	plot(1, type="n",ylim=c(0,1),xlim=c(0,0.2),main=type,ylab="1-ecdf(x)",xlab="x=chunk length")	
+	legend("topright",legend=seq(-24.5,24.5,5),col=transparent_rainbow[seq(1,50,5)],lty=1)
+	for(i in rev(1:ndemes)){points(1-chunks_ecdf[[type]][[i]](seq(0,1,0.005))~seq(0,1,0.005),ylim=c(0,1),type="l",col=transparent_rainbow[i])}
 }
+dev.off()
 
-transparent_rainbow = add.alpha(rainbow(ndemes),0.75)
-
-D = 1; hist(testB_neut[[D]], border="black",breaks=seq(0,1,0.05),ylim=c(0,1000),xlab="length",main="Distribution of tracts")
-
-for(D in rev(seq(3,ndemes,5))){
-	hist(testB_neut[[D]], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	
+pdf(file = paste(outfile,"_chunks_density.pdf",sep=""))
+for(type in names(chunks)){
+	D = 1; hist(chunks[[type]][[1]], border="white",breaks=seq(0,1,0.05),ylim=c(0,200),xlab="length",main=sprintf("Distribution of %s tracts",type),xlim=c(0,0.2))
+	for(D in rev(seq(3,ndemes,1))){
+		relevant_chunks = chunks[[type]][[D]][which(chunks[[type]][[D]]>0 & chunks[[type]][[D]]<1)]
+	#hist(relevant_chunks, col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),ylim=c(0,50),add=T)	}
+	if(length(relevant_chunks)>1){points(density(relevant_chunks), col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),type="l")}}
 }
+dev.off()
+#pdf(file = paste(outfile,"_selected_chunks.pdf",sep=""))
 
-pdf(file = paste(outfile,"_selected_chunks.pdf",sep=""))
+#D = 1; hist(chunks[[1]][[1]], border="white",breaks=seq(0,1,0.05),ylim=c(0,200),xlab="length",main="Distribution of selected tracts",xlim=c(0,0.2))
+#for(D in rev(seq(3,ndemes,5))){
+#	hist(chunks[[1]][[D]][which(chunks[[1]][[D]]>0 & chunks[[1]][[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+#dev.off()
 
-D = 1; hist(testB[[D]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
-for(D in rev(seq(3,ndemes,5))){
-	hist(testB[[D]][which(testB[[D]]>0 & testB[[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+#pdf(file = paste(outfile,"_faraway_chunks.pdf",sep=""))
+#D = 1; hist(chunks[[2]][[1]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of distant tracts")
+#for(D in rev(seq(3,ndemes,5))){
+#	hist(chunks[[2]][[D]][which(chunks[[2]][[D]]>0 & chunks[[2]][[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+#dev.off()
 
+#pdf(file = paste(outfile,"_unlinked_chunks.pdf",sep=""))
+#D = 1; hist(chunks[[3]][[D]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of unlinked tracts")
+#for(D in rev(seq(3,ndemes,5))){
+#	hist(chunks[[3]][[D]][which(chunks[[3]][[D]]>0 & chunks[[3]][[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+#dev.off()
+
+harmmean_sel=1/sapply(testB,function(Z){mean(sapply(Z[which(Z>0 & Z<1)],function(X){1/X}))})
+harmmean_unlinked=1/sapply(testB_unlinked,function(Z){mean(sapply(Z[which(Z>0&Z<1)],function(X){1/X}))})
+harmmean_far = 1/sapply(testB_far,function(Z){mean(sapply(Z[which(Z>0&Z<1)],function(X){1/X}))})
+
+
+pdf(file = paste(outfile,"_chunks_hmean.pdf",sep=""))
+
+plot(harmmean_unlinked,main="harmonic mean",ylim=c(0,1),xlab="deme",ylab="harmonic mean")
+points(harmmean_sel,col="red")
+points(harmmean_far,col="blue")
+
+legend('topleft',legend=c("unlinked","sel.","far."),col=c("black","red","blue"),pch=1)
 dev.off()
 
 
-pdf(file = paste(outfile,"_neutral_chunks.pdf",sep=""))
+geomean_unlinked=sapply(testB_unlinked,function(Z){prod(Z+1)^(1/length(Z))})
+geomean_sel=sapply(testB,function(Z){prod(Z+1)^(1/length(Z))})
+geomean_far=sapply(testB_far,function(Z){prod(Z+1)^(1/length(Z))})
 
-D = 1; hist(testB_neut[[D]], border="white",breaks=seq(0,1,0.05),ylim=c(0,100),xlab="length",main="Distribution of tracts")
-for(D in rev(seq(3,ndemes,5))){
-	hist(testB_neut[[D]][which(testB_neut[[D]]>0 & testB_neut[[D]]<1)], col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.01),ylim=c(0,50),add=T)	}
+pdf(file = paste(outfile,"_chunks_gmean.pdf",sep=""))
 
+plot(geomean_unlinked-1,main="geometric mean",ylim=c(0,1),xlab="deme")
+points(geomean_sel-1,col="red")
+points(geomean_far-1,col="blue")
+legend('topleft',legend=c("unlinked","sel.","far."),col=c("black","red","blue"),pch=1)
 
 dev.off()
-
-
 #Get distribution of chunk length around selected locus. 
+
+mean_unlinked=sapply(testB_unlinked,mean)
+mean_sel=sapply(testB,mean)
+
+plot(mean_unlinked,main="mean",ylim=c(0,1),xlab="deme")
+points(mean_sel,col="red")
+legend('topleft',legend=c("neu.","sel."),col=c("black","red"),pch=1)
+
 
 ######################
 ######################
@@ -155,32 +218,35 @@ get.LD = function(IND_DATA= sims.sums[[1]]$ind.ancest,DEME=1,CHR=1,POS1 = 0.5, P
 #EXAMPLE: LD_by_deme = sapply(1:ndemes,get.LD,POS1=0.5,POS2=0.6,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)
 
 LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
+
 matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
+
+
 
 ######COMPARE TO THEORY:
 
-zeta <- function(x,r){
-	2*pnorm(abs(x)) - 1 + 2 * exp(r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE))	
-}
-#zeta 
-
-pcline <- function(x,r,tau=zone_age,sigma=SIGMA){
-	(1/2)*(1-sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau))	
-}
+#zeta <- function(x,r){
+#2*pnorm(abs(x)) - 1 + 2 * exp(r*abs(x) + r^2/2 + pnorm(abs(x)+r,lower.tail=FALSE,log.p=TRUE))	
+#}
+##zeta 
 #
-
-#xx <- seq(-5,5,length.out=500)
-#plot(-xx, pcline(xx,r=1,sigma=SIGMA), type='l', xlab="distance from cline center", ylab="prob of inherited from the left" )
-rr=(loci[[1]]-0.5)*SIGMA/sqrt(S)
-#rr <- seq(0,2,length.out=11)
-# pp <- lapply(c(5,10,50),function(T){sapply( rr, function (r) { pcline(xx,r=r,sigma=2.5,tau=T) } )})
-
-xx <- (1:ndemes)-0.5-ndemes/2
-pp <- do.call(cbind,lapply(rr,function(R){pcline(xx,r=R,tau=zone_age,sigma=SIGMA)}))
-
-par(mfrow=c(1,3))
-
-for(TIME in 1:3){
-matplot(-xx,pp[[TIME]],type='l',lty=1,col=rainbow(length(rr)))
-matpoints(freqs[[TIME]],x=(-100:99)+0.5,lty=2,col=rainbow(length(rr)),type="l")
-}
+#pcline <- function(x,r,tau=zone_age,sigma=SIGMA){
+#(1/2)*(1-sign(x)*zeta(x=x/sqrt(tau*sigma^2),r=r*tau))	
+#}
+##
+#
+##xx <- seq(-5,5,length.out=500)
+##plot(-xx, pcline(xx,r=1,sigma=SIGMA), type='l', xlab="distance from cline center", ylab="prob of inherited from the left" )
+#rr=(loci[[1]]-0.5)*SIGMA/sqrt(S)
+##rr <- seq(0,2,length.out=11)
+## pp <- lapply(c(5,10,50),function(T){sapply( rr, function (r) { pcline(xx,r=r,sigma=2.5,tau=T) } )})
+#
+#xx <- (1:ndemes)-0.5-ndemes/2
+#pp <- do.call(cbind,lapply(rr,function(R){pcline(xx,r=R,tau=zone_age,sigma=SIGMA)}))
+#
+#par(mfrow=c(1,3))
+#
+#for(TIME in 1:3){
+#matplot(-xx,pp[[TIME]],type='l',lty=1,col=rainbow(length(rr)))
+#matpoints(freqs[[TIME]],x=(-100:99)+0.5,lty=2,col=rainbow(length(rr)),type="l")
+#}

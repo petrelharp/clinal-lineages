@@ -19,14 +19,21 @@
 %\tableofcontents
 
 \section{Introduction}
-The process of speciation commonly involves allopatric divergence in relative isolation \cite{Coyne2004}. When formerly isolated populations come back into contact, a gradient of ancestry can form in geographic space, resulting in a hybrid zone \citep{Barton1985}. Throughout the genome, clines in ancestry may diminish over time due to migration; however, subsets of the genome that are experiencing selection may be expected to maintain clines in ancestry as selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. The influence of selection on linked loci also prevents the mixing of ancestry at regions surrounding these loci, the effect of which diminishes with physical genomic distance \citep{Barton1986}.\\
+The process of speciation commonly involves allopatric divergence in relative isolation \cite{Coyne2004}. When formerly isolated populations come back into contact, a gradient of ancestry can form in geographic space, resulting in a hybrid zone \citep{Barton1985}. If genetic material can be exchanged via hybridization, clines in ancestry throughout the genome may diminish over time; however, subsets of the genome that are under selection may be expected to maintain stable clines in ancestry as selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. The influence of selection on linked loci also prevents the mixing of ancestry at regions surrounding these loci, the effect of which diminishes with physical genomic distance \citep{Barton1986}.\\
+
+
+
 
 The mixing of ancestries is brought about by the the process of recombination that takes place every generation. The expected distribution of lengths of unbroken ancestry have been previously described under neutral conditions \cite[e.g.][]{Gravel2012,Sedghifar2015}. Here we investigate expected genome-wide patterns of co-ancestry in the presence of selection. Selection against migrant ancestries is expected to reduce admixture proportions at and surrounding a target of selection. The effect on patterns of ancestral block lengths is, however, less well understood. Because of rapid removal from the population, we expect to observe few short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone.\\
 
+Some words about how new genomic data will allow us to focus on tracts and not just individual loci. 
 
-Many population genetic models of hybrid zones have focused on the equilibrium states of ancestry clines \cite{Barton1979a,Barton1986}. These models predict cline width to be narrowest at and nearby selected loci, with cline-width at unliked loci to be wider and more heavily influenced by hybrid zone age and rates of gene flow. As denser genotype data becomes more readily available, we can begin to utilize patterns of linkage in the analysis of hybrid zones. Genome-wide covariance in ancestry can provide information about the number of surviving recombination events that have taken place between ancestral genotypes and therefore provides information about the age of the hybrid zone, and the strength of selection at linked loci. It is our goal here to understand how strength of selection, density of selected sites, recombination rate and hybrid zone age interact to produce observed patterns of ancestry in present day populations. This may be especially important for an understanding and interpretation of of non-equilibrium patterns of diversity in hybrid zones, as well as understanding the consequences of selection on the extent of mixing of ancestral genomes and, consequently, the maintenance of species distinctions. In the extreme case of zero fitness in first-generation hybrids, for example, paternal genomes will never mix and the stable hybrid zone will resemble a recently formed one. If hybrids have non-zero fitness, and some amount of introgression can occur, and patterns of introgression can provide information about the strength of selection, extent of hybridization, and timing of secondary contact. In this latter case, it may be of additional interest to establish whether the hybrid zone is in its equilibrium state. \\
+Many population genetic models of hybrid zones have focused on the equilibrium states of ancestry clines \cite{Barton1979a,Barton1986}. These models predict cline width to be narrowest at and nearby selected loci, with cline-width at unliked loci to be wider and more heavily influenced by hybrid zone age and rates of gene flow. As denser genotype data becomes more readily available, genome-wide patterns of linkage can be utilized in the analysis of gene hybrid zones. 
 
+ Genome-wide covariance in ancestry can provide information about the number of surviving recombination events that have taken place between ancestral genotypes and therefore provides information about the age of the hybrid zone, and the strength of selection at linked loci. It is our goal here to understand how strength of selection, density of selected sites, recombination rate and hybrid zone age interact to produce observed patterns of ancestry in present day populations. This may be especially important for an understanding and interpretation of of non-equilibrium patterns of diversity in hybrid zones, as well as understanding the consequences of selection on the extent of mixing of ancestral genomes and, consequently, the maintenance of species distinctions. In the extreme case of zero fitness in first-generation hybrids, for example, paternal genomes will never mix and the stable hybrid zone will resemble a recently formed one. If hybrids have non-zero fitness, and some amount of introgression can occur, and patterns of introgression can provide information about the strength of selection, extent of hybridization, and timing of secondary contact. In this latter case, it may be of additional interest to establish whether the hybrid zone is in its equilibrium state. \\
 
+Expectations:
+Conditional  on having identity B on the wrong side, far away from the center of the zone, the length of unbroken ancestry surrounding the selected locus should be relatively long. This is because an unfit haplotype is likely to be a recent migrant from the other side of the hybrid zone, and therefore will not have experienced many recombination events. 
 
 %In the absence of selection, genome-wide covariance in ancestry can be used to estimate timing and gene-flow in hybrid zones \cite{Sedghifar2015}. 
 
@@ -55,9 +62,10 @@ We consider a lineage sampled in the present day, and determine its ancestry by 
 \subsection{}
 
 \subsection{Simulations}
-Forward in time simulations were used to assess theoretical predictions. We simulate discrete demes with nearest-neighbor migration and non-overlapping generations. Each generation, the dispersal distance of an individual is sampled from a normal distribution, and then discretized to correspond to a deme that is a corresponding distance away. Following migration, the next generation is produced by replacing each individual in a deme by randomly choosing two parents with probability weighted by the fitness of their genotypes. The genotype of the new individual is generated by simulating a recombined chromosome from each parent. This simulation keeps track of the ancestry at each location in the chromosome for all individuals. Each individual has 1 pair of chromosomes of length 1 Morgan. We simulate a single selected locus at position 1M along the chromosome.
+Forward in time simulations were used to assess theoretical predictions. We simulate discrete demes with nearest-neighbor migration and non-overlapping generations. Each generation, the dispersal distance of an individual is sampled from a normal distribution, and then discretized to correspond to a deme that is a corresponding distance away. Following migration, the next generation is produced by replacing each individual in a deme by randomly choosing two parents with probability weighted by the fitness of their genotypes. The genotype of the new individual is generated by simulating a recombined chromosome from each parent. This simulation keeps track of the ancestry at each location in the chromosome for all individuals. Each individual has 2 pairs of chromosomes each of length 1 Morgan such that chromosome 1 contains a selected locus at position 0.5M, and chromosome 2 contains no selected loci.
 
-Hybrid zones of ages 10, 100 and 1000 generations were simulated under conditions of $\sigma=1$ and $s=0.1$. From this we measure unbroken tract lengths to the right of the selected locus. These were compared to the output of neutral simulations with $s=0$
+Hybrid zones of ages 10, 100 and 1000 generations were simulated under conditions of $\sigma=1$ and $s=0.1$. From this we measure unbroken tract lengths to the right of the selected locus. These were compared to the output of neutral simulations with $s=0$\\
+
 
 \subsection{Data}
 We compare the predictions of our model to genomic data obtained from individuals sampled a naturally occurring hybrid zone between \emph{Mus m. musculus/M. m. domesticus} \cite{Turner2011,Turner2014}. The genomic data generated by \citep{Turner2014} was for a mapping population generated by mating wild-caught individuals. Because some individuals were mated multiple times, the mapping population comprises many closely related individuals. We approximate wild population samples by restricting our analysis to genotyped individuals that had both parents sampled in the same location in such a way that none of the individuals shared a parent (see table for list of individuals). Approximately 280,000 SNPs were represented in the final dataset. 
@@ -98,10 +106,21 @@ FP135& TU&11.748\\
 \end{tabular}
 \end{table}
 
+\section{Results}
+\subsection{The distribution of ancestry tract lengths}
+We are interested specifically in the distribution of the length of continuous tracts of ancestry surrounding the selected locus. Far away from the zone center variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, however, when present an unfit migrant haplotype is expected to be longer than a neutral migrant haplotype. Figure X shows the estimated probability density (pdf), of unbroken tract of ancestry B surrounding the selected locus, conditioning on a haplotype being of ancestry B at the selected locus. Compared to the expected density of tract lengths surrounding neutral loci, tracts of ancestry B around the selected locus are longer.\\
+
+
+\subsection{Number of ancestors}
+Not sure what the result is here yet -- unexpected
+
 \section{Discussion}
 Topics include\\
 - ignoring coalescent\\
-- single locus model, selection is STRONG
+- single locus model, selection is STRONG\\
+
+Some words about how confidently calling tracts is the way of the future.\\
+How can this be applied to detecting selection?
 
 \bibliographystyle{dinat}
 \bibliography{library}

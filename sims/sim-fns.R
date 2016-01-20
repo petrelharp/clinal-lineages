@@ -201,7 +201,7 @@ sim.zone <- function (n.ind, n.deme, ...) {
 	sim.gens( n=n.ind, 
              sp.ids = rep(c("A","B"),each=n.ind/2), 
              deme=rep(1:n.deme,each=floor(n.ind/n.deme)),
-             n.chr=1,
+             n.chr=length(qtl),
              QTL = qtl,...)
 }
 
@@ -215,10 +215,10 @@ geno.ind <- function(IND,loci) {
     # Each individual is a list of chromosomes; each chromosome is a two-column data frame of starts, stops, and ancestral identities
     # Returns diploid genotypes;
     #  as a vector, with all chromosomes squooshed together
-    if (length(IND)!=length(loci)) { stop("Number of chromsomes not matching.") }
-    unlist( lapply( seq_along(IND), function (CHR) {
+    if (length(IND)!=length(loci)) { stop("Number of chromosomes not matching.") }
+     lapply( seq_along(IND), function (CHR) {
             rowSums( sapply(IND[[CHR]],function(HAP){
                    HAP$sp2[ findInterval( loci[[CHR]], c(HAP$starts,1), rightmost.closed=TRUE ) ]
               }) )
-        }) )
+        }) 
 }
