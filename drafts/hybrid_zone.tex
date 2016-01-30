@@ -54,13 +54,129 @@ Conditional  on having identity B on the wrong side, far away from the center of
 \subsection{Model}
 We consider a model in which two isolated subspecies, species $A$ and species $B$ come into contact at time $\tau$ generations in the past. Individuals move forward in time by sampling a displacement from a Gaussian distribution. In the simplest case of under-dominance, the fitness of an individual is determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes.
 
+To fix notation, we will say that species $A$ was on the ``left'' of the zone of contact,
+which corresponds to spatial positions $x<0$.
+
 We consider a lineage sampled in the present day, and determine its ancestry by its position at time $\tau$ generations in the past. The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that the two species are fixed for alternate alleles at this locus). For every other locus, we keep track of $a$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination is modeled as a poisson process with rate $r$. The identity $a$ at locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
 
 
 %As an approximation, we consider a cline of narrow width (look up cline width for underdominance, Barton/May?), such that the frequency of migrant alleles is exponential and negligible at distance away from the center of the hybrid zone. This means that recombination events that occur away from the center of the zone do not result in a change in $a$.
 
 
+%%%%%%%% %%%%%%%%%%
+\subsection{Analysis}
 
+Consider a single locus, with alternate alleles fixed in the two parental populations,
+for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
+The deterministic theory predicts that after secondary contact,
+these alleles will form a stable cline.
+To study gene flow past this cline we first need to understand how the cline itself is formed.
+Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
+Suppose that secondary contact occurred at time $t=0$, 
+and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
+(In discrete computations, a deme at $x=0$ has $p(0,0)=1/2$.)
+Let $\sigma^2$ be the mean squared distance between parent and offspring.
+Assuming local random assortment of alleles into diploids,
+that the habitat and dispersal are homogeneous,
+and that $s$ and $\sigma$ are small, 
+the commonly-used equation that $p$ solves is
+\begin{align} \label{eqn:cline_pde}
+    \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
+\end{align}
+where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
+as derived in \citep{bazykin}; for discussion of diploidy see \citep{diploidcline}.
+There is not an exact analytic solution to this equation, 
+but a good approximation to the equilibrium solution is that
+$\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{bazykin}.
+Considering the numerous approximations going into this,
+the important attributes are that 
+the stable cline has width of order $\sigma/\sqrt{s}$,
+and decays exponentially.
+Furthermore, the cline is established through diffusion.
+This is slowed down somewhat by selection against heterozygotes,
+but is still diffusive, and so it will take time of order $1/s$
+to reach its stable width.
+(To confirm this, 
+rescale space by $\sigma/s$ and time by $1/s$ in equation \eqref{eqn:cline_pde},
+and see that the result doesn't depend on $\sigma$ or on $s$.)
+
+Now suppose that the frequency profile of the selected allele $p(x,t)$ is given.
+We will understand how lineages of sampled individuals behave,
+both at and away from the selected site,
+by following lineages as they move between backgrounds,
+as done for instance in \citet{selectioncoal,ralph2015patchy}.
+Consider the collection of $A$ alleles found at location $x$.
+The expected number of such alleles produced by location $y$ is proportional to 
+the number of $A$ alleles at $y$ multiplied by the probability of dispersing from $y$ to $x$;
+looking in the other direction, this is also the probability that an $A$ allele at $x$ had a parent at $y$.
+In other words, lineages move as the random walk determined by dispersal,
+but biased towards areas that produce more of the selected allele that they carry.
+Making the same assumptions underlying equation \eqref{eqn:cline_pde},
+we show in Appendix XXX
+that the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
+with drift $s \grad \log p(x,t)$ (i.e., it is pushed uphill on $\log p$ at speed $s$).
+Since $p=1$ far from the zone to the left, 
+and is proportional to $\exp(-x\sqrt{s}/\sigma)$ to the right,
+then roughly, lineages on ``their own'' side wander randomly,
+while lineages on ``the wrong'' side are pushed at constant speed $\sigma/\sqrt{s}$ 
+back towards the side where they are more common.
+Since an $A$ allele must by definition have been inherited from the $A$ side of the barrier 
+at the time of secondary contact,
+this push must get more intense the closer it is to the time of secondary contact.
+Lineages of $B$ alleles do the same thing, of course, but in the opposite direction.
+
+The behavior of a lineage at a linked locus is similar,
+except that when in heterozygotes the lineage may move between backgrounds:
+if we follow back through time the lineage of a locus we find linked to an $A$ allele, 
+it will first tend to be inherited from ancestors to the left (as $A$ lineages drift to the left),
+but if it spends time in the clinal region where recombination may happen,
+it may be found to have been inherited from a $B$-carrying individual,
+whose ancestors will tend to be more from the right.
+Suppose we sample an allele today at a locus at recombination distance $r$ to the selected site.
+If $X_t$ is the location of its ancestor $t$ generations ago,
+and $Z_t$ is the identity of the selected allele that ancestor carried,
+then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$,
+and that $Z$ jumps between $A$ and $B$ at rate either $r p$ or $r(1-p)$,
+depending on the identity of $Z$.
+In symbols,
+\begin{align}
+    \begin{aligned}
+        dX_t &= \begin{cases}
+            & s \grad \log(p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = A \\
+            & s \grad \log(1-p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = B 
+        \end{cases} \\
+        \P\{ Z_{t+\epsilon} &= B \given Z_t = A \} = \epsilon r (1-p(X_t,t)) + O(\epsilon^2) \\
+        \P\{ Z_{t+\epsilon} &= A \given Z_t = B \} = \epsilon r p(X_t,t) + O(\epsilon^2)  .
+    \end{aligned}
+\end{align}
+
+\textbf{illustrative figure of a lineage moving back and forth?}
+
+Clines at linked sites are given by
+the probability that 
+an allele sampled $t$ generations after secondary contact at location $x$,
+at recombination distance $r$ to a selected allele of type $z$
+is inherited from an individual of ancestry $A$,
+where $z$ can be either $A$ or $B$.
+Denote this probability $q_r(x,t,z)$.
+In other words,
+\begin{align}
+    q_r(x,t,z) = \P^x \{Z_t = A\} .
+\end{align}
+The description above implies that $q_r$ solves the equation
+\begin{align}
+    \dot q_r(x,t,A) &= \grad \log(p(x,t)) \cdot \grad q_r(x,t,A) 
+            + \frac{\sigma^2}{2} \Delta q_r(x,t,A)
+            + r (1-p(x,t))(q_r(x,t,B)-q_r(x,t,A)) \\
+    \dot q_r(x,t,B) &= \grad \log(1-p(x,t)) \cdot \grad q_r(x,t,B) 
+            + \frac{\sigma^2}{2} \Delta q_r(x,t,B)
+            + r (1-p(x,t))(q_r(x,t,A)-q_r(x,t,B))  ,
+\end{align}
+with boundary conditions $q_r(x,0,A)=1$ and $q_r(x,0,B)=0$.
+
+
+
+%%%%%%%% %%%%%%%%%%
 \subsection{Simulations}
 Forward in time simulations were used to assess theoretical predictions. We simulate discrete demes with nearest-neighbor migration and non-overlapping generations. Each generation, the dispersal distance of an individual is sampled from a normal distribution, and then discretized to correspond to a deme that is a corresponding distance away. Following migration, the next generation is produced by replacing each individual in a deme by randomly choosing two parents with probability weighted by the fitness of their genotypes. The genotype of the new individual is generated by simulating a recombined chromosome from each parent. This simulation keeps track of the ancestry at each location in the chromosome for all individuals. Each individual has 2 pairs of chromosomes each of length 1 Morgan such that chromosome 1 contains a selected locus at position 0.5M, and chromosome 2 contains no selected loci.
 

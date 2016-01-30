@@ -272,7 +272,7 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
         fwds.grid=extend_grid(xgrid),  
         fwds.soln=forwards_pde(s=s,times=times,grid=fwds.grid,
             yinit=ifelse(fwds.grid$x.mid==0,(yinit[1:fwds.grid$N]+yinit[fwds.grid$N+(1:fwds.grid$N)])/2,
-                         ifelse(fwds.grid$x.mid<0,yinit[1:fwds.grid$N],yinit[fwds.grid$N+(1:fwds.fwds.grid$N)])) 
+                         ifelse(fwds.grid$x.mid<0,yinit[1:fwds.grid$N],yinit[fwds.grid$N+(1:fwds.grid$N)])) 
         ),
         yinit=rep( c( rep(1.0,xgrid$N), rep(0.0,xgrid$N) ), rgrid$N*(rgrid$N+1)/2 ),
         eps=1e-16, ... ) {
