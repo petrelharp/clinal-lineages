@@ -1,12 +1,24 @@
-
 \documentclass[12pt]{article}
 \usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
 \geometry{a4paper} % or letter or a5paper or ... etc
-% \geometry{landscape} % rotated page geometry
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
 \usepackage{natbib}
 \usepackage{color}
-% See the ``Article customise'' template for come common customisations
+
 \newcommand{\alisa}[1]{{\em \color{red} #1}}
+\newcommand{\plr}[1]{{\em \color{blue} #1}}
+
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\one}{\mathbf{1}}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\grad}{\nabla}
+
+\newcommand{\given}{\,\vert\,}
+\newcommand{\st}{\,\colon\,}
+\renewcommand{\and}{\,\&\,}
 
 \title{Ancestry linkage in hybrid zones}
 \author{}
@@ -32,6 +44,11 @@ Genome-wide covariance in ancestry can provide information about the number of s
 
 Something about how we just study the selection against hets model,
 but we expect general conclusions to apply to other situations.
+
+The tracking lineages given selection trick is an example of the more general idea of duality for particle systems.
+It also assumes a large pop density limit that excludes recombination and makes lineages Markov;
+if things are very patchy this might not be a good one.
+Also, parent-offspring dispersal is not the same thing as successful-offspring-parent dispersal.
 
 Expectations:
 Conditional  on having identity B on the wrong side, far away from the center of the zone, the length of unbroken ancestry surrounding the selected locus should be relatively long. This is because an unfit haplotype is likely to be a recent migrant from the other side of the hybrid zone, and therefore will not have experienced many recombination events. 
@@ -66,6 +83,16 @@ We consider a lineage sampled in the present day, and determine its ancestry by 
 %%%%%%%% %%%%%%%%%%
 \subsection{Analysis}
 
+\plr{The aim here is to give both the heuristics, for how a lineage moves around
+and what that tells us about the scale on which clines happen;
+as well as writing down the PDE.  These should probably be better separated?}
+
+Perhaps start out with the main points:
+the cline takes time $s$ to spread out,
+and after time $\tau$ will have clines out to genetic distance of order $1/\tau$,
+maybe more.
+
+\paragraph{Establishment of the selected cline}
 Consider a single locus, with alternate alleles fixed in the two parental populations,
 for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
 The deterministic theory predicts that after secondary contact,
@@ -100,6 +127,7 @@ to reach its stable width.
 rescale space by $\sigma/s$ and time by $1/s$ in equation \eqref{eqn:cline_pde},
 and see that the result doesn't depend on $\sigma$ or on $s$.)
 
+\paragraph{Lineages at the selected locus}
 Now suppose that the frequency profile of the selected allele $p(x,t)$ is given.
 We will understand how lineages of sampled individuals behave,
 both at and away from the selected site,
@@ -112,7 +140,7 @@ looking in the other direction, this is also the probability that an $A$ allele 
 In other words, lineages move as the random walk determined by dispersal,
 but biased towards areas that produce more of the selected allele that they carry.
 Making the same assumptions underlying equation \eqref{eqn:cline_pde},
-we show in Appendix XXX
+we show in Appendix \ref{apx:lineage_derivation}
 that the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
 with drift $s \grad \log p(x,t)$ (i.e., it is pushed uphill on $\log p$ at speed $s$).
 Since $p=1$ far from the zone to the left, 
@@ -125,6 +153,7 @@ at the time of secondary contact,
 this push must get more intense the closer it is to the time of secondary contact.
 Lineages of $B$ alleles do the same thing, of course, but in the opposite direction.
 
+\paragraph{Lineages at linked loci}
 The behavior of a lineage at a linked locus is similar,
 except that when in heterozygotes the lineage may move between backgrounds:
 if we follow back through time the lineage of a locus we find linked to an $A$ allele, 
@@ -140,40 +169,190 @@ and that $Z$ jumps between $A$ and $B$ at rate either $r p$ or $r(1-p)$,
 depending on the identity of $Z$.
 In symbols,
 \begin{align}
-    \begin{aligned}
+    \begin{aligned} \label{eqn:lineage_motion}
         dX_t &= \begin{cases}
-            & s \grad \log(p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = A \\
-            & s \grad \log(1-p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = B 
+             s \grad \log(p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = A \\
+             s \grad \log(1-p(X_t,t)) dt + dB_t \qquad & \text{if } Z_t = B 
         \end{cases} \\
-        \P\{ Z_{t+\epsilon} &= B \given Z_t = A \} = \epsilon r (1-p(X_t,t)) + O(\epsilon^2) \\
-        \P\{ Z_{t+\epsilon} &= A \given Z_t = B \} = \epsilon r p(X_t,t) + O(\epsilon^2)  .
+        \P\{ Z_{t+\epsilon} = B \given Z_t = A \} &= \epsilon r (1-p(X_t,t)) + O(\epsilon^2) \\
+        \P\{ Z_{t+\epsilon} = A \given Z_t = B \} &= \epsilon r p(X_t,t) + O(\epsilon^2)  .
     \end{aligned}
 \end{align}
 
-\textbf{illustrative figure of a lineage moving back and forth?}
+\textbf{figure of a lineage moving back and forth?}
 
+\paragraph{How fast do linked clines relax?}
+Although loci not under selection can in principle spread across the cline unimpeded,
+in practice it can take quite some time for even unlinked neutral loci to homogenize,
+due to the decreased fitness of heterozygotes \citep{bartonbarrier}
+and the relative slowness of diffusive movement \citep{sedghifar}.
+Suppose we sample across at cline $\tau$ units of time after secondary contact.
+How far away from the selected locus do we expect to see clines that have begun to flatten out more
+than the selected cline?
+A linked cline will have begun to flatten out if there is an appreciable chance that
+a lineage at the linked locus initially linked to an $A$ allele 
+at some point has recombined from an individual carrying the $B$ allele.
+This implies that loci closer than $1/\tau$ to the selected site
+certainly won't have a substantially wider cline than the selected cline.
+\plr{Figure showing this?}
+Of course, this calculation assumes that every generation provides an opportunity for recombination 
+onto the other background,
+but only recombinations in heterozygotes will move the linked lineage between selected backgrounds.
+Since heterozygotes for the selected allele are only found at high frequency in the cline,
+and lineages are generally pushed away from the cline but have no bias far away,
+the amount of time a lineage spends in heterozygotes should grow as $\sqrt{\tau}$ for large $\tau$,
+and so the width of the genomic region showing clines about the selected locus could be 
+substantially larger than $1/\tau$.
+However, this distinction appears hard to observe for realistic parameter values.
+
+
+\paragraph{PDE for linked clines}
 Clines at linked sites are given by
 the probability that 
 an allele sampled $t$ generations after secondary contact at location $x$,
 at recombination distance $r$ to a selected allele of type $z$
 is inherited from an individual of ancestry $A$,
 where $z$ can be either $A$ or $B$.
-Denote this probability $q_r(x,t,z)$.
+Denote this probability $q_z(x,t,r)$.
 In other words,
 \begin{align}
-    q_r(x,t,z) = \P^x \{Z_t = A\} .
+    q_z(x,t,r) = \P^x \{Z_t = A\} .
 \end{align}
 The description above implies that $q_r$ solves the equation
 \begin{align}
-    \dot q_r(x,t,A) &= \grad \log(p(x,t)) \cdot \grad q_r(x,t,A) 
-            + \frac{\sigma^2}{2} \Delta q_r(x,t,A)
-            + r (1-p(x,t))(q_r(x,t,B)-q_r(x,t,A)) \\
-    \dot q_r(x,t,B) &= \grad \log(1-p(x,t)) \cdot \grad q_r(x,t,B) 
-            + \frac{\sigma^2}{2} \Delta q_r(x,t,B)
-            + r (1-p(x,t))(q_r(x,t,A)-q_r(x,t,B))  ,
+    \begin{aligned}  \label{eqn:q_pde}
+    \dot q_A(x,t,r) 
+            &= \grad \log(p(x,t)) \cdot \grad q_A(x,t,r) 
+                + \frac{\sigma^2}{2} \Delta q_A(x,t,r) 
+            \\ &\qquad {} + 
+                r (1-p(x,t))(q_B(x,t,r)-q_A(x,t,r))  \\
+    \dot q_B(x,t,r) &= \grad \log(1-p(x,t)) \cdot \grad q_B(x,t,r) 
+            + \frac{\sigma^2}{2} \Delta q_B(x,t,r)
+            \\ &\qquad {} + 
+            + r (1-p(x,t))(q_A(x,t,r)-q_B(x,t,r))  ,
+    \end{aligned} \\
 \end{align}
-with boundary conditions $q_r(x,0,A)=1$ and $q_r(x,0,B)=0$.
+with boundary conditions $q_A(x,0,r)=1$ and $q_B(x,0,r)=0$.
+We will have more use for the differential operators on the right-hand sides of these equations,
+so write these also as 
+$\dot q_A = G_r^A q_A + r (1-p) (q_A-q_B)$
+and 
+$\dot q_B = G_r^B q_B + r (1-p) (q_B-q_A)$.
 
+\paragraph{Numerical computation}
+To determine how the cline at a linked locus is expected to relax,
+we can solve the partial differential equations \eqref{eqn:cline_pde} and \eqref{eqn:q_pde} numerically,
+producing, for instance, a heatmap of expected local frequencies of $A$ ancestry
+across space and time, as in Figure \ref{fig:pde_clines}.
+Shown is the expected frequency of ancestry $A$ at location $x$ and time $t$ at a site at recombination distance $r$ from the selected site,
+which we denote $p(x,t,r)$ and can compute as $p(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$.
+
+%%%%%%
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{figs/example_cline}
+    \end{center}
+    \caption{
+        \textbf{Numerically computed clines,} at
+        \textbf{(A)} the selected site, which forms over time $1/s$ and then remains stable, and
+        \textbf{(B)} a linked site at distance $r=0.1$, which continues to smooth out as $\sqrt{t}$.
+        Other parameters.
+        \plr{Do we want this figure? This one is just a placeholder; I'd put in two, that showed the formation and spread better.
+        Maybe putting in simulation results would be better, with comparison to numerical solutions? But, this is easier to look at?}
+        \label{fig:pde_clines}
+    }
+\end{figure}
+
+
+\paragraph{Haplotype lengths}
+We can also find the probability of seeing an entire block of genome (haplotype)
+of a single ancestry at a given location and time.
+As in \citet{sedghifar},
+to do this we need only keep track of both lineages when a recombination in the middle of a block occurs,
+so that lineages will act like a particular class of labeled, branching diffusions,
+where the total branching rate is conserved.
+We will not consider subsequent coalescence.
+The general description of the process is as follows.
+The lineage of a segment of genome behaves as a linked locus described in equations \eqref{eqn:lineage_motion},
+with recombination distance $r$ equal to the rate at which the segment recombines away from the selected site.
+(If the selected site lies inside the segment, $r=0$.)
+Additionally, at rate equal to the genetic length of the segment,
+a recombination occurs, at which point the segment splits into two segments at a uniformly chosen location,
+each of which procedes as before, independently.
+
+\paragraph{Spatial haplotype patterns}
+Furthermore, we expect that stretches of $A$ ancestry will tend to be shorter the further one moves into the $B$ side of the cline,
+because they have had more opportunities to recombine with $B$ haplotypes.
+However, stretches of $A$ ancestry that contain the selected site are expected to be longer
+than those that do not at the same spatial location,
+because lineages containing the selected site must have been inherited from the $A$ side of the cline recently --
+concretely, they move at speed roughly $\sigma/\sqrt{s}$,
+so we expect (selected) $A$ alleles at distance $x$ from the cline center
+to have last had an ancestor on the $A$ side of the cline around $x \sqrt{s}/\sigma$ generations ago,
+and so the enclosing $A$ haplotype is no longer than $\sigma/(x \sqrt{s})$.
+\plr{(check predicted decay of mean length $1/x$ in simulations)}
+For linked haplotypes not containing the selected site, the situation is more complicated, and harder to intuit.
+
+\paragraph{General haplotype probabilities}
+To quantify haplotype abundances,
+we'd like to know the probability that the entire segment of genome between positions $a$ and $b$ relative to the selected site
+in an individual sampled at spatial location $x$ and time $t$ after the cline has formed
+is of ancestry $A$.
+Writing this probability $g_A(x,t;a,b)$,
+branching adds a term to equation \eqref{eqn:q_pde}, so that 
+\plr{write this equation more compactly?}
+\begin{align}
+    \begin{aligned} \label{eqn:g_pde}
+        \dot g_A(x,t;a,b) 
+            &= G_{r(a,b)}^A g_A(x,t;a,b) 
+            - (b-a) g_A(x,t;a,b) 
+            \\ {} & \qquad 
+            + p(x,t) \int_a^b {
+                g_A(x,t;a,\theta) g_A(x,t;\theta,b) 
+                - g_A(x,t;a,b) .
+            } d\theta
+            \\ {} & \qquad 
+            + (1-p(x,t)) \int_a^0 {
+                g_B(x,t;a,\theta) g_A(x,t;\theta,b)
+            } d\theta
+            \\ {} & \qquad 
+            + (1-p(x,t)) \int_0^b {
+                g_A(x,t;a,\theta) g_B(x,t;\theta,b)
+            } d\theta,
+    \end{aligned}
+\end{align}
+where the integral $\int_a^0$ is zero if $a>0$ and the integral $\int_0^b$ is zero if $b<0$;
+and $r(a,b)$ is the distance from the segment to the selected site:
+$r(a,b)=0$ if $ab<0$ and $r(a,b)=\min(|a|,|b|)$ otherwise.
+The equation for $g_B(x,t;a,b)$ is identical after exchanging $A \leftrightarrow B$ and
+$p \leftrightarrow (1-p)$.
+The boundary conditions are $g_A(x,0;a,b)=1$ and $g_B(x,0;a,b)=0$.
+
+\paragraph{Numerical solutions}
+Notice that equations \eqref{eqn:g_pde}
+are hierarchical in $[a,b]$:
+the equation for haplotype identity probabilities on a segment $[a,b]$ depends only on those probabilities for smaller segments.
+This allows for efficient numerical solutions,
+described in more detail in Appendix \ref{apx:haplotype_calcs}.
+
+%%%%%%
+\begin{figure}
+    \begin{center}
+    \end{center}
+    \caption{
+        \textbf{Haplotype length distributions},
+        comparing numerical solutions to simulations.
+        \plr{maybe?}
+        \label{fig:haplotype_lengths}
+    }
+\end{figure}
+
+\paragraph{Correlations in ancestry}
+To compute correlations in local ancestry
+(i.e., ``ancestry disequilibrium'', as in \citet{pool,brandvainthisvolume}),
+we need only follow lineages at two sites, instead of an entire region,
+the model described above requires only minor modifications,
+and our numerical code can be used directly.
 
 
 %%%%%%%% %%%%%%%%%%
@@ -246,7 +425,22 @@ Topics include\\
 Some words about how confidently calling tracts is the way of the future.\\
 How can this be applied to detecting selection?
 
+Numerical solution for the PDE can be used on real, non-flat landscapes that change with time;
+we have code and notes on solving them on github.
+
 \bibliographystyle{molecularEcology}
 \bibliography{library}
+
+\appendix
+
+\section{Rescaling a dicrete model to obtain the lineage motion}
+\label{apx:lineage_derivation}
+
+Here put derivation of the PDE for $p(x,t)$ and also the SDE of a lineage motion.
+
+\section{Nuemrical solutions for haplotype probabilities}
+\label{apx:haplotype_calcs}.
+
+Here put some details about the numerical solutions of haplotype probabilities.
 
 \end{document}

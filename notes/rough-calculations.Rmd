@@ -117,7 +117,7 @@ d.  By Lévy's identity, the local time of a Brownian motion at zero
     the constant of proportionality is the mean time spent per visit).
     Therefore, there will be appreciable chance of recombination if $r C \sqrt{\tau}>1$,
     where $C$ is the constant;
-    this says that if clines down to $r$ are flat at $\tau$, then at time $2\tau$ they'll be flat down to $r/4$.
+    this says that if clines down to $r$ are flat at $\tau$, then at time $4\tau$ they'll be flat down to $r/2$.
 
     But, what is the constant $C$?
     Consider the approximation of a lineage that acts like Brownian motion with a constant drift $s$ above zero.
