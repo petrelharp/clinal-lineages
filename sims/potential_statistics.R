@@ -50,7 +50,7 @@ intervalSizes_allAncs = lapply(positions,function(POS){
 #[[POS]][ind,chr]
 
 #COMPARE:
-pdf(file=paste(outstring,"statistic_length.pdf",sep=""),height = 3,width=5)
+pdf(file=paste(outstring,"statistic_length.pdf",sep="_"),height = 3,width=5)
 #mean length across ALL indivduals in the zone (including non-recombinant chroms) vs chromosome position
 
 plot(positions,sapply(intervalSizes_allAncs,mean),type="l",xlab="physical position",ylab="mean length",main="mean length, whole zone")
@@ -79,7 +79,7 @@ for(i in 1:50){points(mean_per_deme_AncB[,i]/mean(mean_per_deme_AncB[,i],na.rm=T
 
 dev.off()
 
-pdf(file=paste(outstring,"statistic_ecdf.pdf",sep=""),height = 3,width=5)
+pdf(file=paste(outstring,"statistic_ecdf.pdf",sep="_"),height = 3,width=5)
 
 #	2. score = $\log$ of ECDF of length (i.e. log of prob that haplotype is longer than this one)
 #relative to ALL individuals in ALL populations:
@@ -126,7 +126,7 @@ dev.off()
 
 #For ALL inds:
 
-pdf(file=paste(outstring,"statistic_length_of_adjacent_blocks.pdf",sep=""),height = 3,width=5)
+pdf(file=paste(outstring,"statistic_length_of_adjacent_blocks.pdf",sep="_"),height = 3,width=5)
 get.flanking.blocks.all = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromosome,POS=0.5,ancB=TRUE){
 	focal_chunks = do.call(rbind,lapply(IND_DATA[[CHR]],function(X){
 		FOCUS = which(X$starts<POS & X$stops>POS);
