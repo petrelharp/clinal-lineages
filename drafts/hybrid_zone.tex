@@ -194,7 +194,11 @@ a lineage at the linked locus initially linked to an $A$ allele
 at some point has recombined from an individual carrying the $B$ allele.
 This implies that loci closer than $1/\tau$ to the selected site
 certainly won't have a substantially wider cline than the selected cline.
-\plr{Figure showing this?}
+\plr{Figure showing this? 
+    For instance, either: (a) time-genome heatmap of number of heterozygotes (from PDE);
+    or (b) a few time-space heatmaps of frequencies at different values of r (from PDE);
+    or (c) a few space-genome heatmaps of frequencies at different times (from sims)
+}
 Of course, this calculation assumes that every generation provides an opportunity for recombination 
 onto the other background,
 but only recombinations in heterozygotes will move the linked lineage between selected backgrounds.
@@ -255,10 +259,12 @@ which we denote $p(x,t,r)$ and can compute as $p(x,t,r) = p(x,t) q_A(x,t,r) + (1
     \caption{
         \textbf{Numerically computed clines,} at
         \textbf{(A)} the selected site, which forms over time $1/s$ and then remains stable, and
-        \textbf{(B)} a linked site at distance $r=0.1$, which continues to smooth out as $\sqrt{t}$.
+        \textbf{(B)} a linked site at distance $r=0.01$, which continues to smooth out as $\sqrt{t}$.
+        \textbf{(C)} a linked site at $r=0.1$
+        \textbf{(D)} an unlinked site.
         Other parameters.
        \plr{Do we want this figure? This one is just a placeholder; I'd put in two, that showed the formation and spread better.
-      Maybe putting in simulation results would be better, with comparison to numerical solutions? But, this is easier to look at?}
+       This is from the PDE (we don't have time courses from sims).}
         \label{fig:pde_clines}
     }
 \end{figure}
@@ -342,6 +348,10 @@ described in more detail in Appendix \ref{apx:haplotype_calcs}.
     \caption{
         \textbf{Haplotype length distributions},
         comparing numerical solutions to simulations.
+        At one time, plot 
+        probability of seeing a haplotype of length at least $r$ covering that position on the genome,
+        against (a) position on the genome, at a few spatial locations;
+        or (b) spatial location, at a few positions on the genome.
         \plr{maybe?}
         \label{fig:haplotype_lengths}
     }
@@ -416,6 +426,12 @@ We are interested specifically in the distribution of the length of continuous t
 
 \subsection{Number of ancestors}
 Not sure what the result is here yet -- unexpected
+
+\subsection{Identifying sites under selection}
+
+Plots with x-axis the genome and having peaks at the selected site.
+
+Question: how much resolution do we have?
 
 \section{Discussion}
 Topics include\\
