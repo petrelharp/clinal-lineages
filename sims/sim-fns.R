@@ -89,12 +89,12 @@ genoAll = function(inds,QTL,sp.ids){
 
 #######    MAKING A NEW GEN     #######
 
-makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),min.deme=min(demes)){
+makeNewGen=function(inds,QTL,sp.ids,demes,sigma,max.deme=max(demes),min.deme=min(demes)){
     pop.sizes <- table(demes) # number of individuals in each deme
     chrnames <- namesList( names(inds[[1]]) )
     #genotyping
     if(!is.null(QTL)){ 
-        genos = lapply(genoAll(inds=inds,QTL=qtl,sp.ids=sp.ids) ,function(IND){do.call(rbind,IND)})  
+        genos = lapply(genoAll(inds=inds,QTL=qtl,sp.ids=sp.ids), function(IND){do.call(rbind,IND)})  
         QTL=do.call(rbind,QTL)
         #make fitness from genotypes
         w_abs = sapply(genos,function(IND){
@@ -112,7 +112,7 @@ makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),m
     }
     if(is.null(QTL)){ w_abs = rep(1,length(inds)) }
     rel.w = w_abs/mean(w_abs)
-    inds.df = data.frame(w=rel.w,deme=demes,edge=ifelse(demes%in%range(demes),2,1))
+    inds.df = data.frame(w=rel.w,deme=demes)
     # sample the displacements of individuals
     sample_move = floor(rnorm(NROW(inds.df),0.5,sigma))
     # new locations of individuals
@@ -120,11 +120,12 @@ makeNewGen=function(inds,QTL,sp.ids,demes,edge="M/2",sigma,max.deme=max(demes),m
     inds.df$id = seq_along(inds.df$new.deme)
     new.inds.df = do.call(rbind,lapply(  unique(inds.df$deme), function(d){	# iterate over demes
                 these.parents = which(inds.df$new.deme==d)
-                # HACK: if there's no available parents, pick ome
+                # if there's no available parents, pick one from a Gaussian displacement
                 while (length(these.parents)==0) {
                     parent.probs = inds.df$w*exp(-(inds.df$deme-d)^2/sigma)
                     these.parents = sample.int(nrow(inds.df),1,prob=parent.probs)
                 }
+                # otherwise, pick parents from the same deme
                 if (length(these.parents)>1) {  # this is needed because of sample()'s bad behavior
                     #find parents
                     a = with(inds.df[these.parents,], sample(id,size=pop.sizes[d], prob=w, replace=TRUE))
@@ -222,4 +223,10 @@ geno.ind <- function(IND,loci) {
                    HAP$sp2[ findInterval( loci[[CHR]], c(HAP$starts,1), rightmost.closed=TRUE ) ]
               }) )
         }) 
+}
+
+trueSigma <- function (sigma,n=1e4) {
+    # steps in dispersal go as x -> x + floor(rnorm(.,sigma)+0.5);
+    # find what the actual SD of dispersal distance is.
+    sd( floor(rnorm(n,mean=0.5,sd=sigma)) )
 }

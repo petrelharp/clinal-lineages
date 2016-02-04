@@ -5,15 +5,7 @@ load("~/Documents/Hybrid_Zones/clinal-lineages/sims/simulation_SIGMA1_Ninds25000
 #this is only around the selected locus. The object name is "chunks_by_deme"
 
 
-add.alpha <- function(col, alpha=1){
-if(missing(col))
-stop("Please provide a vector of colours.")
-apply(sapply(col, col2rgb)/255, 2, 
-function(x) 
-rgb(x[1], x[2], x[3], alpha=alpha)) 
-
-}
-transparent_rainbow = add.alpha(rainbow(ndemes),0.7)
+transparent_rainbow = adjustcolor(rainbow(ndemes),0.7)
 
 
 empty_deme = rep(0,2*deme_size)

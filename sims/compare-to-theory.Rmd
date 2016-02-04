@@ -29,5 +29,20 @@ and might put in the paper:
 
 
 
+# Parameters from a simulation
 
+We'll use some simulation results produced by [yaniv_sims.R](yaniv_sims.R),
+and need to convert those parameters to those from theory.
+Dispersal in the simulation moves as $\lfloor Z + 1/2 \rfloor$,
+where $Z \sim N(0,\sigma^2_\text{demes})$;
+we'll use this fact to compute the actual $\sigma$.
+(Yes, that's an unbiased walk, thanks to the floor.)
+Migrants past the endpoints stay there (they don't reflect).
+
+```{r sim_results}
+simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_simsums_chunks.Robj"
+sim.params <- list( sigma=1, ninds=25000, ndemes=50, s=0.1, tau=1000 )
+
+theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau )
+```
 

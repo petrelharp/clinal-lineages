@@ -4,16 +4,6 @@
 
 source("sim-fns.R")
 
-add.alpha <- function(col, alpha=1){
-if(missing(col))
-stop("Please provide a vector of colours.")
-apply(sapply(col, col2rgb)/255, 2, 
-function(x) 
-rgb(x[1], x[2], x[3], alpha=alpha)) 
-
-}
-
-
 #PARAMS for simulation:
 
 SIGMA = 1
@@ -22,7 +12,7 @@ deme_size = 500
 ninds = ndemes*deme_size
 S = 0.1
 
-transparent_rainbow = add.alpha(rainbow(ndemes),0.7)
+transparent_rainbow = adjustcolor(rainbow(ndemes),0.7)
 
 zone_age = c(100)
 
@@ -35,10 +25,18 @@ xx <- (1:ndemes)-0.5-ndemes/2
 
 
 #DEFINE selection against genotypes:
-qtl=list(chr1=data.frame(traits=c("underdominant"), s = S,pos=c(0.5)),chr2=data.frame(traits=c("underdominant"), s = 0,pos=c(0.5)))
+qtl=list(
+        chr1=data.frame(
+                traits=c("underdominant"), 
+                s=S,
+                pos=c(0.5)),
+        chr2=data.frame(
+                traits=c("underdominant"), 
+                s = 0,pos=c(0.5))
+        )
 
-#SIMULATE the populations (NB: Can't make per-deme population size too small, otherwise deme may end up empty and throws up an error.)
-sims.s0.1 = lapply(zone_age,sim.zone,n.ind=ninds,n.deme=ndemes,sigma=SIGMA)
+#SIMULATE the populations
+sims.s0.1 = lapply(zone_age, sim.zone, n.ind=ninds, n.deme=ndemes, sigma=SIGMA)
 	#output is: a list with hierarchy: [[zone_age]][[c("inds","sp.inds","deme","pars","QTL")]]
 		#where:
 			#"inds" is a list of length ninds, such that [[ind]][[chr]][[X1/X2]][[data.frame where col1 = coordinates of rec., col2 = ancestor ID]]
