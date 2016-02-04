@@ -70,6 +70,31 @@ sim <- sim.zone( n.ind=n.ind, n.deme=n.deme, n.gen=10, sigma=sigma.demes, quiet=
 sim.sums <- spBreaks(sim)
 ```
 
+Here `sim` is a list with five named components:
+
+- **inds** is a list of length `ninds`, 
+    - each element of which is a list, one element per chromosome,
+        - each element of which is a list with names "X1" and "X2", corresponding to the two copies of the chromosome,
+            - each element of which is a data frame, with columns:
+                - **pos**: coordinates of recombination
+                - **ancest**: ancestor ID
+- **sp.inds** is a character vector of length `ninds`, giving the ancestral type of each ancestor (i.e., ancestries corresponding to the the ancestor IDs)
+- **deme** is an integer vector of length `ninds`, giving the deme number of each individual (including the ancestors)
+- **pars** is an integer that gives the number of generations of the simulation
+- **QTL** returns the QTL vector used in the simulation
+
+and `sim.sums` is a named list with components:
+
+- **ind.ancestry**: a list of length `ninds`
+    - each element of which is a list, one element per chromosome,
+        - each element of which is a list with names "X1" and "X2", corresponding to the two copies of the chromosome,
+            - each element of which is a data frame, with variables
+                - **starts**: start position of a chunk of ancestry
+                - **stops**: end position of the chunk of ancestry
+                - **sp2**: logical variable saying whether the chunk is of ancestry $A$ or not
+- **ancest.prop**: is a `ninds*2` matrix giving the ancestry proportion of each individual on each of their two copies of the chromosome.
+		
+
 OK, now let's genotype these individuals at some loci:
 ```{r genotype_sim, fig.width=3*fig.dim, fig.height=1.5*fig.dim}
 loci <- seq(0,1,0.05)

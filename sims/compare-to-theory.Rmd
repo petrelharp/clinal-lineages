@@ -1,0 +1,33 @@
+---
+title: "Comparison of simulation to theory"
+date: "`r date()`"
+---
+
+```{r doc_setup, include=FALSE}
+fig.dim <- 5
+knitr::opts_chunk$set(fig.height=fig.dim,fig.width=2*fig.dim,fig.align='center')
+source("sim-fns.R")
+```
+
+Here's the things that we'd like to have plots of simulation compared to theory for,
+and might put in the paper:
+
+1.  **Establishment of the selected cline:** the frequency of the selected allele, $p(x,t)$,
+    across space, at a few times.
+
+2.  **Conditional ancestry probabilities:** the conditional frequency of ancestry $A$
+    given being linked to a selected allele of ancestry $z$, denoted $q_z(x,t,r)$,
+    across space, at a few times or distances and for each $z$.
+
+3.  **Relaxation of linked clines:** the frequency of ancestry $A$, denoted $p(x,t,r)$, 
+    across space, at a few times and one or two recombination distances. 
+    (This comes after $q$ because it is computed using $q$.)
+
+4.  **Haplotype probabilities:** the probability of seeing a haplotype of length at least $\ell$
+    covering position $r$ on the genome at location $x$ in space: for fixed $\ell$,
+    against $r$ and/or $x$.
+
+
+
+
+
