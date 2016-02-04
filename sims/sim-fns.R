@@ -208,13 +208,14 @@ sim.zone <- function (n.ind, n.deme, ...) {
 
 #GENOTYPE  [ASSUMES A ONE CHR GENOME WHERE WE HAVE PHASED DIPLOID DATA]
 geno.pop <- function (ind.ancest, loci) { 
-    sapply(ind.ancest, geno.ind, loci) 
+    do.call( cbind, lapply( lapply(ind.ancest, geno.ind, loci), "[[", 1 ) )
 }
 
 geno.ind <- function(IND,loci) {
-    # Each individual is a list of chromosomes; each chromosome is a two-column data frame of starts, stops, and ancestral identities
+    # Each individual is a list of chromosomes; each chromosome is TWO two-column data frame of starts, stops, and ancestral identities
     # Returns diploid genotypes;
     #  as a vector, with all chromosomes squooshed together
+    # ASSUMES length of chromosome is equal to 1
     if (length(IND)!=length(loci)) { stop("Number of chromosomes not matching.") }
      lapply( seq_along(IND), function (CHR) {
             rowSums( sapply(IND[[CHR]],function(HAP){
