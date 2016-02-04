@@ -57,9 +57,10 @@ meiosis = function(CHR,r=1){
     B= breaks[seq_along(breaks)%%2!=start]
     X = rbind(
         do.call(rbind,lapply(A,function(a){
-            with(CHR[[1]],c(pos=a,ancest=ancest[max(which(pos<a))]))})),
+                    with(CHR[[1]],c(pos=a,ancest=ancest[max(which(pos<a))]))})),
             CHR[[1]][(findInterval(CHR[[1]][,"pos"],c(-1,breaks,1.2))%%2)!=start,],
-            do.call(rbind,lapply(B,function(b){with(CHR[[2]],c(pos=b,ancest=ancest[max(which(pos<b)) ]))})),
+            do.call( rbind, lapply(B,function(b){
+                    with(CHR[[2]],c(pos=b,ancest=ancest[max(which(pos<b)) ]))})),
             CHR[[2]][(findInterval(CHR[[2]][,"pos"],c(-1,breaks,1.2))%%2)==start,]
         )
     return(		X[order(X$pos),]		)
