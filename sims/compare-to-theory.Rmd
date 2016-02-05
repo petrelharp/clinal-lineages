@@ -68,12 +68,46 @@ theory.params
 Here are some functions we'll use to extract what we want
 from data in the `chunks` format:
 ```{r helper_fns}
-genotype.counts <- function (ch) { 
+genotype_counts <- function (ch) { 
     gcounts <- t(sapply( ch, function (x) { tabulate( 1+rowSums( x>0 ), nbins=3 ) } )) 
     colnames(gcounts) <- c("AA","AB","BB")
     return(gcounts)
 }
+conditioned_genotype_counts <- function (x,y) { 
+    # returns joint genotype counts across space from two chunks objects
+    #  a (ndemes) x 4 x 4 array (4 phased genotypes)
+    deme <- rep(seq_along(x),sapply(x,NROW))
+    x.alleles <- ifelse(do.call(rbind,x)==0,"A","B")
+    y.alleles <- ifelse(do.call(rbind,y)==0,"A","B")
+    x.genotypes <- factor( paste0(x.alleles[,1],x.alleles[,2]), levels=c("AA","AB","BA","BB") )
+    y.genotypes <- factor( paste0(y.alleles[,1],y.alleles[,2]), levels=c("AA","AB","BA","BB") )
+    # x.genotypes <- factor( c("AA","AB","BB")[1+rowSums( do.call(rbind, x)>0 )], levels=c("AA","AB","BB") )
+    # y.genotypes <- factor( c("AA","AB","BB")[1+rowSums( do.call(rbind, y)>0 )], levels=c("AA","AB","BB") )
+    return( table( deme, x=x.genotypes, y=y.genotypes ) )
+}
 dip.to.hap <- rbind( A=c(AA=2,AB=1,BB=0), B=c(AA=0,AB=1,BB=2) )
+bidip.to.bihap <- rbind(
+            "A-A" = c( 2, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 ),
+            "A-B" = c( 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 2, 1, 1, 0 ),
+            "B-A" = c( 0, 1, 1, 2, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0 ),
+            "B-B" = c( 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 2 ) )
+colnames( bidip.to.bihap ) <- as.vector( outer( c("AA","AB","BA","BB"), c("AA","AB","BA","BB"), paste, sep="-" ) )
+conditional_haplotype_counts <- function (gcounts) {
+    # uses output of conditioned_genotype_counts to get conditional haplotype counts
+    # a (ndemes) x 2 x 2 array
+    dim(gcounts) <- c(dim(gcounts)[1],prod(dim(gcounts)[2:3]))
+    out <- tcrossprod( gcounts, bidip.to.bihap )
+    dim(out) <- c(dim(gcounts)[1],2,2)
+    dimnames(out) <- list( dimnames(gcounts)[[1]], c("A","B"), c("A","B") )
+    return(out)
+}
+conditional_freqs <- function (gcounts) {
+    # uses output of conditioned_genotype_counts to get conditional allele frequencies
+    # a (ndemes) x 2 matrix
+    hcounts <- conditional_haplotype_counts(gcounts)
+    cbind( A = hcounts[,"A","A"]/(hcounts[,"A","A"]+hcounts[,"A","B"]),
+           B = hcounts[,"A","B"]/(hcounts[,"A","B"]+hcounts[,"B","B"]) )
+}
 ```
 
 
@@ -88,13 +122,13 @@ fwds.soln <- forwards_pde(s=theory.params$s, times=tt, grid=fgrid, sigma=theory.
 ```
 ... and, compare it to the observed values:
 ```{r selected_cline_sim}
-gcounts <- genotype.counts(chunks[[1]])
+gcounts <- genotype_counts(chunks[[1]])
 # sim frequencies
 sfreqs <- sweep( tcrossprod(gcounts,dip.to.hap), 1, 2*rowSums(gcounts), "/" )
 # theory frequencies
 tfreqs <- cbind( A=fwds.soln[nrow(fwds.soln),-1], B=1-fwds.soln[nrow(fwds.soln),-1] )
 matplot(xx, sfreqs, type='l', lty=1, main="Selected allele frequency", ylab="frequency", xlab='geographic position')
-matlines(fgrid$x.mid, tfreqs, lty=4, lwd=2)
+matlines(fgrid$x.mid, tfreqs, lty=2, lwd=2)
 legend("topright", legend=outer(colnames(sfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
 ```
 
@@ -110,9 +144,24 @@ Looks pretty similar, just shifted.
 
 # Ancestry probabilities
 
+First, compute theoretical predictions at the values of $r$ in the simulation:
 ```{r linked_soln}
 linked.solns <- lapply( sim.rvals, function (r) {
         forwards_backwards_pde(s=theory.params$s, times=tt, grid=xgrid, r=r, 
-                               fwds.soln=fwds.soln, log.p=TRUE)
+                               sigma=theory.params$sigma, fwds.soln=fwds.soln, log.p=TRUE)
     } )
+```
+... and compare to the observed values:
+```{r compare_linked}
+for (kr in seq_along(sim.rvals)[-1]) {
+    gcounts <- conditioned_genotype_counts(chunks[[kr]], chunks[[1]])
+    # frequencies from simulation
+    cfreqs <- conditional_freqs(gcounts)
+    # frequencies from theory
+    tfreqs <- linked.solns[[kr]][nrow(linked.solns[[kr]]),-1]
+    dim(tfreqs) <- c( length(xgrid$x.mid), 2 )
+    matplot(xx, cfreqs, type='l', lty=1, main=sprintf("Frequency of A ancestry by selected background, r=%f",sim.rvals[rk]), ylab="frequency", xlab='geographic position')
+    matlines(xgrid$x.mid, tfreqs, lty=2, lwd=2)
+    legend("topright", legend=outer(colnames(cfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
+}
 ```
