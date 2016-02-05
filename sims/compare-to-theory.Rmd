@@ -7,6 +7,10 @@ date: "`r date()`"
 fig.dim <- 5
 knitr::opts_chunk$set(fig.height=fig.dim,fig.width=2*fig.dim,fig.align='center')
 source("sim-fns.R")
+library(ReacTran)
+library(Matrix)
+source("../notes/tran.1D.R",chdir=TRUE) # fix for log.A
+source("../notes/cline-fns.R",chdir=TRUE)
 ```
 
 Here's the things that we'd like to have plots of simulation compared to theory for,
@@ -42,23 +46,61 @@ We'll work in spatial units equal to one deme spacing;
 since generations are nonoverlapping, one generation is indeed one time step in the simulation.
 
 ```{r sim_results}
-simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_simsums_chunks.Robj"
+simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums_chunks.Robj"
 load(simchunks.file)  # provides 'chunks'
 get_simparams <- function (fname) {
     strings <- c( sigma="SIGMA", ninds="Ninds", ndemes="ndemes", s="s", tau="tau" )
     lapply( strings, function (x) { as.numeric(gsub(sprintf(".*_%s([0-9.]+)_.*",x),"\\1",simchunks.file)) } )
 }
 sim.params <- get_simparams( simchunks.file )
+# recombination distances, hard-coded
+sim.rvals <- c(0,0.01,0.5)
+# spatial locations of the demes
+xx <- seq_len(sim.params$ndemes)-sim.params$ndemes/2
 theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau, 
        density=sim.params$ninds/sim.params$ndemes,
        width=sim.params$ndemes )
 theory.params
 ```
 
+*Note:* We should also work out what the actual value of **s** is.
+
+Here are some functions we'll use to extract what we want
+from data in the `chunks` format:
+```{r helper_fns}
+genotype.counts <- function (ch) { 
+    gcounts <- t(sapply( ch, function (x) { tabulate( 1+rowSums( x>0 ), nbins=3 ) } )) 
+    colnames(gcounts) <- c("AA","AB","BB")
+    return(gcounts)
+}
+dip.to.hap <- rbind( A=c(AA=2,AB=1,BB=0), B=c(AA=0,AB=1,BB=2) )
+```
+
 
 # Selected cline
 
-
-```{r selected_cline_sim}
-
+To get the value predicted from theory, we'll solve the corresponding PDE:
+```{r selected_cline_theory}
+tt <- seq(0,theory.params$tau,length.out=21)
+xgrid <- setup.grid.1D(x.up=-theory.params$width/2, x.down=theory.params$width/2, N=2*theory.params$width)
+fgrid <- extend_grid(xgrid)
+fwds.soln <- forwards_pde(s=theory.params$s, times=tt, grid=fgrid, sigma=theory.params$sigma )
 ```
+... and, compare it to the observed values:
+```{r selected_cline_sim}
+gcounts <- genotype.counts(chunks[[1]])
+# sim frequencies
+sfreqs <- sweep( tcrossprod(gcounts,dip.to.hap), 1, 2*rowSums(gcounts), "/" )
+# theory frequencies
+tfreqs <- cbind( A=fwds.soln[nrow(fwds.soln),-1], B=1-fwds.soln[nrow(fwds.soln),-1] )
+matplot(xx, sfreqs, type='l', lty=1, main="Selected allele frequency", ylab="frequency", xlab='geographic position')
+matlines(fgrid$x.mid, tfreqs, lty=4, lwd=2)
+legend("topright", legend=outer(colnames(sfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
+```
+
+For fun, let's also look at genotype frequencies (is there HW?):
+```{r selected_geno_freqs}
+matplot(xx, sweep(gcounts,1,rowSums(gcounts),"/"), lty=1, type='l', main="Selected genotype frequencies", ylab="frequency", xlab='geographic position')
+matlines(fgrid$x.mid, cbind(AA=tfreqs[,"A"]^2,AB=2*tfreqs[,"A"]*tfreqs[,"B"],BB=tfreqs[,"B"]^2), lty=4, lwd=2)
+```
+Looks pretty similar, just shifted.
