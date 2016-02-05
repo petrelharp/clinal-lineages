@@ -37,7 +37,7 @@ conditional_haplotype_counts <- function (gcounts) {
 conditional_freqs <- function (gcounts) {
     # uses output of conditional_genotype_counts to get conditional allele frequencies
     # of A alleles at the FIRST locus, given the identity of the allele at the SECOND locus
-    # (so, selected allele should be second)
+    # (so, selected allele should be SECOND argument to conditional_genotype_counts)
     # a (ndemes) x 2 matrix
     hcounts <- conditional_haplotype_counts(gcounts)
     cbind( A = hcounts[,"A","A"]/(hcounts[,"A","A"]+hcounts[,"B","A"]),
@@ -94,16 +94,16 @@ true.genotypes <- list( x1=c( "BB-AB", "AA-BB", "AA-AA" ),
                          x2=c( "BA-BB", "BB-BB", "AA-AB" ) )
 true.genocounts <- do.call( table, c( list( rep(c("x1","x2"),each=3), 
                             factor(sapply(strsplit(unlist(true.genotypes),"-"),"[",1), levels=c("AA","AB","BA","BB")),
-                            factor(sapply(strsplit(unlist(true.genotypes),"-"),"[",2),levels=c("AA","AB","BA","BB")) ) ) )
+                            factor(sapply(strsplit(unlist(true.genotypes),"-"),"[",2), levels=c("AA","AB","BA","BB")) ) ) )
 stopifnot( all.equal( test.cgcounts, true.genocounts, check.attributes=FALSE ) )
 
 # test conditional_haplotype_counts
 test.chcounts <- conditional_haplotype_counts( test.cgcounts )
-true.haplotypes <- list( x1=c("BA","BB","AB","AB","AA","AA"),
-                         x2=c("BB","AB","BB","BB","AA","AB") )
+true.haplotypes <- list( x1=c("B-A","B-B","A-B","A-B","A-A","A-A"),
+                         x2=c("B-B","A-B","B-B","B-B","A-A","A-B") )
 true.haplocounts <- do.call( table, c( list( rep(c("x1","x2"),each=6), 
-                            factor(sapply(strsplit(unlist(true.haplotypes),""),"[",1), levels=c("A","B")),
-                            factor(sapply(strsplit(unlist(true.haplotypes),""),"[",2),levels=c("A","B")) ) ) )
+                            factor(sapply(strsplit(unlist(true.haplotypes),"-"),"[",1), levels=c("A","B")),
+                            factor(sapply(strsplit(unlist(true.haplotypes),"-"),"[",2), levels=c("A","B")) ) ) )
 stopifnot( all.equal( as.vector(test.chcounts), as.vector(true.haplocounts), check.attributes=FALSE ) )
 
 # test conditional_freqs

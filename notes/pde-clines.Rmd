@@ -337,7 +337,6 @@ tt <- seq(0,10,length.out=20)
 xgrid <- setup.grid.1D(x.up=-20, x.down=20, N=21)
 rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=40)
 
-# took 24min with xgrid$N=10, rgrid$N=20 and 50 time steps up to t=3, :(
 hap.soln <- forwards_backwards_haplotypes(s=s, times=tt, xgrid=xgrid, rgrid=rgrid)
 ```
 
