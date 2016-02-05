@@ -104,3 +104,15 @@ matplot(xx, sweep(gcounts,1,rowSums(gcounts),"/"), lty=1, type='l', main="Select
 matlines(fgrid$x.mid, cbind(AA=tfreqs[,"A"]^2,AB=2*tfreqs[,"A"]*tfreqs[,"B"],BB=tfreqs[,"B"]^2), lty=4, lwd=2)
 ```
 Looks pretty similar, just shifted.
+
+**Question:** Is that shift due to stochasticity, or have I got the center in the wrong place on the sims?
+
+
+# Ancestry probabilities
+
+```{r linked_soln}
+linked.solns <- lapply( sim.rvals, function (r) {
+        forwards_backwards_pde(s=theory.params$s, times=tt, grid=xgrid, r=r, 
+                               fwds.soln=fwds.soln, log.p=TRUE)
+    } )
+```
