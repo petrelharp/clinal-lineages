@@ -13,7 +13,7 @@ params = list(
 )
 params$ninds = params$ndemes * params$deme_size
 
-outfile = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_tau%s_dir/results",SIGMA,ninds,ndemes,S,zone_age) )
+outfile = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results",SIGMA,ninds,ndemes,S,zone_age) )
 dir.create(dirname(outfile))
 
 #PARAMS for parsing:
