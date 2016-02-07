@@ -56,7 +56,7 @@ sim.params <- get_simparams( simchunks.file )
 # recombination distances, hard-coded
 sim.rvals <- c(0,0.01,0.5)
 # spatial locations of the demes
-xx <- seq_len(sim.params$ndemes)-sim.params$ndemes/2
+xx <- seq_len(sim.params$ndemes)-(sim.params$ndemes+1)/2
 theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau, 
        density=sim.params$ninds/sim.params$ndemes,
        width=sim.params$ndemes )
