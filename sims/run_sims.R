@@ -7,9 +7,9 @@ source("sim-fns.R")
 params = list(
     SIGMA = 1,
     ndemes = 100,
-    deme_size = 10,
+    deme_size = 50,
     S = 0.1,
-    zone_age = 10
+    zone_age = 1000
 )
 params$ninds = params$ndemes * params$deme_size
 
