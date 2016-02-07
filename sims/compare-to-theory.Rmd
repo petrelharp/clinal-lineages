@@ -100,7 +100,8 @@ matlines(fgrid$x.mid, cbind(AA=tfreqs[,"A"]^2,AB=2*tfreqs[,"A"]*tfreqs[,"B"],BB=
 ```
 Looks pretty similar, just shifted.
 
-**Question:** Is that shift due to stochasticity, or have I got the center in the wrong place on the sims?
+**Note:** Verified by looking at simulations with small $\tau$,
+the shift in cline center is due to the cline drifting.
 
 
 # Ancestry probabilities
