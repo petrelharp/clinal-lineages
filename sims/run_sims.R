@@ -76,7 +76,7 @@ matplot(xx,freqs[[1]][[1]],col=rainbow(20),lty=1,type="l", main=paste(params$zon
 matpoints(xx,freqs[[1]][[2]],col="grey",lty=1,type="l", main=paste(params$zone_age,"generations","neutral"),ylab="freq",xlab="deme")
 
 legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
-#matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
 dev.off()
 
 ###########################
@@ -139,4 +139,46 @@ for(type in names(chunks)){
 	#hist(relevant_chunks, col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),ylim=c(0,50),add=T)	}
 	if(length(relevant_chunks)>1){points(density(relevant_chunks), col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),type="l")}}
 }
+dev.off()
+
+#Get distribution of chunk length around selected locus. 
+
+pdf(file = paste(outfile,"_chunks_mean.pdf",sep=""))
+mean_unlinked=sapply(testB_unlinked,mean)
+mean_sel=sapply(testB,mean)
+mean_far =sapply(testB_far,mean)
+
+plot(mean_unlinked,main="mean",ylim=c(0,1),xlab="deme")
+points(mean_sel,col="red")
+points(mean_far,col="blue")
+
+legend('topleft',legend=c("neu.","sel.","far."),col=c("black","red","blue"),pch=1)
+dev.off()
+
+######################
+######################
+#Get LD between two specified loci:
+
+get.genotype = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS1=0.5,POS2=0.5){
+	site1 = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS1 & X$stops>POS1),3]})	
+	site2 = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS2 & X$stops>POS2),3]})
+	return(rbind(site1,site2))
+}
+
+get.LD = function(IND_DATA= sims.sums[[1]]$ind.ancest,DEME=1,CHR=1,POS1 = 0.5, POS2=0.1){
+	INDS = IND_DATA[which(sims.s0.1[[1]]$deme==DEME)]
+	genotypes = do.call(cbind,lapply(INDS,get.genotype,CHR=CHR,POS1=POS1,POS2=POS2))
+	freqB1 = length(which(genotypes[1,]))/length(genotypes[1,])
+	freqB2 = length(which(genotypes[2,]))/length(genotypes[2,])
+	freqB12 = length(which(genotypes[1,] & genotypes[2,]))/length(genotypes[1,])
+	LD = freqB12 - freqB2*freqB1
+	return(LD)
+}
+
+#EXAMPLE: LD_by_deme = sapply(1:ndemes,get.LD,POS1=0.5,POS2=0.6,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)
+
+LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
+
+pdf(file = paste(outfile,"_LD.pdf",sep=""))
+matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
 dev.off()
