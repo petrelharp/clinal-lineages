@@ -31,6 +31,11 @@ and might put in the paper:
     covering position $r$ on the genome at location $x$ in space: for fixed $\ell$,
     against $r$ and/or $x$.
 
+*Note:* This can be run as a script, by specifying `simchunks.file` first,
+and then rendering this document, e.g.:
+```
+Rscript -e "library(templater); simchunks.file='simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau20_dir/results_simsums_chunks.Robj'; render_template('compare-to-theory.Rmd',output='simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau20_dir/results_comparison-to-theory.html')"
+```
 
 
 ## Parameters from a simulation
@@ -46,11 +51,13 @@ We'll work in spatial units equal to one deme spacing;
 since generations are nonoverlapping, one generation is indeed one time step in the simulation.
 
 ```{r sim_results}
-simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums_chunks.Robj"
+if (!exists("simchunks.file")) { 
+    simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums_chunks.Robj" 
+}
 load(simchunks.file)  # provides 'chunks'
 get_simparams <- function (fname) {
     strings <- c( sigma="SIGMA", ninds="Ninds", ndemes="ndemes", s="s", tau="tau" )
-    lapply( strings, function (x) { as.numeric(gsub(sprintf(".*_%s([0-9.]+)_.*",x),"\\1",simchunks.file)) } )
+    lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",simchunks.file)) } )
 }
 sim.params <- get_simparams( simchunks.file )
 # recombination distances, hard-coded
@@ -60,6 +67,7 @@ xx <- seq_len(sim.params$ndemes)-(sim.params$ndemes+1)/2
 theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau, 
        density=sim.params$ninds/sim.params$ndemes,
        width=sim.params$ndemes )
+simchunks.file
 unlist(theory.params)
 ```
 
