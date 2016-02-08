@@ -23,7 +23,7 @@ ninds = ndemes*deme_size
 S = 0.1
 date = Sys.Date()
 
-transparent_rainbow = add.alpha(rainbow(ndemes),0.7)
+transparent_rainbow = adjustcolor(rainbow(ndemes),0.7)
 
 zone_age = c(1000)
 
@@ -104,12 +104,12 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 }
 
 #output is a nind*2 matrix, where each column is a chromosome. 
-#EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=F)})
+#EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
 #D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
 
-testB = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F)})
-testB_far = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.01)})
-testB_unlinked = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=F,POS=0.5,CHR=2)})
+testB = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
+testB_far = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.01)})
+testB_unlinked = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.5,CHR=2)})
 
 chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
 save(chunks,file = paste(outfile,"_simsums_chunks.Robj",sep=""))

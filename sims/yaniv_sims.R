@@ -11,12 +11,13 @@ ndemes = 50
 deme_size = 500
 ninds = ndemes*deme_size
 S = 0.1
+date = Sys.Date()
 
 transparent_rainbow = adjustcolor(rainbow(ndemes),0.7)
 
 zone_age = c(100)
 
-outfile = sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_tau%s",SIGMA,ninds,ndemes,S,zone_age)
+outfile = sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_tau%s_run%s",SIGMA,ninds,ndemes,S,zone_age,date)
 
 #PARAMS for parsing:
 loci = list(seq(0.5,1,0.05),seq(0.5,1,0.05))
@@ -75,7 +76,7 @@ matplot(xx,freqs[[1]][[1]],col=rainbow(20),lty=1,type="l", main=paste(zone_age,"
 matpoints(xx,freqs[[1]][[2]],col="grey",lty=1,type="l", main=paste(zone_age,"generations","neutral"),ylab="freq",xlab="deme")
 
 legend('bottomright',col=rainbow(20),lty=1,legend=loci[[1]],cex=0.75)
-#matpoints(-xx,pp,col=rainbow(20),lty=3,type="l")
+
 #dev.off()
 
 ###########################
@@ -109,7 +110,7 @@ testB_far = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.
 testB_unlinked = lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.5,CHR=2)})
 
 chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
-save(chunks,file = paste(outfile,"simsums_chunks.Robj",sep=""))
+save(chunks,file = paste(outfile,"_simsums_chunks.Robj",sep=""))
 
 empty_deme = rep(0,2*deme_size)
 
@@ -137,6 +138,7 @@ for(type in names(chunks)){
 	if(length(relevant_chunks)>1){points(density(relevant_chunks), col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),type="l")}}
 }
 dev.off()
+
 #pdf(file = paste(outfile,"_selected_chunks.pdf",sep=""))
 
 #D = 1; hist(chunks[[1]][[1]], border="white",breaks=seq(0,1,0.05),ylim=c(0,200),xlab="length",main="Distribution of selected tracts",xlim=c(0,0.2))
@@ -185,13 +187,17 @@ legend('topleft',legend=c("unlinked","sel.","far."),col=c("black","red","blue"),
 dev.off()
 #Get distribution of chunk length around selected locus. 
 
+pdf(file = paste(outfile,"_chunks_mean.pdf",sep=""))
 mean_unlinked=sapply(testB_unlinked,mean)
 mean_sel=sapply(testB,mean)
+mean_far =sapply(testB_far,mean)
 
 plot(mean_unlinked,main="mean",ylim=c(0,1),xlab="deme")
 points(mean_sel,col="red")
-legend('topleft',legend=c("neu.","sel."),col=c("black","red"),pch=1)
+points(mean_far,col="blue")
 
+legend('topleft',legend=c("neu.","sel.","far."),col=c("black","red","blue"),pch=1)
+dev.off()
 
 ######################
 ######################
@@ -217,9 +223,9 @@ get.LD = function(IND_DATA= sims.sums[[1]]$ind.ancest,DEME=1,CHR=1,POS1 = 0.5, P
 
 LD_matrix = do.call(cbind, lapply(seq(0.51,0.99,0.05),function(Z){sapply(1:ndemes,get.LD,POS1=0.5,POS2=Z,CHR=1,IND_DATA=sims.sums[[1]]$ind.ancest)}))
 
+pdf(file = paste(outfile,"_LD.pdf",sep=""))
 matplot(xx,LD_matrix,type="l",col=rainbow(20),xlim=c(-10,10),lty=1)
-
-
+dev.off()
 
 ######COMPARE TO THEORY:
 
