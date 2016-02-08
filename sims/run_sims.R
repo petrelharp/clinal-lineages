@@ -9,11 +9,12 @@ params = list(
     ndemes = 100,
     deme_size = 50,
     S = 0.1,
-    zone_age = 1000
+    zone_age = 10
 )
 params$ninds = params$ndemes * params$deme_size
 
-outfile = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results",SIGMA,ninds,ndemes,S,zone_age) )
+run.id = sprintf("%0.0f",1e6*runif(1))  # unique run id
+outfile = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_runid_%s",SIGMA,ninds,ndemes,S,zone_age,run.id) )
 dir.create(dirname(outfile),recursive=TRUE)
 
 #PARAMS for parsing:
@@ -109,7 +110,7 @@ testB_far = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE
 testB_unlinked = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.5,CHR=2)})
 
 chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
-save(chunks,file = paste(outfile,"simsums_chunks.Robj",sep=""))
+save(chunks,file = paste(outfile,"_simsums_chunks.Robj",sep=""))
 
 empty_deme = rep(0,2*params$deme_size)
 
