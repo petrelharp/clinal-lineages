@@ -401,6 +401,10 @@ genotyping at individual loci was performed by looking up the ancestor's genotyp
 
 Hybrid zones of ages 10, 100 and 1000 generations were simulated under conditions of $\sigma=1$ and $s=0.1$. From this we measure unbroken tract lengths to the right of the selected locus. These were compared to the output of neutral simulations with $s=0$
 
+\begin{figure}
+\includegraphics{figs/alleleFrequencies_sim}
+\caption{Frequency of ancestry B at a given genomic and physical position at $\tau=100$. Every line represents a locus some distance $r$ away from the true target of selection, and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a similar simulation with no selection.}\label{alleleFreq_tau100}
+\end{figure}
 
 \subsection*{Statistics}
 With the above theory and simulations, we are able to make predictions about patterns surrounding selected loci. In reality, however, such loci are not known, so it is useful to have per-site statistics that may allow for detection of candidate targets of selection. The most straightforward measure is $l_I(b)$ the length of haplotype chunk that a sampled chunk containing genomic position $b$, conditioned on ancestry $I$ at the site.
