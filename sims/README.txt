@@ -1,3 +1,29 @@
+# To run a simulation 
+
+Edit `run_sims.R` and execute it.
+
+It will create files in the format `simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_`,
+including some useful plots
+
+
+# To create the "comparison to theory" document
+
+... run e.g.
+```
+make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_comparison-to-theory.html
+```
+or even
+```
+for x in $(find simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/ -name "*_simsums_chunks.Robj")
+do 
+    y=$(echo $x | sed -e 's/_simsums_chunks.Robj/_comparison-to-theory.html/') 
+    make $y
+done
+```
+
+
+# Description of resulting .Robj files
+
 *_rawoutput.Robj
 		#output is: a list with hierarchy: [[zone_age]][[c("inds","sp.inds","deme","pars","QTL")]]
 		#where:
