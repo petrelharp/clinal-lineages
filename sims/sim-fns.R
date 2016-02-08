@@ -239,16 +239,16 @@ trueSigma <- function (sigma,n=1e4) {
 # testB_far = lapply(1:params$ndemes,function(X){getDemeChunks(DEME=X,ancA=FALSE,POS=0.01)})
 
 
-getIntervalSize = function( IND_DATA, CHR, POS, ancA = TRUE ) {
-	# return the length of the interval containing focal site for a individual	
+getChunk = function( IND_DATA, CHR, POS ) {
+	# return the length and identity of the interval containing the focal site for a (haploid) individual	
     # example: getIntervalSize(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE)
-	chunk = sapply( IND_DATA[[CHR]], function (X) {
+	chunklen = sapply( IND_DATA[[CHR]], function (X) {
                        diff( as.numeric( X[which(X$starts<POS & X$stops>POS),1:2]) )
         } )	
-	identity = sapply( IND_DATA[[CHR]], function (X) {
+	ancestry = sapply( IND_DATA[[CHR]], function (X) {
                           X[ which(X$starts<POS & X$stops>POS), 3]
         } )
-	replace(chunk,which(identity==ancA),0)
+    return( data.frame( length=chunklen, ancestry=ancestry ) )
 }
 
 
