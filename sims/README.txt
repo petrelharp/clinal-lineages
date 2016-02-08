@@ -8,7 +8,7 @@ including some useful plots
 
 # To create the "comparison to theory" document
 
-... run e.g.
+first `devtools::install_github("petrelharp/templater")` and then run e.g.
 ```
 make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_comparison-to-theory.html
 ```
