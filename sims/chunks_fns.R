@@ -1,3 +1,7 @@
+##
+# Functions for extracting information from a _simsums_chunks object.
+##
+
 genotype_counts <- function (ch) { 
     gcounts <- t(sapply( ch, function (x) { tabulate( 1+rowSums( x>0 ), nbins=3 ) } )) 
     colnames(gcounts) <- c("AA","AB","BB")

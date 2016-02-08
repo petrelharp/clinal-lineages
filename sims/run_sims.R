@@ -81,7 +81,7 @@ dev.off()
 
 ###########################
 ###########################
-#To get distribution of chunks of ancestry B to the (wlog) right of the selected locus:
+# To get distribution of chunks of ancestry B surrounding the chosen locus:
 
 
 focal_sites = lapply(qtl,function(Z){Z$pos})

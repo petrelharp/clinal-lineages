@@ -1,6 +1,7 @@
 
 getRuns = function(index){
     #This returns an array in which rows are the the beggingns and end of a TRUE/FALSE vector
+    # (note: more efficient to use rle() probably)
     starts  = which(c(0,index)[-1]==1 & c(0,index)[-length(index)]!=1)
     stops   = which(c(index,0)[-1]!=1 & c(index,0)[-(1+length(index))]==1)
     if(index[length(index)] == 1 & index[(length(index)-1)] !=1){starts = c(starts,length(index))}
@@ -231,3 +232,24 @@ trueSigma <- function (sigma,n=1e4) {
     # find what the actual SD of dispersal distance is.
     sd( floor(rnorm(n,mean=0.5,sd=sigma)) )
 }
+
+
+###########################
+#To get distribution of chunks of ancestry B to the (wlog) right of a locus, for instance:
+# testB_far = lapply(1:params$ndemes,function(X){getDemeChunks(DEME=X,ancA=FALSE,POS=0.01)})
+
+
+getIntervalSize = function( IND_DATA, CHR, POS, ancA = TRUE ) {
+	# return the length of the interval containing focal site for a individual	
+    # example: getIntervalSize(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE)
+	chunk = sapply( IND_DATA[[CHR]], function (X) {
+                       diff( as.numeric( X[which(X$starts<POS & X$stops>POS),1:2]) )
+        } )	
+	identity = sapply( IND_DATA[[CHR]], function (X) {
+                          X[ which(X$starts<POS & X$stops>POS), 3]
+        } )
+	replace(chunk,which(identity==ancA),0)
+}
+
+
+
