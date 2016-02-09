@@ -54,14 +54,15 @@ since generations are nonoverlapping, one generation is indeed one time step in 
 if (!exists("simchunks.file")) { 
     simchunks.file <- "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums_chunks.Robj" 
 }
-load(simchunks.file)  # provides 'chunks'
+load(simchunks.file)  # provides 'chunks' and 'chunks.rvals'
 get_simparams <- function (fname) {
     strings <- c( sigma="SIGMA", ninds="Ninds", ndemes="ndemes", s="s", tau="tau" )
     lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",simchunks.file)) } )
 }
 sim.params <- get_simparams( simchunks.file )
-# recombination distances, hard-coded
-sim.rvals <- c(0,0.5-0.01,0.5)
+# recombination distances
+# sim.rvals <- c(0,0.5-0.01,0.5)
+sim.rvals <- sapply( chunks.rvals, "[", 2 )
 # spatial locations of the demes
 xx <- seq_len(sim.params$ndemes)-(sim.params$ndemes+1)/2
 theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau, 
@@ -173,5 +174,17 @@ for (kr in seq_along(sim.rvals)[-1]) {
 }
 ```
 
+
 # Haplotype probabilities
 
+The probability of seeing a haplotype of length at least $\ell$
+covering position $r$ on the genome at location $x$ in space: for fixed $\ell$,
+against $r$ and/or $x$.
+
+We'll do this against $x$ at a few values of $r$ because that's what we have.
+```{r theory_haps, cache=TRUE}
+rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=41)
+hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
+                           sigma=theory.params$sigma, 
+                           fwds.grid=fgrid, fwds.soln=fwds.soln )
+```
