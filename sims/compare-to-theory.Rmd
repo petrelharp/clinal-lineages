@@ -62,7 +62,8 @@ get_simparams <- function (fname) {
 sim.params <- get_simparams( simchunks.file )
 # recombination distances
 # sim.rvals <- c(0,0.5-0.01,0.5)
-sim.rvals <- sapply( chunks.rvals, "[", 2 ) - 0.5
+sim.chroms <- sapply( chunks.rvals, "[", 1 )
+sim.rvals <- ifelse( sim.chroms==1, sapply( chunks.rvals, "[", 2 ) - 0.5, 0.5 )
 # spatial locations of the demes
 xx <- seq_len(sim.params$ndemes)-(sim.params$ndemes+1)/2
 theory.params <- list( sigma=trueSigma(sim.params$sigma), s=sim.params$s, tau=sim.params$tau, 
