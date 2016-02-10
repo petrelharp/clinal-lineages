@@ -5,10 +5,10 @@ source("sim-fns.R")
 #PARAMS for simulation:
 
 params = list(
-    SIGMA = 1,
+    SIGMA = 3,
     ndemes = 100,
     deme_size = 50,
-    S = 0.1,
+    S = 0.05,
     zone_age = 10
 )
 params$ninds = params$ndemes * params$deme_size
@@ -105,12 +105,25 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 #EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
 #D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
 
-testB = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
-testB_far = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.01)})
-testB_unlinked = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.5,CHR=2)})
+chunks.rvals = list( 
+        selected=c(chr=1,pos=0.5),
+        near0.01=c(chr=1,pos=0.51),
+        near0.05=c(chr=1,pos=0.55),
+        near0.1=c(chr=1,pos=0.6),
+        near0.2=c(chr=1,pos=0.7),
+        near0.4=c(chr=1,pos=0.9),
+        unlinked=c(chr=2,pos=0.5),
+        unlinked0.4=c(chr=2,pos=0.9) )
+chunks <- lapply( chunks.rvals, function (xx) {
+            lapply(1:params$ndemes, function (X) { get.deme.chunks(DEME=X,ancA=FALSE,POS=xx[2],CHR=xx[1]) } )
+        } )
 
-chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
-save(chunks,file = paste(outfile,"_simsums_chunks.Robj",sep=""))
+# testB = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
+# testB_far = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.01)})
+# testB_unlinked = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=0.5,CHR=2)})
+# chunks = list(selected=testB,distant=testB_far,unlinked=testB_unlinked)
+
+save(chunks, chunks.rvals, file = paste(outfile,"_simsums_chunks.Robj",sep=""))
 
 empty_deme = rep(0,2*params$deme_size)
 
