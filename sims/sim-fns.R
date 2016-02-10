@@ -268,12 +268,13 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 }
 
 
-get.chunks.at.positions = function(VECTOR_OF_POS,CHR){
+get.ancestry.freqs = function(VECTOR_OF_POS,CHR){
 	lapply(VECTOR_OF_POS,function(POS){lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=POS,CHR=CHR)})})
 }
 
-get.ancestry.freqs = function(LIST_OF_CHUNKS){#outputs a ndeme x length(pos) matrix
-	do.call(cbind,lapply(LIST_OF_CHUNKS,function(C){sapply(C,function(X){length(which(X>0))})}))
+get.ancestry.freqs = function(VECTOR_OF_POS,CHR){#outputs a ndeme x length(pos) matrix
+	CHUNKS=lapply(VECTOR_OF_POS,function(POS){lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=POS,CHR=CHR)})})
+	do.call(cbind,lapply(CHUNKS,function(C){sapply(C,function(X){length(which(X>0))})}))
 }
 
 
