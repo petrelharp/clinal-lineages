@@ -206,7 +206,7 @@ In symbols,
 Although loci not under selection can in principle spread across the cline unimpeded,
 in practice it can take quite some time for even unlinked neutral loci to homogenize,
 due to the decreased fitness of heterozygotes \citep{bartonbarrier}
-and the relative slowness of diffusive movement \citep{sedghifar}.
+and the relative slowness of diffusive movement \citep{Sedghifar2015}.
 Suppose we sample across at cline $\tau$ units of time after secondary contact.
 How far away from the selected locus do we expect to see clines that have begun to flatten out more
 than the selected cline?
@@ -294,7 +294,7 @@ which we denote $p(x,t,r)$ and can compute as $p(x,t,r) = p(x,t) q_A(x,t,r) + (1
 \paragraph{Haplotype lengths}
 We can also find the probability of seeing an entire block of genome (haplotype)
 of a single ancestry at a given location and time.
-As in \citet{sedghifar},
+As in \citet{Sedghifar2015},
 to do this we need only keep track of both lineages when a recombination in the middle of a block occurs,
 so that lineages will act like a particular class of labeled, branching diffusions,
 where the total branching rate is conserved.
@@ -490,7 +490,12 @@ In addition to our finding that ancestry surrounding selected sites was quite lo
 \end{figure}
 
 \subsection*{Number of ancestors}
-Not sure what the result is here yet -- unexpected
+Although the theoretical model presented here does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $\tau$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family. We find that, as distance from the zone center increases, the average family size of an ancestor from time $\tau$ decreases (Figure~\ref{Fig:family_size}). One interpretation of this observation is that migrants tend to leave few offspring before being removed from the population by selection. 
+
+\begin{figure}
+\includegraphics{figs/number_of_ancestors_tau1000}
+\caption{The number of individuals of ancestry B per number of ancestors from $\tau=1000$ represented across geographic space. Each line }\label{Fig:family_size}
+\end{figure}
 
 \subsection*{Identifying sites under selection}
 
@@ -499,6 +504,8 @@ Plots with x-axis the genome and having peaks at the selected site.
 Question: how much resolution do we have?
 
 \section{Discussion}
+Here we present an expectation of ancestry block lengths in hybrid zones. We find that block lengths surrounding selected loci are, on average, longer than those surrounding neutral loci . This simply reflects the intuition that regions surrounding selected loci are going to have a harder time introgressing, and that further away from the center of the hybrid zone a haplotype containing a disadvantageous allele is likely to have been a relatively recent migrant and therefore will have experienced fewer recombination events.
+
 Topics include\\
 - ignoring coalescent\\
 - single locus model, selection is STRONG\\

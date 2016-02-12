@@ -192,3 +192,10 @@ par(mar=c(0.5,3.5,2,0.5))
 	mtext("Distance from HZ center",side=2,line=2.5)
 dev.off()
 
+
+
+#########################
+##########NOW DO NEUTRAL:
+#########################
+
+

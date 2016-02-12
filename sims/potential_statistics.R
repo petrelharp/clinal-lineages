@@ -1,11 +1,10 @@
-load("~/Documents/Hybrid_Zones/clinal-lineages/sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_simsums.Robj")
-
-chromosome = "chr2"
-plot_start = 0.45
-plot_stop=0.55
-increments = 0.005
+load("simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_run2016-01-27_simsums.Robj")
+chromosome = "chr1"
+plot_start = 0.48
+plot_stop=0.52
+increments = 0.001
 Ngen = 1000
-sel=0.1
+sel=0
 SIGMA=1
 Ninds=25000
 Ndemes = 50
@@ -26,7 +25,7 @@ deme_ID = do.call(c,lapply(1:Ndemes,function(X){rep(X,Ninds/Ndemes)}))
 get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromosome,POS=0.5,ancB=TRUE){
 	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})
 	identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
-	replace(chunk,which(identity==ancA),0)
+	replace(chunk,which(identity==ancB),0)
 	
 }
 
@@ -177,14 +176,14 @@ for(i in 1:50){points(flanking.blocks.deme.matrix.AncB[i,]/mean(flanking.blocks.
 
 matplot((mean_per_deme)/t(flanking.blocks.deme.matrix),type="l",col=rainbow(50),lty=1,main="mean_focal/mean_flanking length ALL" ,cex.main=0.7)
 
-matplot((mean_per_deme_AncB)/t(flanking.blocks.deme.matrix.AncB),type="l",col=rainbow(50),lty=1,main="mean_focal/mean_flanking length AncB" ,cex.main=0.7)
+matplot((mean_per_deme_AncB)/t(flanking.blocks.deme.matrix.AncB[50:1,]),type="l",col=rainbow(50),lty=1,main="mean_focal/mean_flanking length AncB" ,cex.main=0.7)
 
 image(t(flanking.blocks.deme.matrix),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="heatmap ALL (log)")
 image(t(flanking.blocks.deme.matrix.AncB),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="heatmap AncB (log)")
 
 
 
-image(((mean_per_deme)/t(flanking.blocks.deme.matrix)),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="focal/flanking heatmap ALL (log)")
-image(((mean_per_deme_AncB)/t(flanking.blocks.deme.matrix.AncB)),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="focal/flanking heatmap AncB (log)")
+image(((mean_per_deme)/t(flanking.blocks.deme.matrix[50:1,])),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="focal/flanking heatmap ALL (log)")
+image(((mean_per_deme_AncB)/t(flanking.blocks.deme.matrix.AncB[50:1,])),x=positions,y=-25:25,ylab="deme",xlab="phys.pos",main="focal/flanking heatmap AncB (log)")
 
 dev.off()
