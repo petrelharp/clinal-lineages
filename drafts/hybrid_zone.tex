@@ -8,6 +8,8 @@
 \usepackage{color}
 \usepackage{amssymb}
 
+\usepackage[normalem]{ulem}
+
 \newcommand{\alisa}[1]{{\em \color{red} #1}}
 \newcommand{\plr}[1]{{\em \color{blue} #1}}
 \newcommand{\yb}[1]{{\em \color{magenta} #1}}
@@ -79,17 +81,15 @@ Our naive expectation under a basic underdominance model is that, conditional on
 
 	
 \section{Methods}
-\subsection*{Model}
-We consider a model in which two isolated subspecies, species $A$ and species $B$ come into contact at time $\tau$ generations in the past. Individuals move forward in time by sampling a displacement from a Gaussian distribution. In the simplest case of under-dominance, the fitness of an individual is determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes.
+\subsection*{The Model}
+We consider a model in which two isolated subspecies, species $A$ and species $B$ come into contact at time $\tau$ generations in the past. Individuals move forward in time by sampling a displacement from a Gaussian distribution. As in \cite{Barton??}, we consider a simple case of under-dominance. Specifically, here the fitness of an individual is  determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes.
 
-To fix notation, we will say that species $A$ was on the ``left'' of the zone of contact,
-which corresponds to spatial positions $x<0$.
-
-We consider a lineage sampled in the present day, and determine its ancestry by its position at time $\tau$ generations in the past. The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that the two species are fixed for alternate alleles at this locus). For every other locus, we keep track of $a$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination is modeled as a poisson process with rate $r$. The identity $a$ at locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
+To fix notation, we will say that species $A$ was initially on the ``left'' of the zone of contact,
+which corresponds to spatial positions $x<0$. Similar to the model presented by \cite{Sedghifar2015}, we consider a lineage sampled in the present day, and determine its ancestry by its position at time $\tau$ generations in the past (Figure~\ref{Fig:schematic}). The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that at time $\tau$ the two species are fixed for alternate alleles at this locus). For every other locus, we keep track of $a$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination between two loci is modeled as a poisson process with rate $r$. The identity $a$ at locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
 
 \begin{figure}
 \includegraphics{figs/BM_schematic}
-\caption{A cartoon representation of the model. The black line represents the path, backwards in time, of a selected site that is sampled in the present day ($\tau=0$). The center of the hybrid zone is defined at geographic position $x=0$, such that ancestry A is less fit at $x>0$ and ancestry B is less fit when $x<0$. In this figure, the sampled allele under selection is of ancestry B, and as a result migrates rapidly back to $x>0$ from a position $x<0$. Red dots represent recombination events along the entire haplotype, and here lineages that recombine off the same initial haplotype as the selected allele are represented by colored lines. Here, the initial haplotype is only broken up into 3 chunks over 100 generations. Recombination events can cause these chunks to change linkage to the allele at the selected locus (e.g. a chunk that was initially linked to a selected allele of ancestry A can become linked to a selected allele of ancestry B). Here, yellow lineages are linked to an allele of ancestry A at the selected locus, and blue lineages are linked to an allele of ancestry B. The ancestry of the blue and yellow lineages are determined by their position at $\tau=100$. Here the left-most yellow lineage is of ancestry A and the blue lineage is of ancestry B.  }\label{Fig:schematic}
+\caption{A cartoon representation of a haplotype under the model. The black line represents the path, backwards in time, of a site under selection ($L_B$) that is sampled in the present day ($\tau=0$). The center of the hybrid zone is defined at geographic position $x=0$, such that ancestry A segregates at lower frequency for $x>0$. Here, because of negative selection, $L_B$ migrates rapidly back to $x>0$ from a position $x<0$. Red dots represent recombination events along the entire haplotype, and lineages that recombine off the same haplotype as $L_B$ are represented by colored lines. (here, the initial haplotype is broken up into 3 chunks over 100 generations). Subsequent recombination events can cause these chunks to change which allele they are linked to at the selected site, and here yellow lineages are linked to an allele of ancestry $A$ at the selected locus, and blue lineages are linked to a selected allele of ancestry $B$. From right to left, the chunks at $\tau=100$ are of ancestry $(A, B, B)$. }\label{Fig:schematic}
 \end{figure}
 %As an approximation, we consider a cline of narrow width (look up cline width for underdominance, Barton/May?), such that the frequency of migrant alleles is exponential and negligible at distance away from the center of the hybrid zone. This means that recombination events that occur away from the center of the zone do not result in a change in $a$.
 
@@ -104,16 +104,16 @@ as well as writing down the PDE.  These should probably be better separated?}
 Perhaps start out with the main points:
 the cline takes time $s$ to spread out,
 and after time $\tau$ will have clines out to genetic distance of order $1/\tau$,
-maybe more.
+maybe more. \alisa{has this not already been stated by Nick somewhere?}
 
-\paragraph{Establishment of the selected cline}
+\paragraph{Establishment of  \sout{the selected cline} \alisa{a cline at the selected locus}}
 Consider a single locus, with alternate alleles fixed in the two parental populations,
 for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
 The deterministic theory predicts that after secondary contact,
 these alleles will form a stable cline.
 To study gene flow past this cline we first need to understand how the cline itself is formed.
 Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
-Suppose that secondary contact occurred at time $t=0$, 
+Suppose that secondary contact occurred at time $t=0$, \alisa{(Will switching between backwards and forwards in time not get confusing?)}
 and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
 (In discrete computations, a deme at $x=0$ has $p(0,0)=1/2$.)
 Let $\sigma^2$ be the mean squared distance between parent and offspring.
@@ -133,13 +133,9 @@ Considering the numerous approximations going into this,
 the important attributes are that 
 the stable cline has width of order $\sigma/\sqrt{s}$,
 and decays exponentially.
-Furthermore, the cline is established through diffusion.
-This is slowed down somewhat by selection against heterozygotes,
+Furthermore, the cline is established through diffusion \alisa{of individuals?}, which is slowed down somewhat by selection against heterozygotes,
 but is still diffusive, and so it will take time of order $1/s$
-to reach its stable width.
-(To confirm this, 
-rescale space by $\sigma/s$ and time by $1/s$ in equation \eqref{eqn:cline_pde},
-and see that the result doesn't depend on $\sigma$ or on $s$.)
+to reach its stable width \alisa{(is this something that has been shown before?)} This can be shown by rescaling space by $\sigma/s$ and time by $1/s$ in equation \eqref{eqn:cline_pde}, and seeing that the result \alisa{(what result?)} doesn't depend on $\sigma$ or on $s$.
 
 \paragraph{Lineages at the selected locus}
 Now suppose that the frequency profile of the selected allele $p(x,t)$ is given.
@@ -498,6 +494,8 @@ Question: how much resolution do we have?
 
 \section{Discussion}
 Here we present an expectation of ancestry block lengths in hybrid zones. We find that block lengths surrounding selected loci are, on average, longer than those surrounding neutral loci . This simply reflects the intuition that regions surrounding selected loci are going to have a harder time introgressing, and that further away from the center of the hybrid zone a haplotype containing a disadvantageous allele is likely to have been a relatively recent migrant and therefore will have experienced fewer recombination events.
+
+Rapid drift (as in BM-drift) back to the `correct' side, conditional on being the wrong ancestry.
 
 Something about how we just study the selection against hets model,
 but we expect general conclusions to apply to other situations.
