@@ -52,7 +52,7 @@ The influence of selection on linked loci also prevents the mixing of ancestry a
 \yb{However the expected length of ancestral tracts around selected loci in admixing populations is poorly understood.}
 
 
-Within a genome, the mixing of ancestries is brought about by the the process of recombination that takes place every generation \yb{(CITE Fisher; Chapman \& Thomson; Barid et al)}.   
+Within a genome, the mixing of ancestries is brought about by the the process of recombination that takes place every generation \yb{(CITE Fisher1954, Chapman \& Thomson; Barid et al)}.   
 The expected distribution of lengths of unbroken ancestry have been previously described under neutral conditions \cite[e.g.][]{Gravel2012,Sedghifar2015}.  
 Here, we investigate expected patterns of co-ancestry \yb{ --- that is, the genomic scale at which ancestry strongly covaries between sites --- } across a hybrid zone in the presence of selection. 
 Selection against migrant \yb{alleles} in a hybrid zone results in reduced frequencies of foreign ancestry surrounding targets of selection \yb{(CITE CLINES)}. 
@@ -70,7 +70,7 @@ Covariance in ancestry across a genome can provide information about the number 
 Our goal here is  to understand how the strength of \yb{selection} and hybrid zone age interact to produce observed patterns of ancestry \yb{around selected sites in recently established hybrid zones}. %in present day populations.  
 This may be especially important for our understanding and interpretation of of non-equilibrium patterns of diversity in hybrid zones, as well as understanding the consequences of selection on the extent of mixing of ancestral genomes and, consequently, the maintenance of species distinctness. 
 In the extreme case of zero fitness in first-generation hybrids, for example, paternal genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
-If hybrids have non-zero fitness, and some amount of introgression can occur, and patterns of introgression can provide information about the strength of selection \yb{in addition to the} extent of hybridization, and timing of secondary contact \yb{(CITE: hapmix, globetrotter)}. 
+If hybrids have non-zero fitness, and some amount of introgression can occur, and patterns of introgression can provide information about the strength of selection \yb{in addition to the} extent of hybridization, and timing of secondary contact \yb{(CITE: hapmix, Hellenthal2014)}. 
 \yb{In this latter case, heterogeneous patterns of ancestry across the genome potentially allows researchers to identify putative targets of selection in hybridizing populations.}  
 \yb{To date, researchers have done so by examining heterogeneous clines in ancestry across loci (CITE: clinefit, gbc), but have not made use of the information contained in the length of ancestry blocks around putatively selected loci.}  
 %In this latter case, it is also of interest to identify putative targets of selection, as these will provide insights into the biological mechanisms of speciation. 
@@ -484,24 +484,37 @@ Additionally, we look at the mean value of these statistics in the two chunks, $
 %\end{table}
 
 \section{Results}
-\subsection*{The distribution of ancestry tract lengths}
-We are interested specifically in the distribution of the length of continuous tracts of ancestry surrounding the selected locus. Far away from the zone center variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, however, when present an unfit migrant haplotype is expected to be longer than a neutral migrant haplotype. Figure X shows the estimated probability density (pdf), of unbroken tract of ancestry B surrounding the selected locus, conditioning on a haplotype being of ancestry B at the selected locus. Compared to the expected density of tract lengths surrounding neutral loci, tracts of ancestry B around the selected locus are longer.
+\subsection*{The distribution of ancestry tract lengths across space}
+We are interested specifically in the distribution of continuous tracts of ancestry surrounding the selected locus. As expected, regions surrounding a locus under selection are more resistant to introrgression (Fig~\ref{Fig:resistanceToIntrogression1000g},~\ref{Fig:resistanceToIntrogression100g}). From previous results we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, the width of clines at closely linked sites are impacted (Fig:~\ref{alleleFreq_tau100}). 
 
-Of particular interest is whether or targets of selection could potentially be identified by a signal of larger ancestry tracts surrounding them compared to a genome-wide background. To demonstrate this, we simulated a chromosome of length 1M with a selected site at position 0.5M. For a set of positions $\mathbf{m}$ along the chromosome, we computed the length $l_B(m_i)$
-of the surrounding unbroken block of ancestry. There is a detectable signal of increased block length surrounding selected loci when conditioning on the less-fit ancestry (Figure~\ref{Fig:blockLengths},~\ref{Supp:blockLengthHeatmap}) at geographic sites far from the center of the zone. A signal is also present for, but less well resolved when ancestry is not taken into account (Figures~\ref{Supp:blockLengthHeatmapNoAnc},~\ref{Supp:blockLengthNoAnc}).
+When present, however, we expect an unfit migrant haplotype to be longer than the genome-wide average, and indeed we observe a detectable signal of increased block length surrounding selected loci when conditioning on the less-fit ancestry (Fig.~\ref{Fig:blockLengths},~\ref{Supp:blockLengthHeatmap}). This pattern provides a potential avenue for identifying targets of selection by looking for a signal of longer-than-average tracts surrounding a position, compared to a genome-wide background. (Figure~\ref{Fig:blockLengths},~\ref{Supp:blockLengthHeatmap}) at geographic sites far from the center of the zone. A signal is also present for, but less well resolved when ancestry is not taken into account (Figures~\ref{Supp:blockLengthHeatmapNoAnc},~\ref{Supp:blockLengthNoAnc}).
 
-\plr{or, perhaps for introduction?}
-In addition to our finding that ancestry surrounding selected sites was quite long, our simulations revealed a consistent and unexpected finding. We found, on a given side of the hybrid zone, a transition from the locally adaptive ancestry at the selected site to the alternative ancestry at a closely linked site was short-lived (Figure~\ref{Supp:adjacentBlocks}). Put differently, blocks of `wrong' ancestry that do not overlap the selected site but are closely linked are exceptionally short. A simple intuitive explanation for this pattern suggests itself - loci physically linked to the selected sites can only survive on the wrong side of the hybrid zone for a reasonable amount of time if they recombine away from their ancestry at the locally adaptive site. Because it is then tightly linked to the alternate ancestry at the selected site, this ancestry chunk will large recombine with the alternate ancestry, and therefore decay rapidly. This pattern means that we can further refine the signal of block lengths around a selected locus, by measuring the ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i+)+l_A(m_i-)}}$ of mean block lengths surrounding a site with the mean length of adjacent blocks (Figures~\ref{Supp:ratioBlockAdjacent},~\ref{Supp:ratioBlockAdjacentHeatmap})
+\subsection*{Lengths of adjacent blocks}
+We find that the length of blocks adjacent to blocks of `wrong' ancestry surrounding a selected site are slightly shorter than average (Figure~\ref{Supp:adjacentBlocks}). This pattern provides an avenue for further enhancement of the block-length signal around a selected locus, by taking the ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i+)+l_A(m_i-)}}$ of mean block lengths surrounding a site with the mean length of adjacent blocks (Figures~\ref{Supp:ratioBlockAdjacent},~\ref{Supp:ratioBlockAdjacentHeatmap}).
+
+\alisa{Moved Yaniv's explanation to the discussion.}
+%This pattern means that we can further refine the signal of block lengths around a selected locus, by measuring the ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i+)+l_A(m_i-)}}$ of mean block lengths surrounding a site with the mean length of adjacent blocks (Figures~\ref{Supp:ratioBlockAdjacent},~\ref{Supp:ratioBlockAdjacentHeatmap})
 
 
 
+%We are interested specifically in the distribution of the length of continuous tracts of ancestry surrounding the selected locus. Far away from the zone center variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, however, when present an unfit migrant haplotype is expected to be longer than a neutral migrant haplotype. Figure X shows the estimated probability density (pdf), of unbroken tract of ancestry B surrounding the selected locus, conditioning on a haplotype being of ancestry B at the selected locus. Compared to the expected density of tract lengths surrounding neutral loci, tracts of ancestry B around the selected locus are longer.
+
+%Of particular interest is whether or targets of selection could potentially be identified by a signal of larger ancestry tracts surrounding them compared to a genome-wide background. To demonstrate this, we simulated a chromosome of length 1M with a selected site at position 0.5M. For a set of positions $\mathbf{m}$ along the chromosome, we computed the length $l_B(m_i)$ of the surrounding unbroken block of ancestry. There is a detectable signal of increased block length surrounding selected loci when conditioning on the less-fit ancestry (Figure~\ref{Fig:blockLengths},~\ref{Supp:blockLengthHeatmap}) at geographic sites far from the center of the zone. A signal is also present for, but less well resolved when ancestry is not taken into account (Figures~\ref{Supp:blockLengthHeatmapNoAnc},~\ref{Supp:blockLengthNoAnc}).
+
+
+
+\begin{figure}
+\includegraphics[width=\textwidth]{figs/plot_chromosomes_tau1000}
+\caption{Randomly sampled chromosomes  across a hybrid zone of age $\tau=1000$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
+ }\label{Fig:resistanceToIntrogression1000g}
+\end{figure}
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioning}
 \caption{Mean block length, $l_B(m_i)$, along a simulated chromosome of length $1M$ with selected locus at position $0.5M$. Here each line represents  $l_B(\mathbf{m})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(m_i)$ along the chromosome in the deme.}\label{Fig:blockLengths}
 \end{figure}
 
-\subsection*{Number of ancestors}
+\subsection*{The number of `unfit' ancestors}
 Although the theoretical model presented here does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $\tau$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family. We find that, as distance from the zone center increases, the average family size of an ancestor from time $\tau$ decreases (Figure~\ref{Fig:family_size}). One interpretation of this observation is that migrants tend to leave few offspring before being removed from the population by selection. 
 
 \begin{figure}
@@ -509,11 +522,6 @@ Although the theoretical model presented here does not account for coalescence, 
 \caption{The number of individuals of ancestry B per number of ancestors from $\tau=1000$ represented across geographic space. Each red or orange line represents a site some distance away (ranging from 0 - 0.01) from the selected site (here $s=0.01$ and $\sigma=1$). Yellow lines are corresponding positions on an unlinked chromosome with no selected loci, and grey lines are corresponding positions in a simulation with no selection.  Bold lines depict the target of selection when present, and corresponding position on chromosomes not harboring any selected sites.}\label{Fig:family_size}
 \end{figure}
 
-\subsection*{Identifying sites under selection}
-
-Plots with x-axis the genome and having peaks at the selected site.
-
-Question: how much resolution do we have?
 
 \section{Discussion}
 Here we present an expectation of ancestry block lengths in hybrid zones. We find that block lengths surrounding selected loci are, on average, longer than those surrounding neutral loci . This simply reflects the intuition that regions surrounding selected loci are going to have a harder time introgressing, and that further away from the center of the hybrid zone a haplotype containing a disadvantageous allele is likely to have been a relatively recent migrant and therefore will have experienced fewer recombination events.
@@ -538,6 +546,10 @@ How can this be applied to detecting selection?
 
 %% yaniv says:
 \paragraph{Signals of block length}
+
+\plr{or, perhaps for introduction?}
+In addition to our finding that ancestry surrounding selected sites was quite long, our simulations revealed a consistent and unexpected finding. We found, on a given side of the hybrid zone, a transition from the locally adaptive ancestry at the selected site to the alternative ancestry at a closely linked site was short-lived (Figure~\ref{Supp:adjacentBlocks}). Put differently, blocks of `wrong' ancestry that do not overlap the selected site but are closely linked are exceptionally short. A simple intuitive explanation for this pattern suggests itself - loci physically linked to the selected sites can only survive on the wrong side of the hybrid zone for a reasonable amount of time if they recombine away from their ancestry at the locally adaptive site. Because it is then tightly linked to the alternate ancestry at the selected site, this ancestry chunk will large recombine with the alternate ancestry, and therefore decay rapidly. 
+
 
 \paragraph{Solutions to PDE}
 Numerical solution for the PDE can be used on real, non-flat landscapes that change with time;
