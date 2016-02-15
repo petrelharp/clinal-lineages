@@ -524,12 +524,57 @@ Although the theoretical model presented here does not account for coalescence, 
 
 
 \section{Discussion}
-Here we present an expectation of ancestry block lengths in hybrid zones. We find that block lengths surrounding selected loci are, on average, longer than those surrounding neutral loci . This simply reflects the intuition that regions surrounding selected loci are going to have a harder time introgressing, and that further away from the center of the hybrid zone a haplotype containing a disadvantageous allele is likely to have been a relatively recent migrant and therefore will have experienced fewer recombination events.
 
-Rapid drift (as in BM-drift) back to the `correct' side, conditional on being the wrong ancestry.
+Most attempts to identify loci under selection in hybrid zones do so by identifying exception allele frequencies as a function of geographic position or genome-wide admixture proportion \yb{(CITE THINGS)}.  
+Current genomic approaches to the study of hybrid zones provide a additional rich sources of information -- namely ancestry deconvolution facilitated by programs such as hapMIX, LAMP and fineSTRUCTURE \yb{(CITE)} provides researchers with a measure of the length of ancestry tracts across the genome. 
+The information contained in the length distribution of these ancestry tracts genome-wide  has been extensively used to infer the demographic history of hybridization and admixture.   
+However, how selection influences the length of tracts of ancestry around selected sites in hybrid zones has received much less attention. 
+We we present an expectation of ancestry block lengths in hybrid zone. 
+We find that selection against hybrid incompatibilities leaves a distinct genomic signature in the form of long contiguous blocks of ancestry around these loci.   
 
-Something about how we just study the selection against hets model,
-but we expect general conclusions to apply to other situations.
+Our finding that long blocks of ancestry surround selected sites in hybrid zones reflects the intuition that regions surrounding selected loci are going to have a harder time introgressing. 
+Thus we can interpret this pattern as Brownian motion with drift in which ancestry which finds itself on the wrong side of a hybrid zone rapidly moves, backwards in time, across space to the "correct" side of the hybrid zone.  
+Selected alleles that have, by chance, encroached deep into the other side of the hybrid have likely to have done so quite recently, as they cannot survive long in such hostile territory.   
+The recently of this movement results in few opportunities for recombination and is therefore reflected in long blocks of contiguous ancestry.  
+\yb{While our theory focusses on a spatially arranged hybrid zone, it is likely that our results extend to alternative models of hybridization including models of assortative mating and hybrid swarms. This is because regardless of the specific demographic model, selection against hybrids will severely limit opportunities for recombination between ancestries around incompatibilities.}
+
+\subsection{Additional signatures around selected loci} 
+
+We further found that the long blocks of ancestry around selected sites on the wrong side of the hybrid zone will likely come from a large number of independent ancestors   (Figure~\ref{Fig:family_size}). % is this right 
+This result also reflects the recency of ancestry on the "wrong" side of the hybrid zone --- any one lineage will rapidly retreat back in time to the correct side of the zone.   
+Thus we predict 
+
+In addition to our finding that ancestry surrounding selected sites was quite long, our simulations revealed a consistent and unexpected finding. We found, on a given side of the hybrid zone, a transition from the locally adaptive ancestry at the selected site to the alternative ancestry at a closely linked site was short-lived (Figure~\ref{Supp:adjacentBlocks}). Put differently, blocks of `wrong' ancestry that do not overlap the selected site but are closely linked are exceptionally short. A simple intuitive explanation for this pattern suggests itself - loci physically linked to the selected sites can only survive on the wrong side of the hybrid zone for a reasonable amount of time if they recombine away from their ancestry at the locally adaptive site. Because it is then tightly linked to the alternate ancestry at the selected site, this ancestry chunk will large recombine with the alternate ancestry, and therefore decay rapidly. 
+
+These two novel finding may be beyond detection in current research programs that often make use of low-density genetic markers for which phase is unknown. 
+However, we as sequencing prices continue to drop and long phased reads become more common \yb{(CITE doi:10.1038/nbt0515-433 )} %Startups use short-read data to expand long-read sequencing market Michael Eisenstein Nature Biotechnology 33, 433?435 (2015) doi:10.1038/nbt0515-433 Published online 12 May 2015
+ressarchers will soon have access to information pertaining to both of these findings and thus these results  could further aid in identifying selected sites in hybrid zones. 
+
+\subsection{Inference}
+Our results suggest that a few natural statistical summaries could help identify selected loci in hybrid zones. 
+Specifically, a novel statistic, $l_I(m)$ -- the genetic length of ancestry surrounding a site of a given lineage -- could prove a simple and informative summary. 
+This statistic, perhaps in relation to the length of ancestry around adjacent sites, could be developed into an approach to stand genomes from hybrid zones to identify putatively selected loci. 
+
+\subsection{Assumptions}
+We made numerous simplifying assumptions to derive our analytical and simulation results. 
+Thus before our results can be profitably used for inference, it is worthwhile to  reflect on our assumptions and their consequences. 
+
+One major assumption of our model is that selection acts against heterozygotes --i.e. that loci are underdominant. 
+Under dominance is quite rare in nature, because underdominant loci cannot invade when rare, and thus our major assumption is likely rarely met. 
+We believe, however, that this assumption is unlikely to drastically influence our results --- previous research has found that under dominant loci  have similar proprrties in hybrid zones as more realistic genetic models, such as ecological selection \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}. 
+An additional assumption of our analytical model is that we ignore coalescence.  
+The broad agreement between our analytical and theoretical results suggests that this assumption will also have negligible effect on our results. 
+
+However, other assumptions of our model may be of greater consequence. 
+Importantly, our work considered only a single selected site.   
+While a small number of selected sites will likely have little influence on our results, a higher density of selected sites could. 
+Specifically, numerous selected sites within one ancestry block would likely act to both  increase the strength of selection, and to generate a longer unit which cannot be effectively broken up by recombination   \yb{(CITE: (BARTON 1983; Kruuk 1989)}. 
+Such regions would likely be surrounded by even greater chunks of unbroken ancestry -- a result reflecting this great $s$ and the map distance between these linked incompatibilities. 
+
+Another important assumption is the smooth and one dimensional spatial structure of the geographic landscape.  
+Patchily connected populations, or other esoteric forms of population structure may predominate on the edges of species ranges' where hybrid zones may occur.  
+While, it is still likely that the genomic signature of longer chunks of ancestry around selected sites will hold in these situations, the strength of this expectation is unclear.     
+
 
 The tracking lineages given selection trick is an example of the more general idea of duality for particle systems.
 It also assumes a large pop density limit that excludes recombination and makes lineages Markov;
@@ -537,9 +582,22 @@ if things are very patchy this might not be a good one.
 Also, parent-offspring dispersal is not the same thing as successful-offspring-parent dispersal.
 
 
+
+
 Topics include\\
 - ignoring coalescent\\
 - single locus model, selection is STRONG\\
+
+\subsection{Islands of divergence}  
+The past years have witnessed evocative metaphors f seascapes to describe heterogeneous patterns of genetic divergence across the genome.  
+The metaphors of "islands", "continents" and "archipelagoes" of divergence have inspired much research (and controversy) speciation genomics, but have been largely descriptive.  
+We hope that our work provides a path towards thinking about the process of heterogeneous divergence more concretely. % in terms of the processes of migration, and selection influencing patterns of ancestry across the genome of hybridizing populations.
+Specifically, we provide a natural interpretation of large contiguous chunks of ancestry, as sites linked to those experiencing selection.   
+Overall focusing on lengths of ancestry blocks across the genome brings focus onto the processes of migration and selection rather than high-level summaries far severely abstracted from the evolutionary process. 
+
+
+\subsection{Future directions}
+
 
 Some words about how confidently calling tracts is the way of the future.\\
 How can this be applied to detecting selection?
@@ -548,7 +606,7 @@ How can this be applied to detecting selection?
 \paragraph{Signals of block length}
 
 \plr{or, perhaps for introduction?}
-In addition to our finding that ancestry surrounding selected sites was quite long, our simulations revealed a consistent and unexpected finding. We found, on a given side of the hybrid zone, a transition from the locally adaptive ancestry at the selected site to the alternative ancestry at a closely linked site was short-lived (Figure~\ref{Supp:adjacentBlocks}). Put differently, blocks of `wrong' ancestry that do not overlap the selected site but are closely linked are exceptionally short. A simple intuitive explanation for this pattern suggests itself - loci physically linked to the selected sites can only survive on the wrong side of the hybrid zone for a reasonable amount of time if they recombine away from their ancestry at the locally adaptive site. Because it is then tightly linked to the alternate ancestry at the selected site, this ancestry chunk will large recombine with the alternate ancestry, and therefore decay rapidly. 
+
 
 
 \paragraph{Solutions to PDE}
