@@ -550,23 +550,26 @@ These two novel findings may be beyond detection in current research programs th
 \subsection{Paths to inference}
 Our results suggest that a few natural statistical summaries could help identify selected loci in hybrid zones. 
 Specifically, a novel statistic, $l_I(m)$ -- the genetic length of ancestry surrounding a site of a given lineage -- could prove a simple and informative summary. 
-This statistic, perhaps in relation to the length of ancestry around adjacent sites, could be developed into an approach to stand genomes from hybrid zones to identify putatively selected loci. \alisa{While numerical solutions of the PDEs presented here may be computationally restrictive, }
+This statistic, perhaps in relation to the length of ancestry around adjacent sites, could be developed into an approach to stand genomes from hybrid zones to identify putatively selected loci. \alisa{While numerical solutions of the PDEs presented here may be computationally restrictive, with some simplifying approximations, it is possible that a future framework could be constructed for inference of migration rate, hybrid zone age and selection.??}
 
 \subsection{Assumptions}
-We made numerous simplifying assumptions to derive our analytical and simulation results. 
-Thus before our results can be profitably used for inference, it is worthwhile to  reflect on our assumptions and their consequences. 
+We made numerous simplifying assumptions to derive our analytical and also in the execution of the simulations. %Thus before our results can be profitably used for inference, it is worthwhile to  reflect on our assumptions and their consequences. 
+Foremost, we have assumed that selection acts against heterozygotes, and that there is a single underdominant locus. This situation is rare in nature, since underdominant loci cannot invade when rare, and thus this assumption is likely rarely met. \alisa{We believe, however, that this assumption is unlikely to drastically influence our results, and previous results demonstrating that underdominant loci shares similar properties as more realistic genetic models such as ecological selection, mean that our findings here are somewhat generalizable} \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}
 
-One major assumption of our model is that selection acts against heterozygotes --i.e. that loci are underdominant. 
-Under dominance is quite rare in nature, because underdominant loci cannot invade when rare, and thus our major assumption is likely rarely met. 
-We believe, however, that this assumption is unlikely to drastically influence our results --- previous research has found that under dominant loci  have similar proprrties in hybrid zones as more realistic genetic models, such as ecological selection \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}. 
-An additional assumption of our analytical model is that we ignore coalescence.  
-The broad agreement between our analytical and theoretical results suggests that this assumption will also have negligible effect on our results. 
+The assumption about the density of selected loci, however, may have greater consequences. Our model, which focuses on a single selected site is likely to be still relevant to cases in which there are only a small number of selected loci scattered throughout the genome. However, our predictions may differ significantly from scenarios in which the density of selected sites is high. Specifically, numerous selected sites within one ancestry block would likely act to both  increase the strength of selection, and to generate a longer unit which cannot be effectively broken up by recombination   \yb{(CITE: (BARTON 1983; Kruuk 1989)}. Such regions would likely be surrounded by even greater chunks of unbroken ancestry -- a result reflecting  greater $s$ and relatively short map distance between linked incompatibilities -- \alisa{and will impact expectations of genome-wide patterns of clines and block lengths. In terms of detecting targets of selection, such sites will be a common limitation among many approaches to identifying selection.}
 
-However, other assumptions of our model may be of greater consequence. 
-Importantly, our work considered only a single selected site.   
-While a small number of selected sites will likely have little influence on our results, a higher density of selected sites could. 
-Specifically, numerous selected sites within one ancestry block would likely act to both  increase the strength of selection, and to generate a longer unit which cannot be effectively broken up by recombination   \yb{(CITE: (BARTON 1983; Kruuk 1989)}. 
-Such regions would likely be surrounded by even greater chunks of unbroken ancestry -- a result reflecting this great $s$ and the map distance between these linked incompatibilities. 
+For ease of calculations, our analytic model assumes a continuous and smooth one-dimensional spatial structure of the geographic landscape. 
+
+Lastly, the analytic model presented here lacks coalescence. \alisa{This can result in an underestimate of covariance in ancestry, as we have ignored sharing through genealogy.} The broad agreement between our analytic predictions and simulations suggests that this assumption does not impact our general results.
+
+%One major assumption of our model is that selection acts against heterozygotes --i.e. that loci are underdominant. 
+%Under dominance is quite rare in nature, because underdominant loci cannot invade when rare, and thus our major assumption is likely rarely met. 
+%We believe, however, that this assumption is unlikely to drastically influence our results --- previous research has found that under dominant loci  have similar proprrties in hybrid zones as more realistic genetic models, such as ecological selection \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}. 
+%An additional assumption of our analytical model is that we ignore coalescence.  
+%The broad agreement between our analytical and theoretical results suggests that this assumption will also have negligible effect on our results. 
+
+
+
 
 Another important assumption is the smooth and one dimensional spatial structure of the geographic landscape.  
 Patchily connected populations, or other esoteric forms of population structure may predominate on the edges of species ranges' where hybrid zones may occur.  
@@ -579,7 +582,7 @@ if things are very patchy this might not be a good one.
 Also, parent-offspring dispersal is not the same thing as successful-offspring-parent dispersal.
 
 
-
+\alisa{epistasis}
 
 Topics include\\
 - ignoring coalescent\\
