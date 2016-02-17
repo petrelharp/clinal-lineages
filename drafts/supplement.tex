@@ -39,6 +39,25 @@
 \renewcommand{\thefigure}{S\arabic{figure}}
 
 
+
+\begin{figure}
+    \begin{center}
+       \includegraphics[width=0.7\textwidth]{figs/example_cline}
+    \end{center}
+    \caption{
+        \textbf{Numerically computed clines,} at
+        \textbf{(A)} the selected site, which forms over time $1/s$ and then remains stable, and
+        \textbf{(B)} a linked site at distance $r=0.01$, which continues to smooth out as $\sqrt{t}$.
+        \textbf{(C)} a linked site at $r=0.1$
+        \textbf{(D)} an unlinked site.
+        Other parameters.
+       \plr{Do we want this figure? This one is just a placeholder; I'd put in two, that showed the formation and spread better.
+       This is from the PDE (we don't have time courses from sims).}
+        \label{fig:pde_clines}
+    }
+\end{figure}
+
+
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau100}
 \caption{Randomly sampled chromosomes  across a hybrid zone of age $\tau=100$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
