@@ -1,5 +1,5 @@
 \documentclass[12pt]{article}
-\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\usepackage[margin=0.8in]{geometry} % see geometry.pdf on how to lay out the page. There's lots.
 \geometry{a4paper} % or letter or a5paper or ... etc
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb}
@@ -127,10 +127,9 @@ Using a combination of predictions from theory and simulated hybrid zones, we pr
 	
 \section{Methods}
 \subsection*{The Model}
-We consider two isolated populations --- labeled \emph{Species $A$} and \emph{Species $B$} ---  that come into contact $\tau$ generations in the past. 
-Individuals move forward in time by sampling a displacement from a Gaussian distribution. 
-We consider a simple case of under-dominance. 
-\yb{Although most selection in hybrid zones is likely more complex than the single locus intrinsic under-dominance we consider, previous work has shown that such models generate clines that are effectively indistinguishable from more complex models of ecological selection \citep{Barton1989, Barton1993} which also generate clines like those degenerated under complex epistatic systems}. Specifically, here the fitness of an individual is  determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes. To fix notation, we will say that species $A$ was initially on the ``left'' of the zone of contact, which corresponds to spatial positions $x<0$. 
+We consider two isolated populations --- labeled \emph{Species $A$} and \emph{Species $B$} ---  that come into contact $\tau$ generations in the past.  To fix notation, we will say that species $A$ was initially on the ``left'' of the zone of contact, which corresponds to spatial positions $x<0$.  
+Dispersal is  such that individuals sample their displacement from a Gaussian distribution. This has the desirable property that we can consider movement of lineages both backwards and forwards in time. 	
+In terms of selection, we consider a simple case of under dominance at a single locus.  Specifically, the fitness of an individual is determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes. \yb{Although most selection in hybrid zones is likely more complex than the single locus intrinsic under-dominance we consider, previous work has shown that such models generate clines that are effectively indistinguishable from more complex models of ecological selection \citep{Barton1989, Barton1993} which also generate clines like those degenerated under complex epistatic systems}. 
 
 Similar to the model presented by \cite{Sedghifar2015}, we consider a lineage sampled in the present day, and determine its ancestry by its position at time $\tau$ generations in the past (Figure~\ref{Fig:schematic}). 
 The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that at time $\tau$ the two species are fixed for alternate alleles at this locus). 
@@ -156,35 +155,28 @@ and after time $\tau$ will have clines out to genetic distance of order $1/\tau$
 maybe more. \alisa{has this not already been stated by Nick somewhere?}
 
 \paragraph{Establishment of  \sout{the selected cline} \alisa{a cline at the selected locus}}
-Consider a single locus, with alternate alleles fixed in the two parental populations,
+Our simple model of underdominance considers a single locus, with alternate alleles fixed in the two parental populations,
 for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
 The deterministic theory predicts that after secondary contact,
-these alleles will form a stable cline.
-To study gene flow past this cline we first need to understand how the cline itself is formed.
+these alleles will form a stable cline \citep{Barton1979}.
+To study gene flow past this cline we \alisa{turn our attention to} how the cline itself is formed.
 Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, \alisa{(Will switching between backwards and forwards in time not get confusing?)}
 and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
 (In discrete computations, a deme at $x=0$ has $p(0,0)=1/2$.)
-Let $\sigma^2$ be the mean squared distance between parent and offspring.
-Assuming local random assortment of alleles into diploids,
-that the habitat and dispersal are homogeneous,
-and that $s$ and $\sigma$ are small, 
-the commonly-used equation that $p$ solves is
+Let $\sigma^2$ be the mean squared distance between parent and offspring \alisa{(i.e. the variance of the distribution of dispersal distances)}.
+Assuming that: (i) alleles locally assort into diploids randomly, (ii) habitat and dispersal are homogeneous, and (iii) $s$ and $\sigma$ are small, then the commonly-used equation that $p$ solves is
+
 \begin{align} \label{eqn:cline_pde}
     \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
 \end{align}
 where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
 as derived in \citep{Bazykin1969}; for discussion of diploidy see \citep{diploidcline} \alisa{not sure which reference this is}.
-There is not an exact analytic solution to this equation, 
-but a good approximation to the equilibrium solution is that
-$\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}.
-Considering the numerous approximations going into this,
-the important attributes are that 
-the stable cline has width of order $\sigma/\sqrt{s}$,
-and decays exponentially.
-Furthermore, the cline is established through diffusion \alisa{of individuals?}, which is slowed down somewhat by selection against heterozygotes,
-but is still diffusive, and so it will take time of order $1/s$
-to reach its stable width \alisa{(is this something that has been shown before?)} This can be shown by rescaling space by $\sigma/s$ and time by $1/s$ in equation \eqref{eqn:cline_pde}, and seeing that the result \alisa{(what result?)} doesn't depend on $\sigma$ or on $s$.
+Although there is not an exact analytic solution to this equation, a good approximation to the equilibrium solution is that
+$\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. This relies on numerous approximations, but importantly, the stable cline has width of order $\sigma/\sqrt{s}$,
+and decays exponentially. Note that rescaling space and time by $\sigma/s$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} doesn't affect this solution, and so the cline establishes over a timescale of the order $1/s$. In other words, the cline is established through diffusion, which is slowed down somewhat by selection against heterozygotes. \alisa{I don't think I understand the independence from $\sigma$?}
+
+
 
 \paragraph{Lineages at the selected locus}
 Now suppose that the frequency profile of the selected allele $p(x,t)$ is given.
