@@ -154,7 +154,7 @@ the cline takes time $s$ to spread out,
 and after time $\tau$ will have clines out to genetic distance of order $1/\tau$,
 maybe more. \alisa{has this not already been stated by Nick somewhere?}
 
-\paragraph{Establishment of  \sout{the selected cline} \alisa{a cline at the selected locus}}
+\paragraph{Establishment of  \alisa{a cline at the selected locus}}
 Our simple model of underdominance considers a single locus, with alternate alleles fixed in the two parental populations,
 for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
 The deterministic theory predicts that after secondary contact,
@@ -179,17 +179,18 @@ and decays exponentially. Note that rescaling space and time by $\sigma/s$ and $
 
 
 \paragraph{Lineages at the selected locus}
-Now suppose that the frequency profile of the selected allele $p(x,t)$ is given.
+Now suppose that the frequency profile of the selected allele $p(x,t)$ is known.
 We will understand how lineages of sampled individuals behave,
 both at and away from the selected site,
 by following lineages as they move between backgrounds,
 as done for instance in \citet{selectioncoal,Ralph2015}.
+
+
 Consider the collection of $A$ alleles found at location $x$.
-The expected number of such alleles produced by location $y$ is proportional to 
-the number of $A$ alleles at $y$ multiplied by the probability of dispersing from $y$ to $x$;
-looking in the other direction, this is also the probability that an $A$ allele at $x$ had a parent at $y$.
-In other words, lineages move as the random walk determined by dispersal,
-but biased towards areas that produce more of the selected allele that they carry.
+The expected number of such alleles that had a parent at location $y$ is proportional to the number of  $A$ alleles at $y$ multiplied by the probability of dispersing from $y$ to $x$;
+In other words, lineages move as a random walk determined by dispersal,
+but biased towards locations where the selected allele they carry is at higher frequency.
+
 Making the same assumptions underlying equation \eqref{eqn:cline_pde},
 we show in Appendix \ref{apx:lineage_derivation}
 that the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
