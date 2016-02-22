@@ -8,6 +8,7 @@
 \usepackage{color}
 \usepackage{amssymb}
 \usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
 
 \usepackage[normalem]{ulem}
 
@@ -57,15 +58,38 @@
 %\tableofcontents
 
 
-\abstract{Hybrid zones formed between recently diverged populations offer an opportunity to better understand the mechanisms underlying reproductive isolation and the process of speciation. \yb{Some form of selection against hybrid genotypes is likely common in many hybrid zones. Here, we use a combination of analytical theory and explicit forward simulations} to gain a better understanding of how this impacts patterns of introgression \yb{across genomic and geographic} space. \yb{We find that ancestral blocks surrounding single-locus incompatibilities} are longer than average \yb{ancestry blocks}, especially when removed from the center of the hybrid zone.  The findings presented here suggest a means for characterizing hybrid zones and identifying candidate targets of selection.}
+\abstract{
+Hybrid zones formed between recently diverged populations offer an opportunity to better understand the mechanisms underlying reproductive isolation and the process of speciation. \yb{Some form of selection against hybrid genotypes is likely common in many hybrid zones. Here, we use a combination of analytical theory and explicit forward simulations} to gain a better understanding of how this impacts patterns of introgression \yb{across genomic and geographic} space. \yb{We find that ancestral blocks surrounding single-locus incompatibilities} are longer than average \yb{ancestry blocks}, especially when removed from the center of the hybrid zone.  The findings presented here suggest a means for characterizing hybrid zones and identifying candidate targets of selection.
+}
 
 \linenumbers
 \doublespacing
 
+Main points:
+\begin{itemize}
+    \item 
+\end{itemize}
 
+
+%%%%% %%%%%% %%%%%%%
 \section*{Introduction}
+
+% summary of intro:
+%  clines happen
+%  but then decay unless selection
+%  which affects haplotypes and LD
+%  most work so far just looks at clines
+%  but haplotype blocks should be helpful
+%  here we look at that stuff
+
 The process of speciation commonly involves allopatric divergence in relative isolation \citep{Coyne2004}.  
-When formerly isolated populations come back into contact \yb{before reproductive isolation is complete, gene flow is still possible. Thus, \alisa{ancestries} originating from each of the two diverged populations spread from their point of contact across a geographic hybrid zone --- establishing a gradient of ancestry across geography, \citep{Barton1985}}. 
+When formerly isolated populations come back into contact 
+before reproductive isolation is complete, gene flow is still possible. 
+As two such populations interbreed,
+a gradient
+
+Thus, \alisa{ancestries} originating from each of the two diverged populations spread from their point of contact across a geographic hybrid zone 
+--- establishing a gradient of ancestry across geography, \citep{Barton1985}. 
 %In addition to steep clines in ancestry,
 \yb{The recent exchange of genetic material between diverged populations leaves a distinct pattern of variation across the genome, in which long tracts of divergent haplotypes from each ancestral population  are broken up by historical recombination events.}  
 
@@ -171,7 +195,6 @@ and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
 (In discrete computations, a deme at $x=0$ has $p(0,0)=1/2$.)
 Let $\sigma^2$ be the mean squared distance between parent and offspring \alisa{(i.e. the variance of the distribution of dispersal distances)}.
 Assuming that: (i) alleles locally assort into diploids randomly, (ii) habitat and dispersal are homogeneous, and (iii) $s$ and $\sigma$ are small, then the commonly-used equation that $p$ solves is
-
 \begin{align} \label{eqn:cline_pde}
     \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
 \end{align}
@@ -660,9 +683,45 @@ we have code and notes on solving them on github.
 \section{Rescaling a dicrete model to obtain the lineage motion}
 \label{apx:lineage_derivation}
 
+For completeness, here we provide one possible derivation of equation \eqref{eqn:cline_pde},
+which gives the expected time evolution of $p(x,t)$
+under a particular concrete model.
+Other derivations are given in \citet{thesepapers};
+see especially \citet{thatone}, which does not assume locally random mating.
+A derivation in the same style is found in \citet{ralph2015patchy}.
+
+For concreteness, we will discuss a population of outcrossing plants.
+Suppose that the population is composed of a finite number of discrete demes,
+each having $N$ diploid individuals.
+Suppose that each individual at $x$ chooses to reproduce at random, 
+exponentially distributed intervals,
+producing a random number $X$ of seeds
+using pollen coming from a random location $x+R_p$.
+Each seed then disperses to a random location $x+R_s$,
+where it replaces a randomly chosen extant individual.
+Suppose that 
+
+Let $\Phi_{AA}(x,t)$ be the proportion of individuals at location $x$ and time $t$
+with genotype $AA$, and likewise for $\Phi_{AB}$ and $\Phi_{BB}$.
+\begin{align*}
+    \frac{\partial}{\partial t}
+    \E[ f(\Phi_t^N) ]
+    &=
+    N \sum_x
+    \left\{
+        \E\left[ 
+            \Phi_t(x-R_s) \Phi_t(x-R_s-R_p)  # AA
+                
+            + \left( \Phi_t(x-R_s) (1-\Phi_t(x-R_s-R_p)) + (1-\Phi_t(x-R_s)) \Phi_t(x-R_s-R_p) \right)
+            + (1-\Phi_t(x-R_s)) (1-\Phi_t(x-R_s-R_p))
+        \right]
+    \right\}
+\end{align*}
+
 Here put derivation of the PDE for $p(x,t)$ and also the SDE of a lineage motion.
 
-\section{Nuemrical solutions for haplotype probabilities}
+
+\section{Numerical solutions for haplotype probabilities}
 \label{apx:haplotype_calcs}.
 
 Here put some details about the numerical solutions of haplotype probabilities.
