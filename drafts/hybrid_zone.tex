@@ -86,28 +86,41 @@ The process of speciation commonly involves allopatric divergence in relative is
 When formerly isolated populations come back into contact 
 before reproductive isolation is complete, gene flow is still possible. 
 As two such populations interbreed,
-a gradient
+individuals' genomes can be labeled according to which ancestral population they are inherited from,
+and local interbreeding and migration of such populations
+creates a gradient of ancestry assignments across geography,
+centered on their point of contact \citep{Barton1985}. 
+\plr{(check that neutral clines discussed in barton '85)}
+If the populations are sufficiently diverged,
+this process leaves a distinct pattern of variation across the genome, 
+in which long tracts of divergent haplotypes from each ancestral population  
+are broken up by historical recombination events,
+leading to substantial correlations in ancestry between distant markers
+(termed ``ancestry LD'').
+\plr{(but, ``ancestry linkage disequilibrium'' doesn't work;
+how about just ``correlations in ancestry''?}
 
-Thus, \alisa{ancestries} originating from each of the two diverged populations spread from their point of contact across a geographic hybrid zone 
---- establishing a gradient of ancestry across geography, \citep{Barton1985}. 
-%In addition to steep clines in ancestry,
-\yb{The recent exchange of genetic material between diverged populations leaves a distinct pattern of variation across the genome, in which long tracts of divergent haplotypes from each ancestral population  are broken up by historical recombination events.}  
+Gene flow will eventually erase 
+both geographic clines in ancestry, and strong correlations in ancestry.
+Subsets of the genome can maintain stable clines in ancestry if selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. The influence of selection on linked loci also prevents the mixing of ancestry at regions surrounding these loci, the effect of which decreases with physical genomic distance \citep{Barton1986,Barton1983}. 
+The mixing of ancestries of a given genome is mediated by 
+the process of recombination, forming chromosomal \emph{junctions} in ancestry \citep{Fisher1954, Chapman2002, Baird2003}.   
+The expected distribution of lengths of unbroken ancestry in admixed populations has been previously described under neutral conditions both in single populations and in contact zones \citep[e.g.][]{Gravel2012,Sedghifar2015}.  
+\plr{(check Gravel; isn't that approximate?)}
 
-
-\yb{To the extent that  genetic variation can be exchanged between species via hybridization, both the geographic clines in ancestry, and extreme linkage disequilibrium in ancestry (ancestry-LD) diminish over time.} Subsets of the genome that are under selection, however, can maintain stable clines in ancestry as selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. The influence of selection on linked loci also prevents the mixing of ancestry at regions surrounding these loci, the effect of which decreases with physical genomic distance \citep{Barton1986,Barton1983}. While these patterns of co-ancestry have been described in multi-locus systems, the  \yb{expected length of ancestral tracts around selected loci in admixing populations remains poorly understood}\alisa{, especially in the geographic context of hybrid zones.}
-
-
-Within a genome, the mixing of ancestries is brought about by the the process of recombination that takes place between every generation, forming chromosomal \emph{junctions} in ancestry \citep{Fisher1954, Chapman2002, Baird2003}.   
-The expected distribution of lengths of unbroken ancestry in admixed populations has been previously described under neutral conditions both in single populations and in contact zones \citep[e.g.][]{Gravel2012,Sedghifar2015}.  Here, we investigate expected patterns of co-ancestry \yb{ --- that is, the genomic scale at which ancestry strongly covaries between sites --- } across a hybrid zone in the presence of selection. 
-
-Variation in \yb{ the action of } selection against migrant alleles within the genome results in genome-wide heterogeneity in cline width, as the frequency of foreign ancestry surrounding targets of selection is reduced \citep{Barton1979}. 
-%The effect on patterns of ancestral block lengths is, however, less well explored theoretically and \yb{empirically.
+% Variation in \yb{ the action of } selection against migrant alleles within the genome results in genome-wide heterogeneity in cline width, as the frequency of foreign ancestry surrounding targets of selection is reduced \citep{Barton1979}. 
+% While these patterns of co-ancestry have been described in multi-locus systems, the \yb{expected length of ancestral tracts around selected loci in admixing populations remains poorly understood}\alisa{, especially in the geographic context of hybrid zones.}
 \yb{While empirical patterns of the block length distribution in hybrid zones have rarely been used to inform the history of selection,}  \alisa{the availability of dense genotype data in combination with linkage information pave a way to utilize such patterns to better understand the processes operating in hybrid zones. } %GREAT SENTENCE!!
+Here, we investigate expected patterns of co-ancestry \yb{ --- that is, the genomic scale at which ancestry strongly covaries between sites --- } across a hybrid zone in the presence of selection. 
 
 
 The extensive history of population genetic modeling of hybrid zones has focused largely on the equilibrium states of ancestry clines \citep{Barton1979a,Barton1986}.  
-These models predict cline width to be narrowest \yb{(i.e. the transition in allele frequency is the steepest)} at loci close to selected loci, and cline width at less tightly linked loci to be wider. %and more heavily influenced by demography.} %hybrid zone age and rates of gene flow. 
-\yb{This provides some expectation for how selection shapes covariation in ancestry at a single locus over \emph{geographic space}, and our aim here  is to extend this to include expectations for how selection shapes covariance in ancestry over \emph{genomic space}}.
+Since stronger selection reduces the amount of genetic mixing,
+these models predict the narrowest clines 
+(i.e., the most rapid changes in allele frequencies)
+at loci close to selected loci, and wider clines at less tightly linked loci.
+This provides some expectation for how selection shapes covariation in ancestry at a single locus over \emph{geographic space}.
+Our aim here is to extend this to include expectations for how selection shapes covariance in ancestry over \emph{genomic space}.
 
 Covariance in ancestry across a genome provides information about the number of surviving recombination events that have taken place between ancestral genotypes and therefore provides information about the age of the hybrid zone and the relative strength of selection affecting subsets of the genome. Our goal is to understand how selection against hybrids interacts with dispersal and recombination to produce observed patterns ancestry around selected sites in recently established hybrid zones. In addition to interpreting non-equilibrium patterns of diversity in hybrid zones, this could be especially important for understanding the impact of selection on the extent of mixing of ancestral genomes and, consequently, the maintenance of species distinctness. In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
 If, on the other hand, hybrids have non-zero fitness, some amount of introgression can occur, and  patterns of introgression can provide information about selection \yb{in addition to the} extent of hybridization, and timing of secondary contact \citep{Price2009, Hellenthal2014}. 
@@ -120,47 +133,32 @@ Using a combination of predictions from theory and simulated hybrid zones, we pr
 \yb{The theoretical expectations developed in this manuscript can aid in the identification of loci under selection in hybridizing populations.} 
 
 
-
-%provide an expectation for how selection shapes the covariation in ancestry at loci over \emph{genomic space.}}  
-%As denser genotype data becomes more readily available, genome-wide patterns of linkage can be utilized in the analysis of gene hybrid zones. 
-
-%Covariance in ancestry across a genome can provide information about the number of surviving recombination events that have taken place between ancestral genotypes and therefore provides information about the age of the hybrid zone and the strength of selection at linked loci. 
-%Our goal here is  to understand how strength of selection, density of selected sites, recombination rate and hybrid zone age interact to produce observed patterns of ancestry in present day populations.   % YB I don't think we are actually asking about density of selected sites, are we? 
-%Our goal here is  to understand how the strength of \yb{selection} and hybrid zone age interact to produce observed patterns of ancestry \yb{around selected sites in recently established hybrid zones}. %in present day populations.  
-%This may be especially important for our understanding and interpretation of of non-equilibrium patterns of diversity in hybrid zones, as well as understanding the consequences of selection on the extent of mixing of ancestral genomes and, consequently, the maintenance of species distinctness. 
-%In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
-%If hybrids have non-zero fitness, and some amount of introgression can occur, patterns of introgression can provide information about the strength of selection \yb{in addition to the} extent of hybridization, and timing of secondary contact \citep{Price2009, Hellenthal2014}. 
-
-%In this latter case, it is also of interest to identify putative targets of selection, as these will provide insights into the biological mechanisms of speciation. 
-%In this latter case, it may be of additional interest to establish whether the hybrid zone is in its equilibrium state. 
-
-%Our naive expectation under a basic underdominance model is that, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus will be relatively long when far away from the zone center. 
-% is because an unfit haplotype is likely to be a recent migrant from the other side of the hybrid zone, and therefore will not have experienced many recombination events. 
+\plr{explain relationship to \citet{Sedghifar2015}}
 
 
-
-%In the absence of selection, genome-wide covariance in ancestry can be used to estimate timing and gene-flow in hybrid zones \cite{Sedghifar2015}. 
-
-%When formerly isolated populations come back into contact, a hybrid zone can form, and may be maintained stably by selection. In such instances, selection on some subset of the genome prevents mixing of genotypes between species. We refer to such hybrid zones as tension zones (as opposed to contact zones which reflect a non-equilibrium gradient in ancestry that will eventually be eroded by migration throughout the whole genome). Because the population genetic signatures around loci experiencing selection is going to differ from other regions of the genome, natural hybrid zones present exciting opportunities to understand species maintenance and the process of speciation.
-
-%Gene-flow across a hybrid zone is impeded by selection against migrant, or hybrid, genotypes, and as a result, produces a cline in ancestry that is expected to be steepest at and nearby the selected locus. Elsewhere in the genome, clines in ancestry are wider, and are more heavily influenced by hybrid zone age and rates of migration. Historically, this has been the most relied-upon population genetic signature, and it is only recently that abundant genomic data has opened the possibility of studying patterns of linkage within hybrid zones. For example, patterns of linkage disequilibrium (LD) or tract length distribution across geographic space can provide information about zone age \cite{Sedghifar2015}. In tensions zones geographic patterns of linkage at loci neighboring targets of selection can potentially be a powerful source of information.
-
-%Many of the traditional models of genetic variation in hybrid zones to date have focused on the equilibrium state of hybrid zones, at both selected and linked loci (lots of Barton). 
-
-%-Studying hybrid zones is a great opportunity to understand the maintenance of distinct species, and the process of speciation. Here we consider hybrid zones that are a cline that is maintained by selection against hybrids (so-called tension zone). 
-%-Gene flow across a hybrid zone may be impeded by selection against migrants. In older contact zones, loci that are associated with reduced fitness in heterozygotes will have steeper clines than the rest of the genome. There is probably a lot to learn from geographic patterns at loci neighboring selected loci (e.g. small block lengths indicate that there has been plenty of opportunity for recombination in heterozygous backgrounds)
-%-There has been a lot of investigation into the equilibrium state of hybrid zones, at both selected and linked loci. 
-
-
-	
+%%%%%%% %%%%%%%%% %%%%%%%%
 \section*{Methods}
+
+%%%%%%% %%%%%%%%% 
 \subsection*{The Model}
-We consider two isolated populations --- labeled \emph{Species $A$} and \emph{Species $B$} ---  that come into contact $\tau$ generations in the past.  To fix notation, we will say that species $A$ was initially on the ``left'' of the zone of contact, which corresponds to spatial positions $x<0$.  
-Dispersal is  such that individuals sample their displacement from a Gaussian distribution. This has the desirable property that we can consider movement of lineages both backwards and forwards in time. 	
 
-We model selection as a simple case of under dominance at a single locus.  Specifically, the fitness of an individual is determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes. \yb{Although most selection in hybrid zones is likely more complex than the single locus intrinsic under-dominance we consider, previous work has shown that such models generate clines that are effectively indistinguishable from more complex models of ecological selection \citep{Barton1989, Barton1993} which also generate clines like those generated under complex epistatic systems}. 
+We consider two isolated populations
+--- labeled \emph{Species $A$} and \emph{Species $B$} ---  
+that come into contact $\tau$ generations in the past.  
+To fix notation, we will say that species $A$ was initially on the ``left'' of the zone of contact, which corresponds to spatial positions $x<0$.  
+After contact, the populations live across continuous geographical space,
+with random, local dispersal that we take to be Gaussian
+(although this should not affect the conclusions if the true dispersal distribution is not too fat-tailed).
 
-Similar to our recent model of a neutral hybrid zone \cite{Sedghifar2015}, we consider a lineage sampled in the present day, and determine its ancestry by its position in space at the time of first contact, $\tau$ generations in the past (Figure~\ref{Fig:schematic}). 
+We model selection through only a single, underdominant locus:
+at this locus, there are two alleles, each fixed in one of the ancestral populations,
+and heterozygous individuals produce on average $1-s$ times as many offspring as either homozygote.
+Although most selection in hybrid zones is likely more complex than the single locus intrinsic under-dominance we consider, previous work has shown that such models generate clines that are effectively indistinguishable from more complex models of ecological selection \citep{Barton1989, Barton1993} which also generate clines like those generated under complex epistatic systems.
+
+As in \citet{Sedghifar2015}, 
+we gain substantial insight by considering where the ancestors of modern-day individuals lived,
+i.e., where their linages fall across geography as we look further back towards the time of first contact.
+we consider a lineage sampled in the present day, and determine its ancestry by its position in space at the time of first contact, $\tau$ generations in the past (Figure~\ref{Fig:schematic}). 
 The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that at time $\tau$ the two species are fixed for alternate alleles at this locus). 
 For every other locus, we keep track of $z$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination between two loci is modeled as a poisson process with rate $r$. The identity $z$ for locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
 
@@ -168,6 +166,7 @@ For every other locus, we keep track of $z$, the identity at $L$, across time an
 \includegraphics{figs/BM_schematic}
 \caption{A cartoon representation of a haplotype under the model. The black line represents the path, backwards in time, of a site under selection ($L_B$) that is sampled in the present day ($\tau=0$). The center of the hybrid zone is defined at geographic position $x=0$, such that ancestry A segregates at lower frequency for $x>0$. Here, because of negative selection, $L_B$ migrates rapidly back to $x>0$ from a position $x<0$. Red dots represent recombination events along the entire haplotype. When a recombination separates two chunks of the sampled haplotype takes place, a branching event occurs and these splitting lineages are represented by colored lines (here the initial haplotype is broken up into 3 chunks over 100 generations). Subsequent recombination events can switch the selected background to which a chunk is linked.  Here, yellow lineages are linked to $L_A$ , and blue lineages are linked to $L_B$. Based on position at time $\tau=100$, from right to left the chunks are of ancestry $(A,B,B)$.}\label{Fig:schematic}
 \end{figure}
+
 %As an approximation, we consider a cline of narrow width (look up cline width for underdominance, Barton/May?), such that the frequency of migrant alleles is exponential and negligible at distance away from the center of the hybrid zone. This means that recombination events that occur away from the center of the zone do not result in a change in $a$.
 
 
@@ -710,8 +709,7 @@ with genotype $AA$, and likewise for $\Phi_{AB}$ and $\Phi_{BB}$.
     N \sum_x
     \left\{
         \E\left[ 
-            \Phi_t(x-R_s) \Phi_t(x-R_s-R_p)  # AA
-                
+            \Phi_t(x-R_s) \Phi_t(x-R_s-R_p)  % AA
             + \left( \Phi_t(x-R_s) (1-\Phi_t(x-R_s-R_p)) + (1-\Phi_t(x-R_s)) \Phi_t(x-R_s-R_p) \right)
             + (1-\Phi_t(x-R_s)) (1-\Phi_t(x-R_s-R_p))
         \right]
