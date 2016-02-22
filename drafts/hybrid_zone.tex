@@ -136,7 +136,7 @@ Dispersal is  such that individuals sample their displacement from a Gaussian di
 
 We model selection as a simple case of under dominance at a single locus.  Specifically, the fitness of an individual is determined by its genotype at a particular locus $L$, such that individuals that are heterozygous at locus $L$ have fitness reduced by $s>0$ compared to homozygotes. \yb{Although most selection in hybrid zones is likely more complex than the single locus intrinsic under-dominance we consider, previous work has shown that such models generate clines that are effectively indistinguishable from more complex models of ecological selection \citep{Barton1989, Barton1993} which also generate clines like those generated under complex epistatic systems}. 
 
-Similar to the model presented by \cite{Sedghifar2015}, we consider a lineage sampled in the present day, and determine its ancestry by its position in space at the time of first contact, $\tau$ generations in the past (Figure~\ref{Fig:schematic}). 
+Similar to our recent model of a neutral hybrid zone \cite{Sedghifar2015}, we consider a lineage sampled in the present day, and determine its ancestry by its position in space at the time of first contact, $\tau$ generations in the past (Figure~\ref{Fig:schematic}). 
 The ancestry at locus $L$ is determined by its state, so that a lineage with identity $L_A$ is of ancestry $A$ and a lineage with identity $L_B$ is of ancestry $B$ regardless of its sampling location (we assume that at time $\tau$ the two species are fixed for alternate alleles at this locus). 
 For every other locus, we keep track of $z$, the identity at $L$, across time and space. If at time $\tau$ a locus is on the same background as $L_A$, it is considered to be of ancestry $A$, and of ancestry $B$ otherwise. Recombination between two loci is modeled as a poisson process with rate $r$. The identity $z$ for locus $K$ changes when a recombination event occurs between $L$ and $K$ in an individual that is heterozygous at locus $L$. 
 
@@ -164,7 +164,7 @@ Our simple model of underdominance considers a single locus, with alternate alle
 for which heterozygotes have fitness $1-s$, and homozygotes are of equal fitness.
 The deterministic theory predicts that after secondary contact,
 these alleles will form a stable cline \citep{Barton1979}.
-To study gene flow past this cline we \alisa{turn our attention to} how the cline itself is formed.
+To study gene flow past this cline, we \alisa{turn our attention to} how the cline itself is formed.
 Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, \alisa{(Will switching between backwards and forwards in time not get confusing?)}
 and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
@@ -179,7 +179,7 @@ where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
 as derived in \citep{Bazykin1969}; for discussion of diploidy see \citep{diploidcline} \alisa{not sure which reference this is}.
 Although there is not an exact analytic solution to this equation, a good approximation to the equilibrium solution is that
 $\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. This relies on numerous approximations, but importantly, the stable cline has width of order $\sigma/\sqrt{s}$,
-and decays exponentially. Note that rescaling space and time by $\sigma/s$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} doesn't affect this solution, and so the cline establishes over a timescale of the order $1/s$. In other words, the cline is established through diffusion, which is slowed down somewhat by selection against heterozygotes. \alisa{I don't think I understand the independence from $\sigma$?}
+and decays exponentially. Note that rescaling space and time by $\sigma/s$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} does not affect this solution, and so the cline establishes over a timescale of the order $1/s$. In other words, the cline is established through diffusion, which is slowed down somewhat by selection against heterozygotes. \alisa{I don't think I understand the independence from $\sigma$?}
 
 
 
@@ -452,7 +452,7 @@ Additionally, we look at the mean value of these statistics in the two chunks, $
 
 \section*{Single-locus behavior}
 
-From previous results we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, the width of clines at closely linked sites are impacted (Fig:~\ref{alleleFreq_tau100}). 
+From previous results, we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, the width of clines at closely linked sites are impacted (Fig:~\ref{alleleFreq_tau100}). 
 
 \paragraph{The timescale over which linked clines relax:}
 Although loci not under selection can in principle spread across the cline unimpeded,
@@ -462,9 +462,9 @@ and the relative slowness of diffusive movement \citep{Sedghifar2015}.
 We are interested, for samples across a cline $\tau$ units of time after secondary contact, how far away from the selected locus one has to look to see clines that resemble the genome-wide mean.
 
 
-A linked cline will begin to flatten out if there is an appreciable chance that a lineage at the linked locus initially linked to an $A$ allele 
+A linked cline will begin to flatten out if there is an appreciable chance that a lineage at the linked locus initially coupled with an $A$ allele 
 at some point recombined from an individual carrying the $B$ allele.
-This implies that loci closer than $1/\tau$ to the selected site won't have a substantially wider cline than the selected cline.
+This implies that loci closer than $1/\tau$ to the selected site will not have a substantially wider cline than the selected cline.
 Of course, this calculation assumes that every generation provides an opportunity for recombination on the other background, but the only way to move linked lineages between selected backgrounds is via recombination in a heterozygote. 
 
 Since heterozygotes for the selected allele are only found at high frequency in the cline,
@@ -492,10 +492,10 @@ As expected, regions surrounding a locus under selection are more resistant to i
 
 In the context of our model, we expect that\alisa{, in the absence of selection,} $l_A$ across the genome will tend to be shorter the further one into the $B$ side of the cline,
 because they have had more opportunities to recombine with $B$ haplotypes. 
-However, stretches of $A$ ancestry that contain a selected site are expected to be longer
+However, we expect that stretches of $A$ ancestry containing a selected site will be longer
 than those that do not at the same spatial location,
-because lineages containing the selected site must have been inherited from the $A$ side of the cline recently --
-concretely, they move at speed roughly $\sigma/\sqrt{s}$,
+because lineages containing the selected site must have been inherited from the $A$ side of the cline recently. 
+Concretely, these lineages move at speed roughly $\sigma/\sqrt{s}$,
 so we expect (selected) $A$ alleles at distance $x$ from the cline center
 to have last had an ancestor on the $A$ side of the cline around $x \sqrt{s}/\sigma$ generations ago \alisa{(compared to $\sigma$?? for a neutral allele)},
 and so the enclosing $A$ haplotype is no longer than $\sigma/(x \sqrt{s})$.
@@ -550,7 +550,7 @@ We find that $l_A(k\pm)$, the length of blocks adjacent to blocks containing $k$
 \end{figure}
 
 \subsection*{The number of `unfit' ancestors}
-Although the theoretical model presented here does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $\tau$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family. We find that, as distance from the zone center increases, the average family size of an ancestor from time $\tau$ decreases (Figure~\ref{Fig:family_size}). One interpretation of this observation is that migrants tend to leave few offspring before being removed from the population by selection. This can potentially provide additional signal for characterizing lineages strongly influenced by selection.
+Although our analytical model does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $\tau$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family. We find that, as distance from the zone center increases, the average family size of an ancestor from time $\tau$ decreases (Figure~\ref{Fig:family_size}). One interpretation of this observation is that migrants tend to leave few offspring before being removed from the population by selection. This can potentially provide additional signal for characterizing lineages strongly influenced by selection.
 
 \begin{figure}
 \includegraphics{figs/number_of_ancestors_tau1000}
