@@ -39,6 +39,25 @@
 
 \usepackage{lineno}
 
+% from http://tex.stackexchange.com/questions/43648/why-doesnt-lineno-number-a-paragraph-when-it-is-followed-by-an-align-equation/55297#55297
+\newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+  \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+  \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+  \renewenvironment{#1}%
+     {\linenomath\csname old#1\endcsname}%
+     {\csname oldend#1\endcsname\endlinenomath}}% 
+\newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+  \patchAmsMathEnvironmentForLineno{#1}%
+  \patchAmsMathEnvironmentForLineno{#1*}}%
+\AtBeginDocument{%
+\patchBothAmsMathEnvironmentsForLineno{equation}%
+\patchBothAmsMathEnvironmentsForLineno{align}%
+\patchBothAmsMathEnvironmentsForLineno{flalign}%
+\patchBothAmsMathEnvironmentsForLineno{alignat}%
+\patchBothAmsMathEnvironmentsForLineno{gather}%
+\patchBothAmsMathEnvironmentsForLineno{multline}%
+}
+
 \usepackage{authblk}
 
 \begin{document}
@@ -349,7 +368,7 @@ and
 $G^B = \sigma^2 \grad \log(1-p(x,t)) \cdot \grad + (\sigma^2/2) \Delta$,
 and then equation \eqref{eqn:q_pde} can be written more compactly as
 \begin{align*}
-    \dot q_A &= G^A q_A + r (1-p) (q_A-q_B)
+    \dot q_A &= G^A q_A + r (1-p) (q_A-q_B) \\
     \dot q_B &= G^B q_B + r (1-p) (q_B-q_A) .
 \end{align*}
 In technical terms, $G^A$ and $G^B$ are the generators of the diffusions of $A$ and $B$ lineages, respectively.
@@ -473,8 +492,10 @@ The simulations are executed in R, with scripts available on
 Frequency of ancestry B,
 across geography and at several physical positions on the genome,
 at $T=100$ generations after secondary contact. 
+\plr{what is $s$?}
 Each line represents a locus some distance $r$ away from the true target of selection, and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
 identical parameters except $s=0$.
+    \plr{Add same figure for some different time points and maybe values of $s$ to the supplement.} 
 }\label{alleleFreq_tau100}
 \end{figure}
 
@@ -542,6 +563,8 @@ Additionally, we look at the mean value of these statistics in the two chunks, $
 
 From previous results, we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, clines at closely linked sites are narrower.
 This is seen, for instance, in Figure~\ref{alleleFreq_tau100}. 
+
+\plr{When discussing haplotype lengths, say what happens at different $s$ and $T$.}
 
 \paragraph{The timescale over which linked clines relax:}
 Although loci not under selection can in principle spread across the cline unimpeded,
@@ -649,12 +672,15 @@ We find that $l_A(k\pm)$, the length of blocks adjacent to blocks containing $k$
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau1000}
 \caption{Randomly sampled chromosomes  across a hybrid zone of age $T=1000$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
- }\label{Fig:resistanceToIntrogression1000g}
+    \plr{Add same figure for some different time points and maybe values of $s$ to the supplement.} 
+}\label{Fig:resistanceToIntrogression1000g}
 \end{figure}
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioning}
-\caption{Mean block length, $l_B(k_i)$, along a simulated chromosome of length $1M$ with selected locus at position $0.5M$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(k_i)$ along the chromosome in the deme.}\label{Fig:blockLengths}
+\caption{Mean block length, $l_B(k_i)$, along a simulated chromosome of length $1M$ with selected locus at position $0.5M$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(k_i)$ along the chromosome in the deme.
+    \plr{what is $T$ and $s$? also, add version with different $T$ and/or $s$ to the supplement.}
+}\label{Fig:blockLengths}
 \end{figure}
 
 
@@ -932,15 +958,6 @@ should both be scaled by $\sigma^2$.
 
 Numerical details.
 
-
-\section{Questions:} 
-\begin{enumerate}
-
-    \item Do we get the same system using, say, a Wright--Fisher model?  (I assume so?)
-
-    \item Can we prove convergence of the finite model to this one, under suitable assumptions?  A main difficulty here would be showing that the lineage spends all its time in the part of the range where $p(x)$ does not fluctuate significantly, i.e.\ is not too small\ldots but if this is not true, it would be even more interesting.
-
-\end{enumerate}
 
 %% supplement
 \section{Supplementary Figures}
