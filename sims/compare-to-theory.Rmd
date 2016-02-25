@@ -183,9 +183,30 @@ covering position $r$ on the genome at location $x$ in space: for fixed $\ell$,
 against $r$ and/or $x$.
 
 We'll do this against $x$ at a few values of $r$ because that's what we have.
+(Don't mess with this next code chunk, it'll invalidate the cache, which was expensive to make.)
 ```{r theory_haps, cache=TRUE}
 rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=41)
 hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
                            sigma=theory.params$sigma, 
                            fwds.grid=fgrid, fwds.soln=fwds.soln )
 ```
+Here are haplotype probabilities centered on the selected site:
+```{r look_at_haps}
+for (haplen in c(0.02, 0.04, 0.08, 0.16, 0.32) ) {
+    hap.probs <- get_hap_probs( hap.soln, left=-haplen/2, right=haplen/2 )
+    image(hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n',
+       main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
+```
+and here are the same offset by `r rgrid$dx[1]`
+```{r look_at_haps_offset}
+for (haplen in c(0.02, 0.04, 0.08, 0.16, 0.32) ) {
+    hap.probs <- get_hap_probs( hap.soln, left=rgrid$dx[1], right=rgrid$dx[1]+haplen )
+    image(hap.probs, zlim=c(0,1), legend=TRUE, yaxt='n',
+       main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
+```
+
+Now, let's get **mean lengths** as best we can.
