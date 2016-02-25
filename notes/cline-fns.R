@@ -415,6 +415,7 @@ hap_cdf_to_pdf <- function ( hap.soln ) {
     # prob(a,>b) = prob(<a,>b) - prob(<a-1,>b) )
     # prob(a,b) = prob(a,>b) - prob(a,>b+1)
     #             prob(<a,>b) - prob(<a-1,>b) ) - prob(<a,>b+1) + prob(<a-1,>b+1) )
+    # except at boundaries: so, turn NAs below into zeros.
     r.coords <- attr(hap.soln,"r")
     rvals <- sort(unique(as.vector(r.coords)))
     segs.k <- cbind( left=match(r.coords[,"left"],rvals), right=match(r.coords[,"right"],rvals) )
@@ -423,11 +424,10 @@ hap_cdf_to_pdf <- function ( hap.soln ) {
             left = match( .hash(segs.k[,1]-1,segs.k[,2]), .hash(segs.k[,1],segs.k[,2]) ),    # (a-1,b)
             right = match( .hash(segs.k[,1],segs.k[,2]+1), .hash(segs.k[,1],segs.k[,2]) ),   # (a,b+1)
             both = match( .hash(segs.k[,1]-1,segs.k[,2]+1), .hash(segs.k[,1],segs.k[,2]) ) ) # (a-1,b+1)
-    dothese.segs <- (rowSums(is.na(segs.neighbors))==0)
     # here's a nrow(r.coords) x nrow(r.coords) matrix to do the conversion
-    cdf.to.pdf <- sparseMatrix( i = c((1:nrow(r.coords))[dothese.segs],as.vector(segs.neighbors[dothese.segs,])), 
-                                j = rep((1:nrow(r.coords))[dothese.segs],4), 
-                                x = rep(c(1,-1,-1,1),each=sum(dothese.segs)),
+    cdf.to.pdf <- sparseMatrix( i = c((1:nrow(r.coords)),segs.neighbors[!is.na(segs.neighbors)]), 
+                                j = rep((1:nrow(r.coords)),4)[c(rep(TRUE,nrow(r.coords)),!is.na(segs.neighbors))], 
+                                x = rep(c(1,-1,-1,1),c(nrow(r.coords),colSums(!is.na(segs.neighbors)))),
                                 dims = c(nrow(r.coords),nrow(r.coords)) )
     nxab <- attr(hap.soln,"soln.dims")[1]  # number of space x AB combinations
     for (xk in 1:nxab) {
