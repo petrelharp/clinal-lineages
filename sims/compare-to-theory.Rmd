@@ -185,7 +185,7 @@ against $r$ and/or $x$.
 We'll do this against $x$ at a few values of $r$ because that's what we have.
 ```{r theory_haps, cache=TRUE}
 rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=41)
-# hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
-#                            sigma=theory.params$sigma, 
-#                            fwds.grid=fgrid, fwds.soln=fwds.soln )
+hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
+                           sigma=theory.params$sigma, 
+                           fwds.grid=fgrid, fwds.soln=fwds.soln )
 ```

@@ -287,6 +287,11 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     # rgrid = grid of recombination values
     ###
     # note: doing parallel lapply below is actually a good bit slower.
+    ###
+    # Result is ordered by:
+    #  - spatial location
+    #  - linked background
+    #  - left/right endpoints (in upper triangular order)
 
     # precompute some things
     rgrid$eps <- unique(diff(rgrid$x.mid))[1]
@@ -306,7 +311,7 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     soln.dims <- c( nrow=2*xgrid$N, ncol=rgrid$N*(rgrid$N+1)/2 )
 
     # the local frequency of the selected allele
-    ufun <- function (x,t) { approx(attr(fwds.soln,"grid")$x.mid,cline_interp(t,soln=fwds.soln),xout=x)$y }
+    ufun <- function (x,t) { approx(attr(fwds.soln,"grid")$x.mid, cline_interp(t,soln=fwds.soln), xout=x)$y }
     # not vectorized in t, so...
     u <- function (x,t) {
         ans <- numeric(length(x))
@@ -326,8 +331,8 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
                   mid=u(x=xgrid$x.mid,t=t),
                   int=u(x=xgrid$x.int,t=t)
               )
-        log.p <- log(pmax(p$int,min(eps,min(p$int[p$int>0]))))
-        log.1mp <- log(pmax(1-p$int,min(eps,min((1-p$int)[p$int<1]))))
+        log.p <- log( pmax(p$int, min(eps,min(p$int[p$int>0]))) )
+        log.1mp <- log( pmax(1-p$int, min(eps,min((1-p$int)[p$int<1]))) )
         diffusion <- do.call( cbind, lapply( 1:ncol(y), function (kcol) {
                 r <- rvals[kcol]
                 yA <- y[1:xgrid$N,kcol]
@@ -382,8 +387,11 @@ AD_from_soln <- function (soln,xgrid) {
 
 
 get_hap_probs <- function ( hap.soln, left, right ) {
+    # number of sites in spatial grid
     nx <- attr(hap.soln,"soln.dims")[1]/2
+    # find closest interval in rgrid (hack!)
     k.ab <- which.min( (attr(hap.soln,"r")[,"left"]-left)^2 + (attr(hap.soln,"r")[,"right"]-right)^2 )
+    # columns of hap.soln are time, then ordered by space, linked allele, rows of r
     kk <- which( 1+(((1:ncol(hap.soln))-2)%/%(2*nx)) == k.ab )
     dummy.soln <- hap.soln[,c(1,kk)]
     class(dummy.soln) <- class(hap.soln)
