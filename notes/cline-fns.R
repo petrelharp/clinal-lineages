@@ -57,9 +57,8 @@ clineplot <- function (soln, thegrid, x=thegrid$x.mid,
     return( invisible( t(soln[times,-1]) ) )
 }
 
-add_grid_axis <- function (thegrid,side=2,...) {
-    axis(side=side,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
-            labels=pretty(thegrid$x.mid))
+add_grid_axis <- function (thegrid,side=2,x=thegrid$x.mid,...) {
+    axis( side=side, at=(pretty(x)-min(x))/diff(range(x)), labels=pretty(x))
 }
 
 cline_interp <- function (t,soln) {

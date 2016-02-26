@@ -327,8 +327,31 @@ $T_B$ the first time $Z_\tau = B$, and likewise for $T_A$,
 \plr{Connect these up more.}
 
 
+\begin{figure}
+    \includegraphics{figs/linked-frequencies}
+    \caption{
+        \textbf{Probabilities of $A$ ancestry,}
+        across space (vertical axis, in units of $\sigma$) 
+        and time (horizontal axis, in generations).
+        In each plot, color corresponds to the expected frequency of $A$ ancestry
+        at a particular location in time and space.
+        The selection coefficient is $s=.02$.
+        \textbf{Top left:} at the selected site, showing establishment and stabilization of the cline
+        on a time scale of $1/s=50$ generations.
+        \textbf{Bottom left:} at an unliked site,
+        with cline flattening continuing with $\sqrt{t}$.
+        Remaining figures show frequencies of $A$ ancestry \emph{conditional}
+        on the ancestry at the selected site,
+        at different distances from the selected site ($r=.01$, .04, and 0.5 Morgans),
+        as described in the text (see definition of $q_z(x,t,r)$).
+        See figure \ref{sfig:linked_cline_heatmaps_longtime}
+        for the same figure over a longer period of time.
+    }
+    \label{fig:linked_cline_heatmaps}
+\end{figure}
 
-\paragraph{PDE for linked clines}
+
+\paragraph{Linked clines}
 We can use this diffusion model for lineages to compute expected clines in ancestry,
 i.e., the expected proportion of individuals who inherit from species $A$,
 as a function of space, time, and position on the genome.
