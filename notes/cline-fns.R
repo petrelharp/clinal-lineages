@@ -292,7 +292,14 @@ forwards_backwards_haplotypes <- function (s, times, xgrid, rgrid, sigma=1,
     #  - spatial location
     #  - linked background
     #  - left/right endpoints (in upper triangular order)
-
+    ###
+    # so can be indexed e.g. by (where hap.soln is the output)
+    # hap.coords <- expand.grid( x=xgrid$x.mid, AB=c("A","B"), rk=1:nrow(attr(hap.soln,"r")) )
+    # hap.coords$p <- hap.soln[nrow(hap.soln),-1]
+    # hap.coords$right <- attr(hap.soln,"r")[hap.coords$rk,"right"]
+    # hap.coords$left <- attr(hap.soln,"r")[hap.coords$rk,"left"]
+    # hap.coords$len <- hap.coords$right-hap.coords$left
+    ####
     # precompute some things
     rgrid$eps <- unique(diff(rgrid$x.mid))[1]
     rgrid$zeroind <- which(rgrid$x.mid>0)[1]
@@ -387,8 +394,9 @@ AD_from_soln <- function (soln,xgrid) {
 
 
 get_hap_probs <- function ( hap.soln, left, right ) {
-    # number of sites in spatial grid
-    nx <- attr(hap.soln,"soln.dims")[1]/2
+    # Return a deSolve-class object giving haplotype probabilites for the given (left,right) endpoints,
+    # across time, space, and linked to A and B.
+    nx <- attr(hap.soln,"soln.dims")[1]/2 # number of sites in spatial grid
     # find closest interval in rgrid (hack!)
     k.ab <- which.min( (attr(hap.soln,"r")[,"left"]-left)^2 + (attr(hap.soln,"r")[,"right"]-right)^2 )
     # columns of hap.soln are time, then ordered by space, linked allele, rows of r
@@ -398,5 +406,59 @@ get_hap_probs <- function ( hap.soln, left, right ) {
     attr(dummy.soln,"r") <- attr(hap.soln,"r")[k.ab,]
     attr(dummy.soln,"nspec") <- 2
     attr(dummy.soln,"dimens") <- attr(hap.soln,"dimens")
+    return(dummy.soln)
+}
+
+hap_cdf_to_pdf <- function ( hap.soln ) {
+    # we compute probability that (a,b) is within the maximal segment
+    # so need to convert to probability that (a,b) *is* the maximal segment:
+    # prob(a,>b) = prob(<a,>b) - prob(<a-1,>b) )
+    # prob(a,b) = prob(a,>b) - prob(a,>b+1)
+    #             prob(<a,>b) - prob(<a-1,>b) ) - prob(<a,>b+1) + prob(<a-1,>b+1) )
+    # except at boundaries: so, turn NAs below into zeros.
+    r.coords <- attr(hap.soln,"r")
+    rvals <- sort(unique(as.vector(r.coords)))
+    segs.k <- cbind( left=match(r.coords[,"left"],rvals), right=match(r.coords[,"right"],rvals) )
+    .hash <- function (a,b) { a*2*length(rvals)+b }  # factor of two avoids wraparound
+    segs.neighbors <- cbind(
+            left = match( .hash(segs.k[,1]-1,segs.k[,2]), .hash(segs.k[,1],segs.k[,2]) ),    # (a-1,b)
+            right = match( .hash(segs.k[,1],segs.k[,2]+1), .hash(segs.k[,1],segs.k[,2]) ),   # (a,b+1)
+            both = match( .hash(segs.k[,1]-1,segs.k[,2]+1), .hash(segs.k[,1],segs.k[,2]) ) ) # (a-1,b+1)
+    # here's a nrow(r.coords) x nrow(r.coords) matrix to do the conversion
+    cdf.to.pdf <- sparseMatrix( i = c((1:nrow(r.coords)),segs.neighbors[!is.na(segs.neighbors)]), 
+                                j = rep((1:nrow(r.coords)),4)[c(rep(TRUE,nrow(r.coords)),!is.na(segs.neighbors))], 
+                                x = rep(c(1,-1,-1,1),c(nrow(r.coords),colSums(!is.na(segs.neighbors)))),
+                                dims = c(nrow(r.coords),nrow(r.coords)) )
+    nxab <- attr(hap.soln,"soln.dims")[1]  # number of space x AB combinations
+    for (xk in 1:nxab) {
+        kk <- 1 + which( ( (0:(ncol(hap.soln)-2)) %% nxab )+1 == xk )
+        hap.soln[,kk] <- as.matrix( hap.soln[,kk] %*% cdf.to.pdf )
+    }
+    return(hap.soln)
+}
+
+mean_hap_len <- function ( hap.pdf, loc ) {
+    # Return a deSolve-class object giving mean haplotype lengths about location loc
+    # across time, space, and linked to A and B.
+    # MUST first convert to probabilities (not 1-cumulative probs)
+    # i.e. do hap.pdf <- hap_cdf_to_pdf(hap.soln)
+    nx <- attr(hap.pdf,"soln.dims")[1]/2 # number of sites in spatial grid
+    r.coords <- attr(hap.pdf,"r")
+    haplens <- r.coords[,"right"] - r.coords[,"left"]
+    # first column of hap.pdf is time; after that columns are ordered by space, linked allele, rows of r
+    # these are rows of r that loc falls in
+    k.in <- which( ( loc >= r.coords[,"left"] ) & ( loc <= r.coords[,"right"] ) )
+    k.ab <- k.in[1]
+    kk <- which( 1+(((1:ncol(hap.pdf))-2)%/%(2*nx)) == k.ab )
+    if (length(kk)==0) { warning("Location outside the range simulated."); return(NULL) }
+    dummy.soln <- hap.pdf[,c(1,kk)]
+    dummy.soln[,-1] <- dummy.soln[,-1] * haplens[k.in[1]]
+    for (k.ab in k.in[-1]) {
+        kk <- which( 1+(((1:ncol(hap.pdf))-2)%/%(2*nx)) == k.ab )
+        dummy.soln[,-1] <- dummy.soln[,-1] + hap.pdf[,kk] * haplens[k.ab]
+    }
+    class(dummy.soln) <- class(hap.pdf)
+    attr(dummy.soln,"nspec") <- 2
+    attr(dummy.soln,"dimens") <- attr(hap.pdf,"dimens")
     return(dummy.soln)
 }

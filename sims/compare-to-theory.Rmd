@@ -183,9 +183,86 @@ covering position $r$ on the genome at location $x$ in space: for fixed $\ell$,
 against $r$ and/or $x$.
 
 We'll do this against $x$ at a few values of $r$ because that's what we have.
+(Don't mess with this next code chunk, it'll invalidate the cache, which was expensive to make.)
 ```{r theory_haps, cache=TRUE}
 rgrid <- setup.grid.1D(x.up=-0.5, x.down=0.5, N=41)
 hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
                            sigma=theory.params$sigma, 
                            fwds.grid=fgrid, fwds.soln=fwds.soln )
+```
+
+```{r get_mean_hap_lens}
+hap.pdf <- hap_cdf_to_pdf( hap.soln )
+```
+
+Now let's compare this to simulation:
+```{r sim_hap_lens}
+sim_lens <- sapply( chunks, sapply, mean )
+sim_cond_lens <- sapply( chunks, sapply, function (x) { if (any(x>0)) { mean(x[x>0]) } else { NA } } )
+
+hap.len.mat <- sapply( chunks.rvals, function (crv) { 
+               haplens <- mean_hap_len( hap.pdf, loc=if(crv[1]==1){crv[2]-0.5}else{max(rgrid$x.mid)} ) 
+               haplens[length(tt),1+seq_along(xgrid$x.mid)]
+           } )
+
+matplot(xx, sim_lens, type='l', lty=sapply(chunks.rvals,"[",1),
+        main="mean haplotype length", ylim=range(sim_lens,hap.len.mat),
+        xlab="spatial position", ylab="mean B haplotype length (incl. zeros)")
+matlines( rev(xgrid$x.mid), hap.len.mat, lty=3 )
+legend("topleft", lty=c(sapply(chunks.rvals,"[",1),3), col=c(rep_len(1:6,ncol(sim_cond_lens)),1),
+        legend=c( sapply( chunks.rvals, function (x) { sprintf("chr %d: %0.3f",x[1],x[2]) } ), "theory") )
+```
+
+Here are haplotype length distributions:
+```{r hap_len_distributions}
+hap.coords <- expand.grid( x=xgrid$x.mid, AB=c("A","B"), rk=1:nrow(attr(hap.pdf,"r")) )
+hap.coords$p <- hap.pdf[nrow(hap.pdf),-1]
+hap.coords$cump <- hap.soln[nrow(hap.pdf),-1]
+hap.coords$right <- attr(hap.pdf,"r")[hap.coords$rk,"right"]
+hap.coords$left <- attr(hap.pdf,"r")[hap.coords$rk,"left"]
+hap.coords$len <- hap.coords$right-hap.coords$left
+
+x.inds <- floor(seq(1,length(xgrid$x.mid),length.out=11))
+xx <- xgrid$x.mid[x.inds]
+nxab <- attr(hap.pdf,"soln.dims")[1]  # number of space x AB combinations
+r.lens <- attr(hap.pdf,"r")[,"right"] - attr(hap.pdf,"r")[,"left"]
+lenvals <- seq(0,1,length.out=21)
+hap.distrns <- sapply( x.inds, function (xk) {
+        kk <- 1 + which( ( (0:(ncol(hap.pdf)-2)) %% nxab )+1 == xk )
+        y <- tapply( hap.pdf[nrow(hap.pdf),kk], match(r.lens,sort(unique(r.lens))), sum )
+        # not really a density: need to divide
+        diff(c(0,approx( sort(unique(r.lens)), cumsum(y), xout=lenvals )$y))
+    } )
+matplot( lenvals, hap.distrns, type='l', xlab="haplotype length", ylab="probability density" )
+legend("topright", lty=1:5, col=1:6, legend=sprintf("location = %0.2f", xx))
+```
+
+Here are haplotype probabilities (**not** cumulative):
+```{r look_at_haps}
+for (haplen in c(0.02, 0.04, 0.08, 0.16, 0.32, 0.64) ) {
+    hap.probs <- get_hap_probs( hap.pdf, left=-haplen/2, right=haplen/2 )
+    image(hap.probs, legend=TRUE, yaxt='n', zlim=range(hap.probs[,-1]),
+       main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
+```
+and here are the same offset by `r rgrid$dx[1]`
+```{r look_at_haps_offset}
+for (haplen in c(0.02, 0.04, 0.08, 0.16, 0.32, 0.64) ) {
+    hap.probs <- get_hap_probs( hap.pdf, left=rgrid$dx[1], right=rgrid$dx[1]+haplen )
+    image(hap.probs, legend=TRUE, yaxt='n', zlim=range(hap.probs[,-1]),
+       main=paste(c("A:","B:"),paste(round(attr(hap.probs,"r"),3),collapse=" to ")) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
+```
+
+Here are also heatmaps of **mean lengths**:
+```{r hap_lens}
+hap.centers <- c(0.0, 0.02, 0.04, 0.08, 0.16, 0.32)
+for (kloc in seq_along(hap.centers)) {
+    hap.len <- mean_hap_len( hap.pdf, loc=hap.centers[kloc] )
+    image(hap.len, legend=TRUE, yaxt='n', zlim=range(hap.len[,-1]),
+          main=paste(c("A:","B:"),sprintf("mean haplotype length at %f",hap.centers[kloc])) )
+    axis(2,at=(pretty(xgrid$x.mid)-min(xgrid$x.mid))/diff(range(xgrid$x.mid)),labels=pretty(xgrid$x.mid))
+}
 ```
