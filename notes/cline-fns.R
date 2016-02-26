@@ -419,7 +419,7 @@ hap_cdf_to_pdf <- function ( hap.soln ) {
     r.coords <- attr(hap.soln,"r")
     rvals <- sort(unique(as.vector(r.coords)))
     segs.k <- cbind( left=match(r.coords[,"left"],rvals), right=match(r.coords[,"right"],rvals) )
-    .hash <- function (a,b) { a*length(rvals)+b }
+    .hash <- function (a,b) { a*2*length(rvals)+b }  # factor of two avoids wraparound
     segs.neighbors <- cbind(
             left = match( .hash(segs.k[,1]-1,segs.k[,2]), .hash(segs.k[,1],segs.k[,2]) ),    # (a-1,b)
             right = match( .hash(segs.k[,1],segs.k[,2]+1), .hash(segs.k[,1],segs.k[,2]) ),   # (a,b+1)
