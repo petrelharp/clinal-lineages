@@ -89,8 +89,10 @@ fgrid <- extend_grid(xgrid)
 fwds.soln <- forwards_pde(s=theory.params$s, times=tt, grid=fgrid, sigma=theory.params$sigma )
 fwds.neutral.soln <- forwards_pde(s=0, times=tt, grid=fgrid, sigma=theory.params$sigma )
 
-compare.positions <- positions[ 1+(0:(floor(length(positions)/5)-1))*5 ]
-compare.positions <- compare.positions[compare.positions>=0.5]
+# compare.k <- 1+(0:(floor(length(positions)/5)-1))*5 
+# compare.k <- compare.k[ positions[compare.k]>=0.5 ]
+compare.k <- 31+c(0,1,2,3,5,8,13,21) 
+compare.positions <- positions[ compare.k ]
 compare.rvals <- compare.positions - 0.5
 
 linked.solns <- lapply( compare.rvals, function (r) {
@@ -98,62 +100,39 @@ linked.solns <- lapply( compare.rvals, function (r) {
                            sigma=theory.params$sigma, fwds.soln=fwds.soln, log.p=TRUE)
     } )
 linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
+tfreqs <- sapply( linked.clines, function (lnc) { lnc[nrow(lnc),-1] } )
 
 linked.neutral.solns <- lapply( compare.rvals, function (r) {
         forwards_backwards_pde(s=0, times=tt, grid=xgrid, r=r, 
                            sigma=theory.params$sigma, fwds.soln=fwds.neutral.soln, log.p=TRUE)
     } )
 linked.neutral.clines <- lapply( linked.neutral.solns, cline_from_soln, grid=xgrid )
+neutral.tfreqs <- sapply( linked.neutral.clines, function (lnc) { lnc[nrow(lnc),-1] } )
 
-pdf(file="alleleFrequencies_sim_comparison.pdf", width=6, height=4, pointsize=10)
+pdf(file="alleleFrequencies_sim_comparison.pdf", width=6, height=8, pointsize=10)
 layout((1:2))
 par(mar=c(3.5,3.5,0.5,0.5))
 
-# Neutral comparison
-# frequencies from theory
-tfreqs <- sapply( linked.neutral.clines, function (lnc) { lnc[nrow(lnc),-1] } )
+    # Neutral comparison
+    matplot( xx, B_neu/(2*neu.params$ninds/neu.params$ndemes),
+            xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5 )
+    matlines(xgrid$x.mid, 1-neutral.tfreqs, lty=2, lwd=2, col='black' )
 
-matplot(xx, B_neu/1000,xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5,x=seq(-24.5,24.6,1))
-matlines(xx, tfreqs, 
+        mtext("Geographic position",side=1,line=2)
+        mtext(expression(p[B]),side=2,line=2.5)
 
-for (kr in seq_along(compare.rvals)[-1]) {
-    # frequencies from theory
-    tfreqs <- linked.neutral.clines[[kr]][nrow(linked.neutral.solns[[kr]]),-1]
-    dim(tfreqs) <- c( length(xgrid$x.mid), 2 )
-    matplot(xx, cfreqs, type='l', lty=1, 
-            main=sprintf("Frequency of A ancestry by selected background, t=%d, r=%0.3f",sel.params$tau, sim.rvals[kr]), 
-            ylab="frequency", xlab='geographic position')
-    matlines(xgrid$x.mid, tfreqs, lty=2, lwd=2)
-    legend("topright", legend=outer(colnames(cfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
-}
+    # selected comparision
+    r.cols <- rainbow(ncol(B_freq)+10)
+    matplot( xx, B_freq[,compare.k]/(2*sel.params$ninds/sel.params$ndemes),
+            xlab="",ylab="",type="l",lty=1,lwd=0.75,
+            col=r.cols[1+floor(abs(ncol(B_freq)/2+0.5-1:ncol(B_freq)))][compare.k] )
+    matlines(xgrid$x.mid, 1-tfreqs, lty=2, lwd=2, 
+            col=r.cols[1+floor(abs(ncol(B_freq)/2+0.5-1:ncol(B_freq)))][compare.k] )
 
+        mtext("Geographic position",side=1,line=2)
+        mtext(expression(p[B]),side=2,line=2.5)
 
-# selected comparison
-for (kr in seq_along(compare.rvals)[-1]) {
-    # frequencies from theory
-    tfreqs <- linked.solns[[kr]][nrow(linked.solns[[kr]]),-1]
-    dim(tfreqs) <- c( length(xgrid$x.mid), 2 )
-    matplot(xx, cfreqs, type='l', lty=1, 
-            main=sprintf("Frequency of A ancestry by selected background, t=%d, r=%0.3f",sel.params$tau, sim.rvals[kr]), 
-            ylab="frequency", xlab='geographic position')
-    matlines(xgrid$x.mid, tfreqs, lty=2, lwd=2)
-    legend("topright", legend=outer(colnames(cfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
-}
-
-    matplot(B_neu/1000,xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5,x=seq(-24.5,24.6,1))
-
-    matplot(xx, sfreqs, type='l', lty=1, main=sprintf("Selected allele frequency, t=%d",sel.params$tau), ylab="frequency", xlab='geographic position')
-    matlines(fgrid$x.mid, tfreqs, lty=2, lwd=2)
-    legend("topright", legend=outer(colnames(sfreqs),c("sim","theory"),paste,sep=" : "), lty=rep(1:2,each=2), col=rep(1:ncol(sfreqs),2))
-
-    mtext("Geographic position",side=1,line=2)
-    mtext(expression(p[B]),side=2,line=2.5)
-dev.off()
-
-pdf(file="alleleFrequencies_sim.pdf",height=4,width=6,pointsize=10)
-    for(i in 1:30){
-        matlines(B_freq[,c(i,62-i)]/1000,col=(rainbow(43))[32-i],lty=1,lwd=0.75,x=seq(-24.5,24.6,1))
-    }
-    points(B_freq[,31]/1000,col="red",lwd=2,type="l",x=seq(-24.5,24.6,1))
     legend("bottomright",legend = c("r=0","r=0.05","r=0.1","r=0.2","r=0.3","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
+
 dev.off()
+
