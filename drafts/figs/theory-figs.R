@@ -109,12 +109,12 @@ pdf( file="linked-frequencies-longtime.pdf", width=6.5, height=4.2, pointsize=10
 # png( file="linked-frequencies.png", width=6.5*144, height=4.2*144, pointsize=10, res=144 )
 par(mar=c(3.5,3,2,0)+.1, mgp=c(2.3,1,0))
 layout(matrix(c(1:9,9),nrow=2),widths=c(rep(1,4),0.4))
-.imgplot( fwds.soln, main=expression(p(x,t)) )
+.imgplot( fwds.soln, main=expression(p(x,t)), xlab='' )
 .imgplot( linked.clines[[match(0.5,rr)]], main=expression(q(x,t,r==0.5)) )
 for (k in c(2,4,8)) {
-    .imgplot( linked.solns[[k]], which=1, xlab='',
+    .imgplot( linked.solns[[k]], which=1, xlab='', ylab='',
             main=as.expression(substitute( q[A](x,t,r==thisr), list(thisr=rr[k]))) )
-    .imgplot( linked.solns[[k]], which=2,
+    .imgplot( linked.solns[[k]], which=2, ylab='',
             main=as.expression(substitute( q[B](x,t,r==thisr), list(thisr=rr[k]))) )
 }
 .drawlegend()

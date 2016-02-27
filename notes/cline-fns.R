@@ -243,8 +243,9 @@ cline_from_soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     #  - and the next N numbers gives the value linked to Bs
     A.inds <- 1+(1:grid$N)
     B.inds <- 1+grid$N+(1:grid$N)
-    sel.cline <- outer( grid$x.mid, soln[,1], clinefn )
-    pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
+    sel.cline <- t( outer( grid$x.mid, soln[,1], clinefn ) )
+    #pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
+    pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline + soln[,B.inds]*(1-sel.cline) )
     attributes(pde.cline) <- c( attributes(pde.cline), attributes(soln)[setdiff(names(attributes(soln)),c("dim","dimnames"))] )
     attr(pde.cline,"nspec")<-1
     return(pde.cline)
