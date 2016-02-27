@@ -326,8 +326,31 @@ $T_B$ the first time $Z_\tau = B$, and likewise for $T_A$,
 \plr{Connect these up more.}
 
 
+\begin{figure}
+    \includegraphics{figs/linked-frequencies}
+    \caption{
+        \textbf{Probabilities of $A$ ancestry,}
+        across space (vertical axis, in units of $\sigma$) 
+        and time (horizontal axis, in generations).
+        In each plot, color corresponds to the expected frequency of $A$ ancestry
+        at a particular location in time and space.
+        The selection coefficient is $s=.02$.
+        \textbf{Top left:} at the selected site, showing establishment and stabilization of the cline
+        on a time scale of $1/s=50$ generations.
+        \textbf{Bottom left:} at an unliked site,
+        with cline flattening continuing with $\sqrt{t}$.
+        Remaining figures show frequencies of $A$ ancestry \emph{conditional}
+        on the ancestry at the selected site,
+        at different distances from the selected site ($r=.01$, .04, and 0.5 Morgans),
+        as described in the text (see definition of $q_z(x,t,r)$).
+        See figure \ref{sfig:linked_cline_heatmaps_longtime}
+        for the same figure over a longer period of time.
+    }
+    \label{fig:linked_cline_heatmaps}
+\end{figure}
 
-\paragraph{PDE for linked clines}
+
+\paragraph{Linked clines}
 We can use this diffusion model for lineages to compute expected clines in ancestry,
 i.e., the expected proportion of individuals who inherit from species $A$,
 as a function of space, time, and position on the genome.
@@ -378,7 +401,7 @@ In technical terms, $G^A$ and $G^B$ are the generators of the diffusions of $A$ 
 \paragraph{Numerical computation}
 To determine how the cline at a linked locus is expected to relax,
 we can solve the partial differential equations \eqref{eqn:cline_pde} and \eqref{eqn:q_pde} numerically.
-For instance, Figure \ref{fig:pde_clines} shows a heatmap of $p(x,t,r)$, 
+For instance, Figure \ref{fig:linked_cline_heatmaps} shows a heatmap of $p(x,t,r)$, 
 the expected frequency of ancestry $A$ at location $x$ and time $t$ 
 at a site at recombination distance $r$ from the selected site,
 which is computed as $p(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$. 
@@ -485,16 +508,19 @@ Hybrid zones of varying ages were simulated under conditions of $\sigma=1$ and $
 
 The simulations were executed in R, with scripts available on
 \url{https://github.com/asedghifar/hybridzones}.
+\plr{if I'm to be the corresp author, put this to \url{https://github.com/petrelharp/clinal-lineages}?}
 
 \begin{figure}
 \includegraphics{figs/alleleFrequencies_sim}
 \caption{
-Frequency of ancestry B,
-across geography and at several physical positions on the genome,
-at $T=100$ generations after secondary contact. 
-\plr{what is $s$?}
-Each line represents a locus some distance $r$ away from the true target of selection, and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
-identical parameters except $s=0$.
+    Frequency of ancestry B,
+    across geography and at several physical positions on the genome,
+    at $T=100$ generations after secondary contact,
+    and with $s=0.1$.
+    Each line represents a locus some distance $r$ away from the true target of selection, 
+    and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
+    identical parameters except $s=0$.
+    Corresponding theoretical quantities are shown juxtaposed in Figure \ref{sfig:alleleFreq_tau100_comparison}.
     \plr{Add same figure for some different time points and maybe values of $s$ to the supplement.} 
 }\label{alleleFreq_tau100}
 \end{figure}

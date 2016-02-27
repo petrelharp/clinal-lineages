@@ -57,9 +57,8 @@ clineplot <- function (soln, thegrid, x=thegrid$x.mid,
     return( invisible( t(soln[times,-1]) ) )
 }
 
-add_grid_axis <- function (thegrid,side=2,...) {
-    axis(side=side,at=(pretty(thegrid$x.mid)-min(thegrid$x.mid))/diff(range(thegrid$x.mid)),
-            labels=pretty(thegrid$x.mid))
+add_grid_axis <- function (thegrid,side=2,x=thegrid$x.mid,...) {
+    axis( side=side, at=(pretty(x)-min(x))/diff(range(x)), labels=pretty(x))
 }
 
 cline_interp <- function (t,soln) {
@@ -244,8 +243,9 @@ cline_from_soln <- function (soln, grid, clinefn=attr(soln,"u") ) {
     #  - and the next N numbers gives the value linked to Bs
     A.inds <- 1+(1:grid$N)
     B.inds <- 1+grid$N+(1:grid$N)
-    sel.cline <- outer( grid$x.mid, soln[,1], clinefn )
-    pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
+    sel.cline <- t( outer( grid$x.mid, soln[,1], clinefn ) )
+    #pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline[col(soln[,A.inds])] + soln[,B.inds]*(1-sel.cline)[col(soln[,B.inds])] )
+    pde.cline <- cbind( soln[,1], soln[,A.inds]*sel.cline + soln[,B.inds]*(1-sel.cline) )
     attributes(pde.cline) <- c( attributes(pde.cline), attributes(soln)[setdiff(names(attributes(soln)),c("dim","dimnames"))] )
     attr(pde.cline,"nspec")<-1
     return(pde.cline)

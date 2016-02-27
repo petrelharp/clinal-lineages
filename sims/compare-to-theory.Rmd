@@ -57,7 +57,7 @@ if (!exists("simchunks.file")) {
 load(simchunks.file)  # provides 'chunks' and 'chunks.rvals'
 get_simparams <- function (fname) {
     strings <- c( sigma="SIGMA", ninds="Ninds", ndemes="ndemes", s="s", tau="tau" )
-    lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",simchunks.file)) } )
+    lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",fname)) } )
 }
 sim.params <- get_simparams( simchunks.file )
 # recombination distances

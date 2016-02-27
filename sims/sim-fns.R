@@ -252,7 +252,8 @@ getChunk = function( IND_DATA, CHR, POS ) {
 }
 
 
-get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE){
+# here usually IND_DATA=sims.sums[[1]]$ind.ancest[[1]]
+get.interval.size = function(IND_DATA,CHR=1,POS=0.5,ancA = TRUE){
 	#return the interval containing focal site for a individual	
 	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
 	identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
@@ -260,7 +261,9 @@ get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0
 }
 
 
-get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,POS=0.5,ancA = TRUE){
+# and here usually IND_DATA=sims.sums[[1]]$ind.ancest
+# NOTE THE DIFFERENCE
+get.deme.chunks = function(IND_DATA, demeID, DEME = 1, CHR=1,POS=0.5,ancA = TRUE){
 	#get distribution of chunks within a deme
 	INDS = IND_DATA[which(demeID==DEME)]
 	intervals = do.call(rbind,lapply(INDS,get.interval.size,CHR=CHR,POS=POS,ancA=ancA)) 	
@@ -268,12 +271,9 @@ get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,P
 }
 
 
-get.ancestry.freqs = function(VECTOR_OF_POS,CHR){
-	lapply(VECTOR_OF_POS,function(POS){lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=POS,CHR=CHR)})})
-}
-
-get.ancestry.freqs = function(VECTOR_OF_POS,CHR){#outputs a ndeme x length(pos) matrix
-	CHUNKS=lapply(VECTOR_OF_POS,function(POS){lapply(1:ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE,POS=POS,CHR=CHR)})})
+get.ancestry.freqs = function(IND_DATA, VECTOR_OF_POS, CHR, ndemes, demeID){
+    # outputs a ndeme x length(pos) matrix
+	CHUNKS=lapply(VECTOR_OF_POS,function(POS){lapply(1:ndemes,function(X){get.deme.chunks(IND_DATA=IND_DATA, demeID=demeID, DEME=X,ancA=FALSE,POS=POS,CHR=CHR)})})
 	do.call(cbind,lapply(CHUNKS,function(C){sapply(C,function(X){length(which(X>0))})}))
 }
 
