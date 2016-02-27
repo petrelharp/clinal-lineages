@@ -14,14 +14,15 @@ prop.pal <- colorRampPalette(c(rev(brewer.pal(n=6,name="Blues")),brewer.pal(n=6,
 #####
 ## from pde-clines.Rmd
 
+########
 ## Time for the cline to get set up
 sigma <- 1
-xgrid <- setup.grid.1D(x.up=-floor(30*sigma), x.down=floor(30*sigma), N = 500)
+xgrid <- setup.grid.1D(x.up=-floor(30*sigma), x.down=floor(30*sigma), N = 200)
 
 r <- 0.1
 s <- 0.02
 zone.age <- 150  # this is tau
-tt <- seq(0,zone.age,length.out=500)
+tt <- seq(0,zone.age,length.out=200)
 
 # selected frequency
 fwds.soln <- forwards_pde(s=s, times=tt, grid=extend_grid(xgrid), sigma=sigma)
@@ -43,6 +44,7 @@ linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
             ylim=c(0.3,0.7),
             ylab=ylab, xlab=xlab,
             col=prop.pal(100), 
+            useRaster=TRUE,
            ... )
     graphics::contour( xmat, add=TRUE )
     add_grid_axis(attr(x,"grid"))
@@ -71,16 +73,51 @@ linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
 }
 
 
-pdf( file="linked-frequencies.pdf", width=6.5, height= 4.2, pointsize=10 )
+pdf( file="linked-frequencies.pdf", width=6.5, height=4.2, pointsize=10 )
+# png( file="linked-frequencies.png", width=6.5*144, height=4.2*144, pointsize=10, res=144 )
 par(mar=c(3.5,3,2,0)+.1, mgp=c(2.3,1,0))
 layout(matrix(c(1:9,9),nrow=2),widths=c(rep(1,4),0.4))
 .imgplot( fwds.soln, main=expression(p(x,t)) )
 .imgplot( linked.clines[[match(0.5,rr)]], main=expression(q(x,t,r==0.5)) )
 for (k in c(2,4,8)) {
-    .imgplot( linked.solns[[k]], which=1, 
+    .imgplot( linked.solns[[k]], which=1, xlab='',
             main=as.expression(substitute( q[A](x,t,r==thisr), list(thisr=rr[k]))) )
     .imgplot( linked.solns[[k]], which=2,
             main=as.expression(substitute( q[B](x,t,r==thisr), list(thisr=rr[k]))) )
 }
 .drawlegend()
 dev.off()
+
+
+########
+## same thing, but much larger time
+zone.age <- 600  # this is tau
+tt <- seq(0,zone.age,length.out=400)
+
+# selected frequency
+fwds.soln <- forwards_pde(s=s, times=tt, grid=extend_grid(xgrid), sigma=sigma)
+
+# linked frequencies
+linked.solns <- lapply( rr, function (r) {
+            forwards_backwards_pde(s=s, times=tt, grid=xgrid, 
+                    r=r, sigma=sigma,
+                    log.p=TRUE, fwds.soln=fwds.soln)
+        } )
+linked.clines <- lapply( linked.solns, cline_from_soln, grid=xgrid )
+
+pdf( file="linked-frequencies-longtime.pdf", width=6.5, height=4.2, pointsize=10 )
+# png( file="linked-frequencies.png", width=6.5*144, height=4.2*144, pointsize=10, res=144 )
+par(mar=c(3.5,3,2,0)+.1, mgp=c(2.3,1,0))
+layout(matrix(c(1:9,9),nrow=2),widths=c(rep(1,4),0.4))
+.imgplot( fwds.soln, main=expression(p(x,t)) )
+.imgplot( linked.clines[[match(0.5,rr)]], main=expression(q(x,t,r==0.5)) )
+for (k in c(2,4,8)) {
+    .imgplot( linked.solns[[k]], which=1, xlab='',
+            main=as.expression(substitute( q[A](x,t,r==thisr), list(thisr=rr[k]))) )
+    .imgplot( linked.solns[[k]], which=2,
+            main=as.expression(substitute( q[B](x,t,r==thisr), list(thisr=rr[k]))) )
+}
+.drawlegend()
+dev.off()
+
+
