@@ -6,8 +6,8 @@ source("sim-fns.R")
 
 params = list(
     SIGMA = 3,
-    ndemes = 100,
-    deme_size = 50,
+    ndemes = 10,
+    deme_size = 10,
     S = 0.05,
     zone_age = 10
 )

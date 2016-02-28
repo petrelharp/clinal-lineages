@@ -137,7 +137,7 @@ get.flanking.blocks.all = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=c
 	}
 	
 flanking.blocks.by.ind = lapply(positions,function(POS){
-	tapply(1:lenth(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
+	tapply(1:length(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
 			get.flanking.blocks.all(IND_DATA=sims.sums[[1]]$ind.ancest[[IND]],POS=POS)}))})})
 	
 
