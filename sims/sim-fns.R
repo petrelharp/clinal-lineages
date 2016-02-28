@@ -1,6 +1,6 @@
 
 getRuns = function(index){
-    #This returns an array in which rows are the the beggingns and end of a TRUE/FALSE vector
+    #This returns an array in which rows are the the beginnings and end of a TRUE/FALSE vector
     # (note: more efficient to use rle() probably)
     starts  = which(c(0,index)[-1]==1 & c(0,index)[-length(index)]!=1)
     stops   = which(c(index,0)[-1]!=1 & c(index,0)[-(1+length(index))]==1)
@@ -235,9 +235,8 @@ trueSigma <- function (sigma,n=1e4) {
 
 
 ###########################
-#To get distribution of chunks of ancestry B to the (wlog) right of a locus, for instance:
-# testB_far = lapply(1:params$ndemes,function(X){getDemeChunks(DEME=X,ancA=FALSE,POS=0.01)})
-
+# Getting lengths of chunks of ancestry
+###
 
 getChunk = function( IND_DATA, CHR, POS ) {
 	# return the length and identity of the interval containing the focal site for a (haploid) individual	
