@@ -234,6 +234,9 @@ intervalSizes_allAncs = lapply(positions,function(POS){
             }))
         })
 
+save(intervalSizes, file=paste(outstring,"intervalSizes.Robj",sep="_"))
+save(intervalSizes_allAncs, file=paste(outstring,"intervalSizes_allAncs.Robj",sep="_"))
+
 #[[POS]][ind,chr]
 
 # from deSolve:::drawlegend

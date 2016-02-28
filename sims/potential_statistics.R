@@ -13,7 +13,7 @@ positions = seq(plot_start,plot_stop,increments)
 
 outstring = sprintf("simulation_SIGMA%d_Ninds%d_ndemes50_s%g_tau%d_%s_start%g_stop%g_by%g",SIGMA,Ninds,sel,Ngen,chromosome,plot_start,plot_stop,increments)
 
-deme_ID = do.call(c,lapply(1:Ndemes,function(X){rep(X,Ninds/Ndemes)}))
+deme_ID = rep( 1:Ndemes, each=Ninds/Ndemes )
 
 #1. For each site, add up scores of all overlapping haplotypes
 #2. Ways to score:
@@ -34,7 +34,8 @@ intervalSizes = lapply(positions,function(POS){
 				get.interval.size(IND_DATA=IND,CHR=chromosome,POS=POS,ancB=TRUE)	
 				}))
 				})
-				
+
+# WARNING: redefining the same function:
 #lengths of any ancestry:
 get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromsoome,POS=0.5,ancB=TRUE){
 	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
