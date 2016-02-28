@@ -252,11 +252,14 @@ getChunk = function( IND_DATA, CHR, POS ) {
 
 
 # here usually IND_DATA=sims.sums[[1]]$ind.ancest[[1]]
-get.interval.size = function(IND_DATA,CHR=1,POS=0.5,ancA = TRUE){
+get.interval.size = function(IND_DATA,CHR=1,POS=0.5,ancA=TRUE,restrict.anc=TRUE){
 	#return the interval containing focal site for a individual	
 	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
-	identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
-	replace(chunk,which(identity==ancA),0)
+    if (restrict.anc) {
+        identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
+        replace(chunk,which(identity==ancA),0)
+    }
+    return(chunk)
 }
 
 
