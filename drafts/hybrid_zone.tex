@@ -817,6 +817,7 @@ We expect, therefore, our findings here to be somewhat generalizable.
 Our assumption of a single selected locus may have greater consequences. While our model is likely to be relevant to cases in which there are only a small number of targets of selection scattered throughout the genome, our predictions may differ significantly from situations in which the density of selected sites is higher. 
 Having numerous selected sites within one ancestry block increases the strength of selection, and the relatively short map distances between linked incompatibilities generates a longer unit which is not readily broken up by recombination. Both factors are expected to result in regions that are surrounded by even greater chunks of unbroken ancestry, and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection. 
  $s$ and relatively short map distances between linked incompatibilities)
+ 
 
 \paragraph{Geographic space and other sources of stochasticity}
 For ease of calculations, our analytic model assumes a continuous and smooth one-dimensional spatial structure of the geographic landscape, allowing us to derive analytic expressions that track lineages. 
@@ -828,6 +829,35 @@ While we still believe that the genomic signature of long ancestry chunks around
 Of particular concern that stems from the above assumption is that our model ignores potential, and likely, sources of stochasticity arising from geographic structure and coalescence/pedigree structure. The latter can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \cite{Liang2014}. With respect to genealogy, the broad agreement between our analytic predictions and simulations (which include an explicit pedigree structure), suggests that this assumption does not have a severe qualitative impact on our major results when populations are moderately high, especially for all but the most recently formed hybrid zones. 
 
 Lastly, while our theory focusses on a spatially arranged hybrid zone, it is likely that our results extend to alternative models of hybridization including models of assortative mating and hybrid swarms. This is because regardless of the specific demographic model, selection against hybrids will severely limit opportunities for recombination between ancestries around incompatibilities.
+
+
+
+
+\subsection*{Theory and simulation}
+In this work, we have taken two complementary approaches,
+using both simulation and theory, and comparing the two.
+As usual, simulations make fewer biological simplifications,
+while theory provides more generalizable conclusions.
+To do this, we have described the branching diffusion process that approximates
+the lineages along which haplotypes are inherited.
+Since the expected motion of a lineage depends on the local frequencies of the selected alleles,
+these diffusions are time-inhomogeneous.
+
+The diffusion model for lineages predicts that quantities of interest solve sets of coupled partial differential equations (PDE),
+which we have written down.
+As there are no known analytical solutions to these PDE,
+we have constructed numerical solutions (and provide the source code for doing this).
+A main role of these solutions in our work has been to verify that theory based on the diffusion model of lineages
+matches the simulations.
+These solutions easily and quickly provide predictions of joint frequencies at small numbers of loci:
+about 1 second to compute predicted clines, as opposed to hours for the full simulation.
+However, due to the high dimensionality of the haplotype problem (spatial position $\times$ time $\times$ endpoints of the haplotype),
+numerical solutions for mean haplotype lengths along the genome can be as computationally intensive as simulations
+(although are substantially less noisy).
+More work could be done to develop more efficient methods of solution,
+but it may be better to perform more biologically realistic forwards-time simulations that includes coalescence and drift.
+Nonetheless, the PDE approach is easily modified to provide predictions for spatial and temporally inhomogeneous systems --
+for instance, across maps of real landscapes.
 
 %, and is an example of the more general idea of duality for particle systems \alisa{I think this may be beyond the average ME reader?}. 
 %\plr{Tracking lineages is duality, has nothing to do with 1D, though.}
@@ -876,49 +906,26 @@ Overall, focusing on lengths of ancestry blocks across the genome brings focus t
 %We hope that our work provides a path towards thinking about the process of heterogeneous divergence more concretely. % in terms of the processes of migration, and selection influencing patterns of ancestry across the genome of hybridizing populations.
 
 
-\subsection*{Future directions}
+%\subsection*{Future directions}
 
-\plr{Perhaps delete this paragraph? A small note saying should check power with simulations up where we discuss the statistic would do.}
-Our work has highlighted distinct genomic signatures accompanying hybrid incompatibilities. 
-We suggest that such signatures could be combined in an inference framework that aims to identify incompatibilities from genome scans of hybrid zones.  
-However, doing so requires careful evaluation of potential signals of an incompatibility. 
-For example, should we consider jointly lengths of ancestry and allele frequencies to identify incompatibilities?
-Will dividing haplotype length by the length of adjacent haplotypes add power to tests because of the extra information contained in this measure, or add noise because of chance variation in these statistics.  
-Validation of the effectiveness of our proposed statistics, especially under demographic models that differ from the one dimensional hybrid zone explored above, will  provide a guide on how our results can be used to learn about selection from the distribution of ancestry tract lengths. We note, however, that power to detect regions under selection will depend on a number of parameters, such as $s$ and $T$
+%\plr{Perhaps delete this paragraph? A small note saying should check power with simulations up where we discuss the statistic would do.}
+%Our work has highlighted distinct genomic signatures accompanying hybrid incompatibilities. 
+%We suggest that such signatures could be combined in an inference framework that aims to identify incompatibilities from genome scans of hybrid zones.  
+%However, doing so requires careful evaluation of potential signals of an incompatibility. 
+%For example, should we consider jointly lengths of ancestry and allele frequencies to identify incompatibilities?
+%Will dividing haplotype length by the length of adjacent haplotypes add power to tests because of the extra information contained in this measure, or add noise because of chance variation in these statistics.  
+%Validation of the effectiveness of our proposed statistics, especially under demographic models that differ from the one dimensional hybrid zone explored above, will  provide a guide on how our results can be used to learn about selection from the distribution of ancestry tract lengths. We note, however, that power to detect regions under selection will depend on a number of parameters, such as $s$ and $T$
 
 \plr{Remove "Future directions", title this "The hybrid filter", and discuss the hybrid filter ideas we had?}
-Throughout, we have focussed on hybrid incompatibilities, however, the possibility that some loci adaptively introgress across hybrid zones has excited many biologists \citep{Arnold2004}.   
-The best characterized example of adaptive introgression comes from the vitamin K epoxide reductase subcomponent 1 (vkorc1), which seems to have spread from Algerian mice \emph{Mus spretus} to house mice \emph{Mus musculus} from because it confers resistance to the anticoagulant rodenticide, warfarin. \citep{Song2011}. 
-Future work could dress expected genomic signatures of adaptive introgression in hybridizing populations using the number and length of haplotypes of non-native ancestry. 
-Doing so requires an understanding of how positive selection shapes ancestry block lengths in these cases. 
+\subsection*{The hybrid filter}
+\alisa{Could not find a reference to the hybrid filter}
 
+We have demonstrated here the potential utility for block length distributions in hybrid zone populations, particularly in populations that are found some distance from the center of the zone. While the focus here, has been on hybrid incompatibilities, the possibility that some loci adaptively introgress across hybrid zones has excited many biologists \citep{Arnold2004}. Future work could take a similar approach to understand how positive selection shapes ancestry block lengths, and predict  signatures of adaptive introgression in hybridizing populations using similar statistics presented here. These could eventually be combined to gain a fuller understanding of the forces shaping patterns of introgression in hybrid zones. 
 
+%The best characterized example of adaptive introgression comes from the vitamin K epoxide reductase subcomponent 1 (vkorc1), which seems to have spread from Algerian mice \emph{Mus spretus} to house mice \emph{Mus musculus} from because it confers resistance to the anticoagulant rodenticide, warfarin. \citep{Song2011}. 
+%Future work could dress expected genomic signatures of adaptive introgression in hybridizing populations using the number and length of haplotypes of non-native ancestry. 
+%Doing so requires an understanding of how positive selection shapes ancestry block lengths in these cases. 
 
-\subsection*{Theory and simulation}
-In this work, we have taken two complementary approaches,
-using both simulation and theory, and comparing the two.
-As usual, simulations make fewer biological simplifications,
-while theory provides more generalizable conclusions.
-To do this, we have described the branching diffusion process that approximates
-the lineages along which haplotypes are inherited.
-Since the expected motion of a lineage depends on the local frequencies of the selected alleles,
-these diffusions are time-inhomogeneous.
-
-The diffusion model for lineages predicts that quantities of interest solve sets of coupled partial differential equations (PDE),
-which we have written down.
-As there are no known analytical solutions to these PDE,
-we have constructed numerical solutions (and provide the source code for doing this).
-A main role of these solutions in our work has been to verify that theory based on the diffusion model of lineages
-matches the simulations.
-These solutions easily and quickly provide predictions of joint frequencies at small numbers of loci:
-about 1 second to compute predicted clines, as opposed to hours for the full simulation.
-However, due to the high dimensionality of the haplotype problem (spatial position $\times$ time $\times$ endpoints of the haplotype),
-numerical solutions for mean haplotype lengths along the genome can be as computationally intensive as simulations
-(although are substantially less noisy).
-More work could be done to develop more efficient methods of solution,
-but it may be better to perform more biologically realistic forwards-time simulations that includes coalescence and drift.
-Nonetheless, the PDE approach is easily modified to provide predictions for spatial and temporally inhomogeneous systems --
-for instance, across maps of real landscapes.
 
 
 %\subsection*{Simulation and analysis code}
