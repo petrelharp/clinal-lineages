@@ -22,7 +22,7 @@ filebase <- sprintf("haplotypes_SIGMA%d_density%d_ndemes%d_s%0.3f_tau%d",
                  theory.params$sigma, theory.params$density, theory.params$ndemes, theory.params$s, theory.params$tau )
 robj.file <- file.path("cache",paste0(filebase,".Robj"))
 
-if (!file.exists) {
+if (!file.exists(robj.file)) {
     tt <- seq(0,theory.params$tau,length.out=21)
     xgrid <- setup.grid.1D(x.up=-theory.params$ndemes/2, x.down=theory.params$ndemes/2, N=50)
     fgrid <- extend_grid(xgrid)
