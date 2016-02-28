@@ -12,7 +12,10 @@ theory.params <- list(
               s=0.01,
               tau=1000L,
               density=100L,
-              ndemes=50L )
+              ndemes=50L,
+              sim.files=file.path("../../sims",c("simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes.Robj",
+                 "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes_allAncs.Robj"))
+             )
 theory.params$ninds <- theory.params$ndemes * theory.params$density
 
 filebase <- sprintf("haplotypes_SIGMA%d_density%d_ndemes%d_s%0.3f_tau%d",
@@ -38,41 +41,89 @@ if (!file.exists) {
 }
 
 ####
+# plot stuff
 
+# expected from theory  (see compare-to-theory.Rmd)
 hap.pdf <- hap_cdf_to_pdf( hap.soln )
-
 
 hap.len.mat <- sapply( rgrid$x.mid, function (rr) { 
                haplens <- mean_hap_len( hap.pdf, loc=rr )
                haplens[length(tt),1+seq_along(xgrid$x.mid)]
            } )
 
-# mean length against space
-matplot(rev(xgrid$x.mid), hap.len.mat, type='l', lty=1,
-        main="mean B haplotype length", 
-        col=rainbow(length(rgrid$x.mid)),
-        xlab="spatial position", ylab="mean B haplotype length (incl. zeros)")
-k.legend <- floor(seq(1,ncol(hap.len.mat),length.out=8))
-legend("topleft", lty=1, col=rainbow(length(rgrid$x.mid))[k.legend],
-        legend=sprintf("r=%0.0f cM",100*rgrid$x.mid[k.legend]) )
+if (FALSE) {
 
-# mean length along the genome
-matplot(rgrid$x.mid*100, t(hap.len.mat), type='l', lty=1,
-        main="mean B haplotype length", 
-        col=rainbow(length(xgrid$x.mid)),
-        xlab="position along genome (cM)", 
-        ylab="mean B haplotype length (incl. zeros)")
-k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
-legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
-        legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+# from simulation
+for (x in theory.params$sim.files){ load(x) }
+positions=seq(0.48,0.52,0.001)
+deme_ID = rep( 1:theory.params$ndemes, each=theory.params$density )
+xx = (1:theory.params$ndemes)-0.5-theory.params$ndemes/2
 
-# mean length along the genome, normalized
-matplot(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")), 
-        type='l', lty=1,
-        main="mean B haplotype length, normalized by location", 
-        col=rainbow(length(xgrid$x.mid)),
-        xlab="position along genome (cM)", 
-        ylab="relative mean B haplotype length (incl. zeros)")
-k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
-legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
-        legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)])})}))
+
+
+.spatial.legend <- function () {
+    # do the legend for a matplot where one line correponds to a location
+    these.lines <- unique(floor(seq(1,length(xx),length.out=10)))
+    legend("topright",
+           title="distance from center:",
+           legend = xx[these.lines],
+           cex=0.7,col=rainbow(length(xx))[these.lines],lty=1,xjust=1)
+}
+
+pdf(height=4, width=6.25,file=paste("blocksAlongChromAncBConditioning_comparison.pdf",sep="_"))
+
+par(mar=c(3.5,3.5,0.5,0.5))
+plot( (positions-0.5)*100, mean_per_deme_AncB[,1]/mean(mean_per_deme_AncB[,1],na.rm=T), 
+     ylim=c(0.5,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="")
+for(i in 1:theory.params$ndemes){
+    lines((positions-0.5)*100,mean_per_deme_AncB[,i]/mean(mean_per_deme_AncB[,i],na.rm=T),
+          col=rainbow(theory.params$ndemes)[i])
+}
+mtext("Distance from selected locus (cM)",side=1,line=2.5)
+mtext("Normalized mean block length",side=2,line=2.5)
+
+# theory
+matlines(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")), 
+        lty=1, col=rainbow(length(xgrid$x.mid)) )
+
+.spatial.legend()
+
+dev.off()
+
+}
+
+# if (FALSE) 
+{
+    pdf(file=paste0(filebase,"_haplotype_lens.pdf",width=6,height=4,pointsize=10)
+    # mean length against space
+    matplot(rev(xgrid$x.mid), hap.len.mat, type='l', lty=1,
+            main="mean B haplotype length", 
+            col=rainbow(length(rgrid$x.mid)),
+            xlab="spatial position", ylab="mean B haplotype length (incl. zeros)")
+    k.legend <- floor(seq(1,ncol(hap.len.mat),length.out=8))
+    legend("topleft", lty=1, col=rainbow(length(rgrid$x.mid))[k.legend],
+            legend=sprintf("r=%0.0f cM",100*rgrid$x.mid[k.legend]) )
+
+    # mean length along the genome
+    matplot(rgrid$x.mid*100, t(hap.len.mat), type='l', lty=1,
+            main="mean B haplotype length", 
+            col=rainbow(length(xgrid$x.mid)),
+            xlab="position along genome (cM)", 
+            ylab="mean B haplotype length (incl. zeros)")
+    k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
+    legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
+            legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+
+    # mean length along the genome, normalized
+    matplot(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")), 
+            type='l', lty=1,
+            main="mean B haplotype length, normalized by location", 
+            col=rainbow(length(xgrid$x.mid)),
+            xlab="position along genome (cM)", 
+            ylab="relative mean B haplotype length (incl. zeros)")
+    k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
+    legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
+            legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+    dev.off()
+}
