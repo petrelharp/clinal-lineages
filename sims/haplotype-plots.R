@@ -1,3 +1,14 @@
+# needs to have defined:
+#   params
+
+# this could be useful for that:
+get_simparams <- function (fname) {
+    strings <- c( SIGMA="SIGMA", ninds="Ninds", ndemes="ndemes", S="s", tau="tau", run.id="runid_" )
+    out <- lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",fname)) } )
+    out$zone_age <- out$tau
+    out$deme_size <- out$ninds/out$ndemes
+    return(out)
+}
 
 #########
 #########
@@ -60,7 +71,7 @@ save(intervalSizes_allAncs, file=paste(outstring,"intervalSizes_allAncs.Robj",se
 ##
 our_image <- function (z, main='', breaks=pretty(z,n=25), col=heat.colors(length(breaks)-1)) {
     # do an image plot with a scale bar
-    layout(c(1,2),heights=c(1,4))
+    layout(c(1,2),heights=c(1.5,4))
     on.exit(layout(1),add=TRUE)
     opar <- par(mar=c(0.5,3.5,4,1))
     on.exit(par(opar),add=TRUE)
