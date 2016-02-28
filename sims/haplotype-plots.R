@@ -128,6 +128,20 @@ pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromHeatmapAncBCondit
 our_image(mean_per_deme_AncB)
 dev.off()
 
+get.flanking.blocks.all = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromosome,POS=0.5,ancB=TRUE){
+	focal_chunks = do.call(rbind,lapply(IND_DATA[[CHR]],function(X){
+		FOCUS = which(X$starts<POS & X$stops>POS);
+		if(max(FOCUS-1,1)!=min(FOCUS+1,nrow(X))){return(X[c(max(FOCUS-1,1),min(FOCUS+1,nrow(X))),])}else return(X[max(FOCUS-1,1),])}
+		))
+	focal_chunks$stops-focal_chunks$starts
+	}
+	
+flanking.blocks.by.ind = lapply(positions,function(POS){
+	tapply(1:lenth(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
+			get.flanking.blocks.all(IND_DATA=sims.sums[[1]]$ind.ancest[[IND]],POS=POS)}))})})
+	
+
+
 pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromNoConditioning.pdf",sep="_"))
 par(mar=c(3.5,3.5,0.5,0.5))
 flanking.blocks.deme.matrix = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind,function(POS){mean(POS[[DEME]])})}))
