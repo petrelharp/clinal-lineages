@@ -99,6 +99,7 @@ locally disadvantageous alleles exist as recent, small families (moving at speed
 haplotype chunks longest around introgressing selected bits, flanked by shorter chunks.
 }
 
+\plr{say what population density in simulation figures}
 
 %%%%% %%%%%% %%%%%%%
 \section*{Introduction}
@@ -439,10 +440,10 @@ which is written (omitting the $(x,t)$ for conciseness):
         \dot g_A(a,b) 
         &= G^A g_A(a,b) + r(a,b) (1-p) (g_A(a,b)-g_B(a,b))
             \\ {} & \qquad 
-            + (1-p) \int_a^0 \left(
+            + (1-p) \left( \int_a^0 
                 g_B(a,\theta) g_A(\theta,b)
-                + g_A(a,\theta) g_B(\theta,b)
-            \right) d\theta,
+                + \int_0^b g_A(a,\theta) g_B(\theta,b)
+            d\theta \right)
             \\ {} & \qquad 
             + p \int_a^b {
                 g_A(a,\theta) g_A(\theta,b) 
@@ -588,7 +589,18 @@ Although our analytical model does not account for coalescence, we are able to p
 
 \section*{Results}
 
-\section*{Single-locus behavior}
+\subsection*{Comparison of theory and simulation}
+
+The theoretical results described above matched well with our individual-based simulations,
+across a large range of parameter values.
+This can be seen by comparing
+clines in frequency of $A$ ancestry at linked loci,
+either unconditional on the identity of the linked selected allele (Figure \ref{sfig:alleleFreq_tau100_comparison}),
+or conditional on its identity 
+(Figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau320_comparison}, and \ref{sfig:condAlleleFreq_tau1280_comparison}).
+
+
+\subsection*{Single-locus behavior}
 
 From previous results, we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, clines at closely linked sites are narrower.
 This is seen, for instance, in Figure~\ref{alleleFreq_tau100}. 
@@ -773,6 +785,20 @@ This statistic, perhaps in relation to the length of ancestry around adjacent si
 While these statistics presented here are currently detectable only in the few systems for which dense genetic markers and phase information is known, as the cost of sequencing continues to drop and long-phased reads become more common, the patterns described here could further aid in the identification of selected sites in hybrid zones. In the meantime, patterns of elevated pairwise LD, which is more easily computed from readily available low-density and unphased genomic data, could offer a less-powerful alternative to these findings. 
 
 
+\plr{note that when drift starts to kick in for clines (around $\tau=320$) we start to get better power with haplotype lengths}
+
+\plr{This first paragraph sounds like the Introduction.  A brief recap here is good: maybe something like:
+    Our goal in this paper was to describe cline formation and haplotype structure around a new hybrid zone,
+    which we have done using both theory and simulation.
+    Our most useful observations are that clines establish over time $1/s$,
+    and that lineages of selected loci found on the side of the hybrid zone where they are at a disadvantage
+    tend to move back towards the side where they are common
+    at speed $\sigma/\sqrt{s}$.
+    This predicts that blocks of ancestry are longer near the center, flanked by shorter ones ...
+}
+
+
+
 %However, how selection influences the length of tracts of ancestry around selected sites in hybrid zones has received much less attention. We we present an expectation of ancestry block lengths in hybrid zone. We find that selection against hybrid incompatibilities leaves a distinct genomic signature in the form of long contiguous blocks of ancestry around these loci.   
 
 \alisa{These seem like an orphan statement. Any idea where to stick these?}
@@ -884,7 +910,8 @@ As there are no known analytical solutions to these PDE,
 we have constructed numerical solutions (and provide the source code for doing this).
 A main role of these solutions in our work has been to verify that theory based on the diffusion model of lineages
 matches the simulations.
-These solutions easily and quickly provide predictions of joint frequencies at small numbers of loci.
+These solutions easily and quickly provide predictions of joint frequencies at small numbers of loci:
+about 1 second to compute predicted clines, as opposed to hours for the full simulation.
 However, due to the high dimensionality of the haplotype problem (spatial position $\times$ time $\times$ endpoints of the haplotype),
 numerical solutions for mean haplotype lengths along the genome can be as computationally intensive as simulations
 (although are substantially less noisy).
@@ -1020,7 +1047,97 @@ should both be scaled by $\sigma^2$.
 \section{Numerical calculation of haplotype probabilities}
 \label{apx:haplotype_calcs}.
 
-Numerical details.
+In this section, we give details for how we found numerical solutions
+to the partial differential equations (PDE) of the text,
+which are all of reaction-diffusion type.
+The R code, with worked examples, is available in our git repository.
+Spatial grids were usually chosen to have at least four grid sites per dispersal distance,
+but using substantially finer grids did not affect the results.
+
+The forwards-time evolution of the selected alleles,
+equation \eqref{eqn:cline_pde}, presents no difficulty;
+we use the ReacTran package \citep{soetaert2012reactive} to compute discrete approximations to the diffusion term,
+and the deSolve package \citep{soetaert2010solving} to solve the equation.
+
+The equations \eqref{eqn:q_pde} describing probabilities that a lineage descends from $A$ ancestry,
+conditional on the linked selected allele, required some more attention.
+First, $s>0.1$ the system of equations can be \emph{stiff} 
+(as is commonly observed for reaction-diffusion equations),
+and hence slow to solve,
+because of the extremely steep slope of the selected allele frequency $p(x,t)$.
+In practice we used $s<0.1$.
+Second, the ReacTran function tran.1D that converts the diffusion portion of the PDE into a system of ODE
+contains a term like 
+\begin{align*}
+    \frac{1}{A(x)} \frac{d}{dx} A(x) f(x) = \frac{d}{dx} f(x) + f(x) \frac{d}{dx} \log A(x) ,
+\end{align*}
+where $A(x)$ is the interface area between grid cells, and $f(x)$ is the flux.
+(See \citet{sotaert2012reactive} for more details.)
+Discrete approximations of the left-hand side, as implemented in ReacTran, 
+run into numerical difficulties if $A(x)$ is small,
+and in our case, $A(x)$ is equal to $p$, the local frequency of the selected $A$ allele.
+To avoid this, we made minor modifications to the tran.1D to provide a discrete approximation to the right-hand side.
+
+Haplotype probabilities are obtained from equations \eqref{eqn:g_pde},
+which is a coupled system of integro-differential equations in three variables plus time.
+One method for solution would be via a Wild sum over the number of recombination events, 
+as we did in \citet{Sedghifar2015}.
+Here, we solved the equations numerically,
+again discretizing the equations and using the ode.1D function of the deSolve package.
+The reaction-diffusion part is the same as for equations \eqref{eqn:q_pde}.
+The functions $g_A(x,t;a,b)$ and $g_B(x,t;a,b)$ are functions of space ($x$), time ($t$), 
+and the endpoints of the block in question ($a$ and $b$, with $a<b$).
+The second integral in \eqref{eqn:g_pde} is
+\begin{align} \label{eqn:unifprod}
+    \int_a^b { g_A(a,\theta) g_A(\theta,b) } d\theta .
+\end{align}
+Conceptually, this is an integral transformation
+$g(a,b) \mapsto \int_a^b g(a,\theta) g(\theta,b) d\theta$;
+the reason it appears here is that for the entire segment $(a,b)$ to be of ancestry $A$,
+if there was a recombination at $\theta$,
+the two segments $(a,\theta)$ and $(\theta,b)$ must both be of ancestry $A$
+(and, ignoring coalescence, these probabilities are independent).
+Suppose we have divided the segment of chromosome into a regular grid, say, $r_1 < \ldots < r_n$.
+The natural discretization approximates this transformation by a sum,
+and is equivalent to keeping track of only a finite number of loci.
+Writing $g_A(i,j)$ for $g_A(x,t;r_i,r_j)$,
+the discrete transformation we use corresponding to \eqref{eqn:unifprod}
+is $g_A(i,j) \mapsto {}$ the sum
+\begin{align*}
+    \sum_{k=i}^{j-1} (r_{k+1}-r_k) g_A(i,k) g_A(k+1,j) .
+\end{align*}
+This is the correct term for the process only tracking loci on the grid, because
+for all the alleles at $r_i, r_{i+1}, \ldots, r_j$ to be of ancestry $A$,
+when a recombination occurrs between $r_k$ and $r_{k+1}$,
+the sequences of alleles at $r_i, \ldots, r_{k}$ and at $r_{k+1}, \ldots, r_j$ must each be of ancestry $A$.
+The first integral term in \eqref{eqn:g_pde} is
+%       p * unifprod_ut(y=yA,ncx=nabvals)
+%       + (1-p) * biprod_ut(yA=yA,yB=yB,zeroind=zeroind,ncx=nabvals)
+\begin{align*} \label{eqn:biprod}
+    \int_a^0 g_B(a,\theta) g_A(\theta,b) d\theta
+    + \int_0^b g_A(a,\theta) g_B(\theta,b) d\theta 
+\end{align*}
+We now require that one of the grid points along the chromosome is exactly at the selected site;
+say this is $r_\ell = 0$.
+The discrete term corresponding to \eqref{eqn:biprod} is
+\begin{align*}
+    \sum_{k=i}^{\ell-1} (r_{k+1}-r_k) g_B(i,k) g_A(k+1,j) +
+    \sum_{k=\ell}^{j-1} (r_{k+1}-r_k) g_A(i,k) g_B(k+1,j) .
+\end{align*}
+Since these are not easily vectorizable in R, for efficiency
+we implemented the discrete transformations in C, using the Rcpp package \citep{Eddelbuettel2011}.
+In implementing these,
+we kept track of $g_A(i,j)$ in a vector in the order that the upper triangular elements of a matrix are encountered
+when traversing the matrix column-wise,
+allowing for efficient computation of the sum.
+
+\paragraph{A note on symmetry:}
+The equations we present have the symmetry that they are invariant after exchanging $A$ and $B$ and reversing space.
+For instance, $q_A(x,t,r) = 1 - q_B(-x,t,r)$.
+Using this fact would speed up the code by a factor of two,
+at the cost of generality:
+as written, it would be easy to modify the code to allow space to be inhomogeneous 
+(which would break this symmetry).
 
 
 %% supplement

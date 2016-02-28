@@ -82,7 +82,6 @@
 \end{figure}
 
 
-
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau100}
 \caption{Randomly sampled chromosomes  across a hybrid zone of age $\tau=100$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
@@ -125,6 +124,44 @@
 \includegraphics{figs/ratioAdjacentBlocksAlongChromHeatmapAncBConditioning}
 \caption{Heatmap of $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site ($s=0.01, \tau=1000$). }\label{Supp:ratioBlockAdjacentHeatmap}
 \end{figure}
+
+
+\begin{figure}
+    \includegraphics{figs/cond_freqs_comparison_tau_80}
+    \caption{
+        \textbf{Conditional frequencies of ancestry $A$ at $\tau=80$},
+        comparing simulation and theory, with $\sigma=3$ deme spacings, $s=0.05$, and 50 individuals per deme.
+        The top left figure shows observed and expected genotype frequencies for the two homozygotes and the heterozygote at the selected locus;
+        expected genotype counts were obtained assuming random mating,
+        and by solving equation \eqref{eqn:cline_pde} numerically.
+        The remaining figures show observed and expected frequencies of $A$ ancestry,
+        separately conditioned on the identity of the linked allele at the selected site.
+        Observed frequencies become much noisier where the linked allele becomes rarer.
+    } \label{sfig:condAlleleFreq_tau80_comparison}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics{figs/cond_freqs_comparison_tau_320}
+    \caption{
+        \textbf{Conditional frequencies of ancestry $A$ at $\tau=320$},
+        as in figure \ref{sfig:condAlleleFreq_tau80_comparison}.
+        Deviations are larger than at $\tau=80$, 
+        due to genetic drift.
+    } \label{sfig:condAlleleFreq_tau320_comparison}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics{figs/cond_freqs_comparison_tau_1280}
+    \caption{
+        \textbf{Conditional frequencies of ancestry $A$ at $\tau=1280$},
+        as in figure \ref{sfig:condAlleleFreq_tau80_comparison}.
+        Deviations are larger still than at $\tau=320$, 
+        due to genetic drift.
+    } \label{sfig:condAlleleFreq_tau1280_comparison}
+\end{figure}
+
 
 
 % \end{document}
