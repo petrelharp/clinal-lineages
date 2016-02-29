@@ -10,10 +10,13 @@ get_simparams <- function (fname) {
     return(out)
 }
 
+if (!exists("xx")) { xx = (1:params$ndemes)-0.5-params$ndemes/2 }
+
+
 #########
 #########
 #########
-## stuff from potential_statistics: haplotype lengths, etcetera.
+## stuff from make_length_along_chr.R
 
 chromosome = "chr1"
 plot_start = 0.48
@@ -29,20 +32,32 @@ outstring = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s
 deme_ID = rep( 1:params$ndemes, each=params$deme_size )
 
 
-intervalSizes = lapply(positions,function(POS){
+# returns a list, corresponding to positions along the genome,
+# with the [[k]]th element a (ninds x ploidy) matrix, one column per chromosome,
+# giving the lengths of segments of B ancestry at the k-th position (length is zero if ancestry is A)
+if (!file.exists(paste(outstring,"intervalSizes.Robj",sep="_"))) {
+    intervalSizes = lapply(positions,function(POS){
+                    do.call(rbind,lapply(sims.sums[[1]]$ind.ancest,function(IND){
+                        get.interval.size(IND_DATA=IND,CHR=chromosome,POS=POS,ancA=TRUE)	
+                    }))
+                })
+    save(intervalSizes, file=paste(outstring,"intervalSizes.Robj",sep="_"))
+} else {
+    load(paste(outstring,"intervalSizes.Robj",sep="_"))
+}
+
+
+# same, but not zero-ing out A ancestry
+if (!file.exists(paste(outstring,"intervalSizes_allAncs.Robj",sep="_"))) {
+    intervalSizes_allAncs = lapply(positions,function(POS){
                 do.call(rbind,lapply(sims.sums[[1]]$ind.ancest,function(IND){
-                    get.interval.size(IND_DATA=IND,CHR=chromosome,POS=POS,ancA=TRUE)	
+                    get.interval.size(IND_DATA=IND,CHR=chromosome,POS=POS,ancA=TRUE,restrict.anc=FALSE)
                 }))
             })
-
-intervalSizes_allAncs = lapply(positions,function(POS){
-            do.call(rbind,lapply(sims.sums[[1]]$ind.ancest,function(IND){
-				get.interval.size(IND_DATA=IND,CHR=chromosome,POS=POS,ancA=TRUE,restrict.anc=FALSE)
-            }))
-        })
-
-save(intervalSizes, file=paste(outstring,"intervalSizes.Robj",sep="_"))
-save(intervalSizes_allAncs, file=paste(outstring,"intervalSizes_allAncs.Robj",sep="_"))
+    save(intervalSizes_allAncs, file=paste(outstring,"intervalSizes_allAncs.Robj",sep="_"))
+} else {
+    load(paste(outstring,"intervalSizes_allAncs.Robj",sep="_"))
+}
 
 #[[POS]][ind,chr]
 
@@ -95,12 +110,36 @@ our_image <- function (z, main='', breaks=pretty(z,n=25), col=heat.colors(length
 }
 
 ## from make_length_along_chr.R
+paramstring <- sprintf("tau=%d, s=%0.3f",params$zone_age, params$S)
 
-pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromNoConditioning.pdf",sep="_"))
-par(mar=c(3.5,3.5,0.5,0.5))
+# this is a (locus x deme) matrix giving mean lengths
+#  for haplotype chunks of ALL ANCESTRIES
 mean_per_deme = do.call(rbind, lapply(intervalSizes_allAncs,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){mean(P[Z,])})}))
-plot(mean_per_deme[,1]/mean(mean_per_deme[,1],na.rm=T),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
-for(i in 1:params$ndemes){points(mean_per_deme[,i]/mean(mean_per_deme[,i],na.rm=T),x=positions,type="l",col=rainbow(params$ndemes)[i])}
+
+# this plots mean block length, regardless of ancestry
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromNoConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5),mgp=c(2.5,1,0))
+matplot(100*positions, 100*mean_per_deme, type='l', lty=1, col=rainbow(params$ndemes),
+        xlab="Distance from selected locus (cM)",
+        ylab="Mean block length (cM)",
+        main=paste("Mean block length",paramstring) )
+.spatial.legend()
+dev.off()
+
+# this gives a heatmap of the same thing
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromHeatmap.pdf",sep="_"))
+our_image(100*mean_per_deme,
+        main=paste("Mean block length (cM)",paramstring) )
+dev.off()
+
+# this plots mean block length, regardless of ancestry
+#   divided by the mean value for that deme
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromNoConditioning.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5))
+plot(mean_per_deme[,1]/mean(mean_per_deme[,1],na.rm=TRUE),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",
+     main=paste("Mean block length, normalized by deme",paramstring),
+     cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
+for(i in 1:params$ndemes){points(mean_per_deme[,i]/mean(mean_per_deme[,i],na.rm=TRUE),x=positions,type="l",col=rainbow(params$ndemes)[i])}
 axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
 axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
 mtext("Distance from selected locus (M)",side=1,line=2.5)
@@ -108,11 +147,33 @@ mtext("Normalized mean block length",side=2,line=2.5)
 .spatial.legend()
 dev.off()
 
+# this is a (locus x deme) matrix giving mean lengths
+#   for haplotype chunks of B ancestry
+mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)])})}))
+
+# this plots mean block length, for only ancestry B
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromAncBConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5),mgp=c(2.5,1,0))
+matplot(100*positions, 100*mean_per_deme_AncB, type='l', lty=1, col=rainbow(params$ndemes),
+        xlab="Distance from selected locus (cM)",
+        ylab="Mean block length (cM)",
+        main=paste("Mean block length, ancestry B",paramstring) )
+.spatial.legend()
+dev.off()
+
+# and a heatmap of the same thing
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromHeatmapAncBConditioning.pdf",sep="_"))
+our_image(100*mean_per_deme_AncB,
+        main=paste("Mean block length, ancestry B (cM)",paramstring) )
+dev.off()
+
+
+# this plots mean block length of ancestry B,
+#   divided by the mean value for that deme
 pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromAncBConditioning.pdf",sep="_"))
 par(mar=c(3.5,3.5,0.5,0.5))
-mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)])})}))
-plot(mean_per_deme_AncB[,1]/mean(mean_per_deme_AncB[,1],na.rm=T),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
-for(i in 1:params$ndemes){points(mean_per_deme_AncB[,i]/mean(mean_per_deme_AncB[,i],na.rm=T),x=positions,type="l",col=rainbow(params$ndemes)[i])}
+plot(mean_per_deme_AncB[,1]/mean(mean_per_deme_AncB[,1],na.rm=TRUE),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
+for(i in 1:params$ndemes){points(mean_per_deme_AncB[,i]/mean(mean_per_deme_AncB[,i],na.rm=TRUE),x=positions,type="l",col=rainbow(params$ndemes)[i])}
 axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
 axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
 mtext("Distance from selected locus (M)",side=1,line=2.5)
@@ -120,64 +181,84 @@ mtext("Normalized mean block length",side=2,line=2.5)
 .spatial.legend()
 dev.off()
 
-pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromHeatmap.pdf",sep="_"))
-our_image(mean_per_deme)
-dev.off()
 
-pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromHeatmapAncBConditioning.pdf",sep="_"))
-our_image(mean_per_deme_AncB)
-dev.off()
-
-get.flanking.blocks.all = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromosome,POS=0.5,ancB=TRUE){
-	focal_chunks = do.call(rbind,lapply(IND_DATA[[CHR]],function(X){
-		FOCUS = which(X$starts<POS & X$stops>POS);
-		if(max(FOCUS-1,1)!=min(FOCUS+1,nrow(X))){return(X[c(max(FOCUS-1,1),min(FOCUS+1,nrow(X))),])}else return(X[max(FOCUS-1,1),])}
-		))
-	focal_chunks$stops-focal_chunks$starts
-	}
-	
-flanking.blocks.by.ind = lapply(positions,function(POS){
-	tapply(1:length(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
-			get.flanking.blocks.all(IND_DATA=sims.sums[[1]]$ind.ancest[[IND]],POS=POS)}))})})
-	
+####
+# now on to neighboring blocks
 
 
-pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromNoConditioning.pdf",sep="_"))
-par(mar=c(3.5,3.5,0.5,0.5))
-flanking.blocks.deme.matrix = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind,function(POS){mean(POS[[DEME]])})}))
-matplot(t(flanking.blocks.deme.matrix/apply(flanking.blocks.deme.matrix,1,mean))[,params$ndemes:1],xaxt="n",yaxt="n",xlab="",ylab="",lty=1,col=rainbow(params$ndemes),type="l",x=positions,ylim=c(0.5,3))
-axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
-axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
-mtext("Distance from selected locus (M)",side=1,line=2.5)
-mtext("Normalized mean block length",side=2,line=2.5)
-.spatial.legend()
-dev.off()
+if (!file.exists(paste(outstring,"flankingBlocks.Robj",sep="_"))) {
+    # this is a list, corresponding to position along the genome,
+    #  whose [[k]]th element is a vector of all lengths of blocks immediately neighboring the block surrounding the position in question.
+    flanking.blocks.by.ind = lapply(positions,function(POS){
+        tapply(1:length(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
+                get.flanking.blocks.all(IND_DATA=sims.sums[[1]]$ind.ancest[[IND]],CHR=chromosome,POS=POS)}))})})
+    save(flanking.blocks.by.ind,file=paste(outstring,"flankingBlocks.Robj",sep="_"))
+} else {
+    load(paste(outstring,"flankingBlocks.Robj",sep="_"))
+}
 
-## flanking blocks
-flanking.blocks.deme.matrix = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind,function(POS){mean(POS[[DEME]])})}))
-
-#For AncB inds:
-get.flanking.blocks.AncB = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=chromosome,POS=0.5,ancB=TRUE){
-	focal_chunks = do.call(rbind,lapply(IND_DATA[[CHR]],function(X){
-		FOCUS = which(X$starts<=POS & X$stops>=POS);
-		if(X[FOCUS,]$sp2){
-		if(max(FOCUS-1,1)!=min(FOCUS+1,nrow(X))){return(X[c(max(FOCUS-1,1),min(FOCUS+1,nrow(X))),])}else return(X[max(FOCUS-1,1),])}else return()}
-		))
-	focal_chunks$stops-focal_chunks$starts
-	}
-
+if (!file.exists(paste(outstring,"flankingBlocksAncB.Robj",sep="_"))) {
 flanking.blocks.by.ind.AncB = lapply(positions,function(POS){
 	tapply(1:length(deme_ID),deme_ID,function(DEME){do.call(c,lapply(DEME,function(IND){
 			get.flanking.blocks.AncB(IND_DATA=sims.sums[[1]]$ind.ancest[[IND]],POS=POS)}))})})
+    save(flanking.blocks.by.ind.AncB,file=paste(outstring,"flankingBlocksAncB.Robj",sep="_"))
+} else {
+    load(paste(outstring,"flankingBlocksAncB.Robj",sep="_"))
+}
 
-flanking.blocks.deme.matrix.AncB = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind.AncB,function(POS){mean(POS[[DEME]])})}))
+        
+# this is a (deme x position) matrix giving mean flanking block length
+flanking.blocks.deme.matrix = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind,function(POS){mean(POS[[DEME]],na.rm=TRUE)})}))
+
+# this plots mean flanking block length along the genome, with lines per deme,
+pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromNoConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5))
+matplot(100*positions, 100*t(flanking.blocks.deme.matrix)[,params$ndemes:1], 
+        lty=1,col=rainbow(params$ndemes),type="l",
+        xlab="Distance from selected locus (cM)",
+        ylab="Mean flanking block length",
+        main=paste("Mean flanking block length",paramstring) )
+.spatial.legend()
+dev.off()
+
+# this plots mean flanking block length along the genome, with lines per deme,
+# and divided by the mean length for that deme
+pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromNoConditioning.pdf",sep="_"))
+par(mar=c(3.5,3.5,0.5,0.5))
+matplot(t(flanking.blocks.deme.matrix/apply(flanking.blocks.deme.matrix,1,mean,na.rm=TRUE))[,params$ndemes:1],xaxt="n",yaxt="n",xlab="",ylab="",lty=1,col=rainbow(params$ndemes),type="l",x=positions,ylim=c(0.5,3),
+        main=paste("Normalized mean flanking block length",paramstring) )
+axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
+axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
+mtext("Distance from selected locus (M)",side=1,line=2.5)
+mtext("Normalized mean block length",side=2,line=2.5)
+.spatial.legend()
+dev.off()
 
 
+# this is a (deme x position) matrix giving mean flanking block length
+# only for indivs that are ancestry B at the position
+flanking.blocks.deme.matrix.AncB = do.call(rbind,lapply(1:params$ndemes,function(DEME){sapply(flanking.blocks.by.ind.AncB,function(POS){mean(POS[[DEME]],na.rm=TRUE)})}))
+
+# this plots mean flanking block length along the genome, with lines per deme,
+# only for indivs that are ancestry B at the position
+pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5))
+matplot(100*positions, 100*t(flanking.blocks.deme.matrix.AncB)[,params$ndemes:1], 
+        lty=1,col=rainbow(params$ndemes),type="l",
+        xlab="Distance from selected locus (cM)",
+        ylab="Mean flanking block length",
+        main=paste("Mean flanking block length",paramstring) )
+.spatial.legend()
+dev.off()
+
+# this plots mean flanking block length along the genome, with lines per deme,
+# only for indivs that are ancestry B at the position,
+# divided by the mean value for that deme
 pdf(height=4, width=6.25,file=paste(outstring,"adjacentBlocksAlongChromAncBConditioning.pdf",sep="_"))
 par(mar=c(3.5,3.5,0.5,0.5))
-plot(flanking.blocks.deme.matrix.AncB[1,]/mean(flanking.blocks.deme.matrix.AncB[1,],na.rm=T),
+plot(flanking.blocks.deme.matrix.AncB[1,]/mean(flanking.blocks.deme.matrix.AncB[1,],na.rm=TRUE),
      x=positions,ylim=c(0,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
-for(i in params$ndemes:1){points(flanking.blocks.deme.matrix.AncB[i,]/mean(flanking.blocks.deme.matrix.AncB[i,],na.rm=T),x=positions,type="l",col=rainbow(params$ndemes)[params$ndemes-i])}
+for(i in params$ndemes:1){points(flanking.blocks.deme.matrix.AncB[i,]/mean(flanking.blocks.deme.matrix.AncB[i,],na.rm=TRUE),x=positions,type="l",col=rainbow(params$ndemes)[params$ndemes-i])}
 axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
 axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
 mtext("Distance from selected locus (M)",side=1,line=2.5)
@@ -185,41 +266,74 @@ mtext("Normalized mean block length",side=2,line=2.5)
 .spatial.legend()
 dev.off()
 
+# this is the (locus x deme) matrix of ratios: (mean length)/(mean flanking length)
+ratio.blocks = mean_per_deme/t(flanking.blocks.deme.matrix[params$ndemes:1,])
+
+# this plots the ratio of (mean length)/(mean flanking length), by deme,
+pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromNoConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,0.5,0.5),mgp=c(2.5,1,0))
+matplot(100*positions, ratio.blocks, type="l",lty=1,
+        col=rainbow(params$ndemes),
+        xlab="Distance from selected locus (cM)",
+        ylab="Ratio",
+        main=paste("Mean length/mean flanking length",paramstring))
+.spatial.legend()
+dev.off()
+
+# heatmap of the same thing
+pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf",sep="_"))
+our_image(ratio.blocks[,params$ndemes:1],
+        main=paste("Mean length/mean flanking length",paramstring))
+dev.off()
+
+# this plots the ratio of (mean length)/(mean flanking length), by deme,
+# and divided by the average in that deme
 pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromNoConditioning.pdf",sep="_"))
 par(mar=c(3.5,3.5,0.5,0.5))
-ratio.blocks = mean_per_deme/t(flanking.blocks.deme.matrix[params$ndemes:1,])
-plot(ratio.blocks[,1]/mean(ratio.blocks[,1],na.rm=T),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
-for(i in 1:params$ndemes){points(ratio.blocks[,i]/mean(ratio.blocks[,i],na.rm=T),x=positions,type="l",col=rainbow(params$ndemes)[i])}
+plot(ratio.blocks[,1]/mean(ratio.blocks[,1],na.rm=TRUE),x=positions,ylim=c(0.5,3),type="l",lty=1,col="white",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n",
+        main=paste("Mean length/mean flanking length",paramstring))
+for(i in 1:params$ndemes){points(ratio.blocks[,i]/mean(ratio.blocks[,i],na.rm=TRUE),x=positions,type="l",col=rainbow(params$ndemes)[i])}
 axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
 axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
-
 mtext("Distance from selected locus (M)",side=1,line=2.5)
-mtext("Normalized mean block length",side=2,line=2.5)
+mtext("Ratio",side=2,line=2.5)
 .spatial.legend()
 dev.off()
 
+# this is a (locus x deme) matrix giving the ratio of mean lengths as above, but for individuals of ancestry B
+ratio.blocks.AncB = mean_per_deme_AncB/t(flanking.blocks.deme.matrix.AncB[params$ndemes:1,])
 
-
-pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf",sep="_"))
-our_image(ratio.blocks[,params$ndemes:1])
+# this plots the ratio of (mean length)/(mean flanking length), by deme,
+# only for individuals that are ancestry B at that position.
+pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5),mgp=c(2.5,1,0))
+matplot(100*positions, ratio.blocks.AncB, type="l",lty=1,
+        col=rainbow(params$ndemes),
+        xlab="Distance from selected locus (cM)",
+        ylab="Ratio",
+        main=paste("Mean length/mean flanking length, ancestry B",paramstring))
+.spatial.legend()
 dev.off()
 
+# same thing, heatmap
+pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf",sep="_"))
+our_image(ratio.blocks.AncB[,params$ndemes:1],
+        main=paste("Mean length/mean flanking length, ancestry B",paramstring))
+dev.off()
 
+# this plots the ratio of (mean length)/(mean flanking length), by deme,
+# only for individuals that are ancestry B at that position.
+# and divided by the mean value for that deme
 pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromAncBConditioning.pdf",sep="_"))
 par(mar=c(3.5,3.5,0.5,0.5))
-ratio.blocks.AncB = mean_per_deme_AncB/t(flanking.blocks.deme.matrix.AncB[params$ndemes:1,])
-plot(ratio.blocks.AncB[,1]/mean(ratio.blocks.AncB[,1],na.rm=T),x=positions,ylim=c(0.0,3),type="l",lty=1,col="white",main="",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n")
-for(i in 1:params$ndemes){points(ratio.blocks.AncB[,i]/mean(ratio.blocks.AncB[,i],na.rm=T),x=positions,type="l",col=rainbow(params$ndemes)[i])}
+plot(ratio.blocks.AncB[,1]/mean(ratio.blocks.AncB[,1],na.rm=TRUE),x=positions,ylim=c(0.0,3),type="l",lty=1,col="white",cex.main=0.8,xlab="",ylab="",yaxt="n",xaxt="n",
+        main=paste("Normalized mean length/mean flanking length, ancestry B",paramstring))
+for(i in 1:params$ndemes){points(ratio.blocks.AncB[,i]/mean(ratio.blocks.AncB[,i],na.rm=TRUE),x=positions,type="l",col=rainbow(params$ndemes)[i])}
 axis(1,at=seq(0.48,0.52,0.01),labels=seq(-0.02,0.02,0.01),cex.axis=0.9)
 axis(2,at=seq(0.5,3,0.5),cex.axis=0.9,las=2)
-
 mtext("Distance from selected locus (M)",side=1,line=2.5)
 mtext("Normalized mean block length",side=2,line=2.5)
 .spatial.legend()
-dev.off()
-
-pdf(height=4, width=6.25,file=paste(outstring,"ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf",sep="_"))
-our_image(ratio.blocks.AncB[,params$ndemes:1])
 dev.off()
 
 

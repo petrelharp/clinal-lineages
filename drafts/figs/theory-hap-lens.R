@@ -13,8 +13,9 @@ theory.params <- list(
               tau=1000L,
               density=100L,
               ndemes=50L,
-              sim.files=file.path("../../sims",c("simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes.Robj",
-                 "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes_allAncs.Robj"))
+              sim.files=file.path( "../../sims",c(
+                      "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes.Robj",
+                      "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_intervalSizes_allAncs.Robj"))
              )
 theory.params$ninds <- theory.params$ndemes * theory.params$density
 
@@ -29,7 +30,8 @@ if (!file.exists(robj.file)) {
     fwds.soln <- forwards_pde(s=theory.params$s, times=tt, grid=fgrid, sigma=theory.params$sigma )
 
     # do it on a fine scale: for tau=1000, looks to be over +/- 5 or 6 cM
-    rgrid <- setup.grid.1D(x.up=-0.05, x.down=0.05, N=40)
+    # more generally +/- 2/sqrt(tau)
+    rgrid <- setup.grid.1D(x.up=-2/sqrt(theory.params$tau), x.down=2/sqrt(theory.params$tau), N=40)
     hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
                                sigma=theory.params$sigma, 
                                fwds.grid=fgrid, fwds.soln=fwds.soln )

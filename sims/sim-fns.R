@@ -251,13 +251,14 @@ getChunk = function( IND_DATA, CHR, POS ) {
 }
 
 
-# here usually IND_DATA=sims.sums[[1]]$ind.ancest[[1]]
+# here for instance: IND_DATA=sims.sums[[1]]$ind.ancest[[1]], the first individual of the first deme.
 get.interval.size = function(IND_DATA,CHR=1,POS=0.5,ancA=TRUE,restrict.anc=TRUE){
-	#return the interval containing focal site for a individual	
+	# return the length of the interval containing focal site for a given individual,
+    #   with the length set to zero if restrict.anc=TRUE and the site is of ancestry A.
 	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
     if (restrict.anc) {
         identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
-        replace(chunk,which(identity==ancA),0)
+        chunk = replace(chunk,which(identity==ancA),0)
     }
     return(chunk)
 }
@@ -279,4 +280,18 @@ get.ancestry.freqs = function(IND_DATA, VECTOR_OF_POS, CHR, ndemes, demeID){
 	do.call(cbind,lapply(CHUNKS,function(C){sapply(C,function(X){length(which(X>0))})}))
 }
 
+
+# in this function, IND_DATA is an individual (e.g. sims.sums[[1]]$ind.ancest[[1]]),
+# and the output is the lengths of the at most two blocks neighboring the block at (CHR,POS):
+# if the focal block is on the end of the chromosome, only one number is returned.
+get.flanking.blocks.all = function ( IND_DATA, CHR="chr1", POS=0.5, ancB=TRUE ) {
+	focal_lengths = do.call(rbind, lapply( IND_DATA[[CHR]], function(X) {
+            FOCUS = which(X$starts<POS & X$stops>POS)
+            return( c(
+                      if (FOCUS==1) { NA } else { X$stops[FOCUS-1]-X$starts[FOCUS-1] },
+                      if (FOCUS==nrow(X)) { NA } else { X$stops[FOCUS+1]-X$starts[FOCUS+1] }
+                  ) )
+        } ))
+    return( focal_lengths )
+}
 
