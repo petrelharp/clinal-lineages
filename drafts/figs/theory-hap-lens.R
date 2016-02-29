@@ -118,7 +118,7 @@ dev.off()
 
 # if (FALSE) 
 {
-    pdf(file=paste0(filebase,"_haplotype_lens.pdf",width=6,height=4,pointsize=10)
+    pdf(file=paste0(filebase,"_haplotype_lens.pdf"),width=6,height=4,pointsize=10)
     # mean length against space
     matplot(rev(xgrid$x.mid), hap.len.mat, type='l', lty=1,
             main="mean B haplotype length", 
