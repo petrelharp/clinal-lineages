@@ -86,7 +86,7 @@
 
 
 \abstract{
-Hybrid zones formed between recently diverged populations offer an opportunity to better understand the mechanisms underlying reproductive isolation and the process of speciation. \yb{Some form of selection against hybrid genotypes is likely common in many hybrid zones. Here, we use a combination of analytical theory and explicit forward simulations} to gain a better understanding of how this impacts patterns of introgression \yb{across genomic and geographic} space. \yb{We find that ancestral blocks surrounding single-locus incompatibilities} are longer than average \yb{ancestry blocks}, especially when removed from the center of the hybrid zone.  The findings presented here suggest a means for characterizing hybrid zones and identifying candidate targets of selection.
+Hybrid zones formed between recently diverged populations offer an opportunity to better understand the mechanisms underlying reproductive isolation and the process of speciation. \yb{Some form of selection against hybrid genotypes is likely common in many hybrid zones. Here, we use a combination of analytical theory and explicit forward simulations} to gain a better understanding of how this impacts patterns of introgression \yb{across genomic and geographic} space. \alisa{We describe the properties of clines across the genomes as they are formed, and find that locally disadvantageous alleles exist as recent, small families that move relatively rapidly across space}. \yb{We find that, within a population, ancestral blocks surrounding single-locus incompatibilities} are longer than average \yb{ancestry blocks} within the genome, especially when removed from the center of the hybrid zone.  The findings presented here suggest a means for characterizing hybrid zones and identifying candidate targets of selection.
 }
 
 \linenumbers
@@ -99,7 +99,6 @@ locally disadvantageous alleles exist as recent, small families (moving at speed
 haplotype chunks longest around introgressing selected bits, flanked by shorter chunks.
 }
 
-\plr{say what population density in simulation figures}
 
 %%%%% %%%%%% %%%%%%%
 \section*{Introduction}
@@ -513,20 +512,19 @@ The simulations were executed in R, with scripts available on
 \includegraphics{figs/alleleFrequencies_sim}
 \caption{
     Frequency of ancestry B,
-    across geography and at several physical positions on the genome,
-    at $T=100$ generations after secondary contact,
+    across geography and at several physical positions on the genome, simulated for a hybrid zone
+     $T=100$ generations after secondary contact,
     and with $s=0.1$.
+        50 demes, each with a population size of 500 diploid individuals, were simulated across the hybrid zone.
     Each line represents a locus some distance $r$ away from the true target of selection, 
     and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
     identical parameters except $s=0$.
     Corresponding theoretical quantities are shown juxtaposed in Figure \ref{sfig:alleleFreq_tau100_comparison}.
-    \plr{Add same figure for some different time points and maybe values of $s$ to the supplement.} 
 }\label{alleleFreq_tau100}
 \end{figure}
 
 \subsection*{Measures of introgression}
 
-\plr{This needs to be more precise, and should define and give a name to the ratio-of-adjacents statistic here, too.}
 
 The above theory and simulations allow us to make predictions about patterns surrounding selected loci. In reality, however, such loci are not known, so it is useful to have per-site statistics that may allow for detection of candidate targets of selection. The most straightforward measure is $l_I(m)$,  the mean length of all haplotype chunks that contain genomic position $m$, given that $m$ is of ancestry $I$, where $I\in\{A,B\}$.
 We then focus on $I_B(m)$ for $m$ across a chromosome. 
@@ -536,16 +534,14 @@ Additionally, we look at the mean value of these statistics in the two chunks, $
 \begin{align*}
 C(m) =  \frac{2\sum_i{l_B(m_i)}}{\sum_i{l_A(m_i+)+l_A(m_i-)}}
 \end{align*}
-which is the ratio of mean block length around $m_i$ and mean length of blocks directly flanking the block surrounding $m_i$ (i.e. adjacent blocks).
-\plr{what is the sum over? define $m_i$.}
+where $m_i$ is the block length in individual $i$, and $C$ is  the mean block length around $m$ in the population, divided by the mean lengths of  the two blocks directly flanking the block containing $m$. 
 
-We are interested in identifying regions of the genome with abnormal distributions of block lengths, and where indicated normalize $l_I(m)$ and $C(m)$ by dividing respectively by \plr{the empirical} mean \plr{of} $l_I$ and $C$  within \plr{the corresponding} deme. 
-\plr{which deme? should say that this is computed separately by deme?}
-While there is useful information contained in the geographic distribution of block length patterns, obtaining good spatial sampling can often be difficult, and this allows us to predict patterns within relatively few populations. 
-\plr{I'm not sure what you mean by "predict patterns".}
+We are interested in identifying regions of the genome with abnormal distributions of block lengths, and within each deme compute $l_B(m)$ and $C(m)$ across the genome. Where indicated, we normalize $l_B(m)$ and $C(m)$ by dividing by the empirical mean of $I_B$ and $C$ across the genome for a given deme. 
+While there is useful information contained in the geographic distribution of block length patterns, obtaining good spatial sampling can often be difficult, and this allows us to search for  patterns if block lengths within relatively few populations. 
+%\plr{I'm not sure what you mean by "predict patterns".}
 
-Although our analytical model does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $T$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family, and is potentially a source of additional information. Within each deme $X$, we calculated $F_B(m,X)$, which is the number of independent ancestors from time $T$ contributing to the pool of alleles of ancestry $B$ at site $m$, divided by the number of individuals of ancestry $B$ at site $m$.
-\plr{how about $x$ instead of $X$? above $x$ refers to spatial location.}
+Although our analytical model does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $T$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family, and is potentially a source of additional information. Within each deme $x$, we calculated $F_B(m,x)$, which is the number of independent ancestors from time $T$ contributing to the pool of alleles of ancestry $B$ at site $m$, divided by the number of individuals of ancestry $B$ at site $m$.
+%\plr{how about $x$ instead of $X$? above $x$ refers to spatial location.}
 
 
 %\subsection*{Data}
@@ -602,7 +598,7 @@ or conditional on its identity
 \subsection*{Single-locus behavior}
 
 From previous results, we expect that far away from the zone center, variants under negative selection will be rare \citep[for demonstration of this theoretical result, see e.g.][]{May1975,Slatkin1973,Barton??}, and correspondingly, clines at closely linked sites are narrower.
-This is seen, for instance, in Figure~\ref{alleleFreq_tau100}. 
+This is seen, for instance, in Figures~\ref{alleleFreq_tau100},~\ref{alleel_Freq_tau100_weaker_s} and ~\ref{alleleFreq_tau1000}. 
 
 \plr{When discussing haplotype lengths, say what happens at different $s$ and $T$.}
 
@@ -712,15 +708,14 @@ For linked haplotypes not containing the selected site, the situation is more co
 
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau1000}
-\caption{Randomly sampled chromosomes  across a hybrid zone of age $T=1000$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
-    \plr{Add same figure for some different time points and maybe values of $s$ to the supplement.} 
+\caption{Randomly sampled chromosomes  across a hybrid zone of age $T=1000$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. 
+    50 demes, each with a population size of 500 diploid individuals, were simulated across the hybrid zone.
 }\label{Fig:resistanceToIntrogression1000g}
 \end{figure}
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioning}
-\caption{Mean block length, $l_B(m_i)$, along a simulated chromosome of length $1M$ with selected locus of $s=0.01$ at position $0.5M$ in a hybrid zone of $T=1000$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(m)$ along the chromosome in the deme.
-    \plr{what is $T$ and $s$? also, add version with different $T$ and/or $s$ to the supplement.}
+\caption{Mean block length, $l_B(m_i)$, along a simulated chromosome of length $1M$ with selected locus of $s=0.01$ at position $0.5M$ in a hybrid zone of $T=1000$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(m)$ along the chromosome in the deme. Chromosome were sampled across the hybrid zone, which consists of 50 demes, each containing 500 diploid individuals.
 }\label{Fig:blockLengths}
 \end{figure}
 
@@ -728,8 +723,7 @@ For linked haplotypes not containing the selected site, the situation is more co
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioningHighRes}
-\caption{Mean block length, $l_B(k_i)$, along a simulated chromosome of length $1M$ with selected locus at position $0.5M$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(k_i)$ along the chromosome in the deme.
-    \plr{what is $T$ and $s$? also, add version with different $T$ and/or $s$ to the supplement.}
+\caption{Mean block length, $l_B(m_i)$, along a simulated chromosome of length $1M$ with selected locus of $s=0.01$ at position $0.5M$ in a hybrid zone of $T=1000$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(m)$ along the chromosome in the deme. Chromosome were sampled across the hybrid zone, which consists of 50 demes, each containing 500 diploid individuals. This figure represents the same simulation and statistic as Fig.~\ref{Fig:blockLengths}, on a finer genomic scale.
 }\label{Fig:blockLengthsZoom}
 \end{figure}
 
@@ -743,7 +737,8 @@ One interpretation of this observation is that migrants tend to leave few offspr
 
 \begin{figure}
 \includegraphics{figs/number_of_ancestors_tau1000}
-\caption{The number of individuals of ancestry B per number of ancestors from secondary contact occurring $T=1000$ generations ago, represented across geographic space. Each red or orange line represents a site some distance away (ranging from 0 - 0.01) from the selected site (here $s=0.01$ and $\sigma=1$). Yellow lines are corresponding positions on an unlinked chromosome with no selected loci, and grey lines are corresponding positions in a simulation with no selection.  Bold lines depict the target of selection when present, and corresponding position on chromosomes not harboring any selected sites.}\label{Fig:family_size}
+\caption{The number of individuals of ancestry B per number of ancestors from secondary contact occurring $T=1000$ generations ago, represented across geographic space. The hybrid zone is 50 demes, each containing 500 diploid individuals.
+ Each red or orange line represents a site some distance away (ranging from 0 - 0.01) from the selected site (here $s=0.01$ and $\sigma=1$). Yellow lines are corresponding positions on an unlinked chromosome with no selected loci, and grey lines are corresponding positions in a simulation with no selection.  Bold lines depict the target of selection when present, and corresponding position on chromosomes not harboring any selected sites.}\label{Fig:family_size}
 \end{figure}
 
 
@@ -917,7 +912,7 @@ Overall, focusing on lengths of ancestry blocks across the genome brings focus t
 %Validation of the effectiveness of our proposed statistics, especially under demographic models that differ from the one dimensional hybrid zone explored above, will  provide a guide on how our results can be used to learn about selection from the distribution of ancestry tract lengths. We note, however, that power to detect regions under selection will depend on a number of parameters, such as $s$ and $T$
 
 \plr{Remove "Future directions", title this "The hybrid filter", and discuss the hybrid filter ideas we had?}
-\subsection*{The hybrid filter}
+\subsection*{Other patterns of introgression}
 \alisa{Could not find a reference to the hybrid filter}
 \plr{don't have to call it the hybrid filter, and it looks like maybe I made up that term, but after reading this paper: \citet{martinsen2001hybrid}; these sorts of things are discussed in \citet{Barton1986}}
 
