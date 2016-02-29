@@ -295,3 +295,14 @@ get.flanking.blocks.all = function ( IND_DATA, CHR="chr1", POS=0.5, ancB=TRUE ) 
     return( focal_lengths )
 }
 
+# does the same as get.flanking.blocks.all() but restricts to only individuals that are B at the focal position
+get.flanking.blocks.AncB = function(IND_DATA,CHR="chr1",POS=0.5,ancB=TRUE){
+	focal_lengths = do.call(rbind, lapply( IND_DATA[[CHR]], function(X) {
+            FOCUS = which(X$starts<POS & X$stops>POS)
+            return( if (X$sp2[FOCUS]) { c(
+                      if (FOCUS==1) { NA } else { X$stops[FOCUS-1]-X$starts[FOCUS-1] },
+                      if (FOCUS==nrow(X)) { NA } else { X$stops[FOCUS+1]-X$starts[FOCUS+1] }
+                  ) } else { c(NA,NA) } )
+        } ))
+    return( focal_lengths )
+}
