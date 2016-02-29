@@ -22,7 +22,7 @@ increments = 0.001
 
 positions = seq(plot_start,plot_stop,increments)
 
-outstring = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_runid_%s_chr%s_start%g_stop%g_by%g",
+outstring = with( list2env(params), sprintf("simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_runid_%s_%s_start%g_stop%g_by%g",
                                             SIGMA, ninds, ndemes, S, zone_age, run.id,  
                                             chromosome, plot_start, plot_stop, increments ) )
 

@@ -86,24 +86,11 @@ dev.off()
 
 focal_sites = lapply(qtl,function(Z){Z$pos})
 
-get.interval.size = function(IND_DATA=sims.sums[[1]]$ind.ancest[[1]],CHR=1,POS=0.5,ancA = TRUE){
-	#return the interval containing focal site for a individual	
-	chunk = sapply(IND_DATA[[CHR]],function(X){diff(as.numeric(X[which(X$starts<POS & X$stops>POS),1:2]))})	
-	identity = sapply(IND_DATA[[CHR]],function(X){X[which(X$starts<POS & X$stops>POS),3]})
-	replace(chunk,which(identity==ancA),0)
-}
-
-
-get.deme.chunks = function(IND_DATA=sims.sums[[1]]$ind.ancest, DEME = 1, CHR=1,POS=0.5,ancA = TRUE){
-	#get distribution of chunks within a deme
-	INDS = IND_DATA[which(sims.full[[1]]$deme==DEME)]
-	intervals = do.call(rbind,lapply(INDS,get.interval.size,CHR=CHR,POS=POS,ancA=ancA)) 	
-	return(intervals)
-}
-
 #output is a nind*2 matrix, where each column is a chromosome. 
 #EXAMPLE: testB = lapply(1:50,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
 #D = 23; hist(testB[[D]][which(testB[[D]]<1 & testB[[D]]>0)], col="black",breaks=seq(0,1,0.05))
+
+deme_ID = rep( 1:params$ndemes, each=params$deme_size )
 
 chunks.rvals = list( 
         selected=c(chr=1,pos=0.5),
@@ -115,7 +102,10 @@ chunks.rvals = list(
         unlinked=c(chr=2,pos=0.5),
         unlinked0.4=c(chr=2,pos=0.9) )
 chunks <- lapply( chunks.rvals, function (xx) {
-            lapply(1:params$ndemes, function (X) { get.deme.chunks(DEME=X,ancA=FALSE,POS=xx[2],CHR=xx[1]) } )
+            lapply(1:params$ndemes, function (X) { 
+                       get.deme.chunks(IND_DATA=sims.sums[[1]]$ind.ancest,demeID=deme_ID,
+                                       DEME=X,ancA=FALSE,POS=xx[2],CHR=xx[1]) 
+                } )
         } )
 
 # testB = lapply(1:params$ndemes,function(X){get.deme.chunks(DEME=X,ancA=FALSE)})
@@ -150,7 +140,7 @@ for(type in names(chunks)){
 	for(D in rev(seq(3,params$ndemes,1))){
 		relevant_chunks = chunks[[type]][[D]][which(chunks[[type]][[D]]>0 & chunks[[type]][[D]]<1)]
 	#hist(relevant_chunks, col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),ylim=c(0,50),add=T)	}
-	if(length(relevant_chunks)>1){points(density(relevant_chunks), col=transparent_rainbow[D],border=NA,breaks=seq(0,1,0.001),type="l")}}
+	if(length(relevant_chunks)>1){lines(density(relevant_chunks), col=transparent_rainbow[D])}}
 }
 dev.off()
 
