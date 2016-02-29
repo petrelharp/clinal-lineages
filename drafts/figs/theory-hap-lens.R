@@ -7,7 +7,8 @@ source("../../notes/tran.1D.R",chdir=TRUE) # fix for log.A
 source("../../notes/cline-fns.R",chdir=TRUE)
 source("../../sims/chunks_fns.R",chdir=TRUE)
 
-theory.params <- list( 
+theory.param.list <- list(
+          list( 
               sigma=1L,
               s=0.1,
               tau=1000L,
@@ -16,7 +17,21 @@ theory.params <- list(
               sim.files=file.path( "../../sims",c(
                       "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_dir/tau1000_dir/results_runid_20160130_intervalSizes.Robj",
                       "simulation_SIGMA1_Ninds25000_ndemes50_s0.1_dir/tau1000_dir/results_runid_20160130_intervalSizes_allAncs.Robj"))
-             )
+             ),
+          list( 
+              sigma=1L,
+              s=0.01,
+              tau=1000L,
+              density=500L,
+              ndemes=50L,
+              sim.files=file.path( "../../sims",c(
+                      "simulation_SIGMA1_Ninds25000_ndemes50_s0.01_dir/tau1000_dir/results_runid_20160127_intervalSizes.Robj",
+                      "simulation_SIGMA1_Ninds25000_ndemes50_s0.01_dir/tau1000_dir/results_runid_20160127_intervalSizes_allAncs.Robj" ))
+              )
+      )
+
+
+theory.params <- theory.param.list[[2]]
 theory.params$ninds <- theory.params$ndemes * theory.params$density
 
 filebase <- sprintf("haplotypes_SIGMA%d_density%d_ndemes%d_s%0.3f_tau%d",
