@@ -533,19 +533,19 @@ We then focus on $I_B(m)$ for $m$ across a chromosome.
 %Another statistic is the cumulative probability $C_I(m)$ of a sampled chunk encompassing position $m$ being longer than a chunk sampled from the distribution of all chunk lengths across the genome in the population. 
 
 Additionally, we look at the mean value of these statistics in the two chunks, $m-$ and $m+$ that flank, to the left and right respectively, the block of unbroken ancestry containing $m$. Since there appears to be a signal at these regions also, we further define a statistic 
-
-$$C(m) =  \frac{2\sum_i{l_B(m_i)}}{\sum_i{l_A(m_i+)+l_A(m_i-)}}$$
-
+\begin{align*}
+C(m) =  \frac{2\sum_i{l_B(m_i)}}{\sum_i{l_A(m_i+)+l_A(m_i-)}}
+\end{align*}
 which is the ratio of mean block length around $m_i$ and mean length of blocks directly flanking the block surrounding $m_i$ (i.e. adjacent blocks).
+\plr{what is the sum over? define $m_i$.}
 
-We are interested in identifying regions of the genome with abnormal distributions of block lengths, and where indicated normalize $l_I(m)$ and $C(m)$ by dividing respectively by mean $l_I$ and $C$  within a deme. While there is useful information contained in the geographic distribution of block length patterns, obtaining good spatial sampling can often be difficult, and this allows us to predict patterns within relatively few populations. 
-
-
-
-
+We are interested in identifying regions of the genome with abnormal distributions of block lengths, and where indicated normalize $l_I(m)$ and $C(m)$ by dividing respectively by \plr{the empirical} mean \plr{of} $l_I$ and $C$  within \plr{the corresponding} deme. 
+\plr{which deme? should say that this is computed separately by deme?}
+While there is useful information contained in the geographic distribution of block length patterns, obtaining good spatial sampling can often be difficult, and this allows us to predict patterns within relatively few populations. 
+\plr{I'm not sure what you mean by "predict patterns".}
 
 Although our analytical model does not account for coalescence, we are able to partially trace the genealogy of haplotypes in our simulations. In particular, we wish to know the relative number of ancestors from $T$ generations ago that are represented in present day populations at a given locus, given the frequency of a particular ancestry. This is a reflection of the average size of a haplotype family, and is potentially a source of additional information. Within each deme $X$, we calculated $F_B(m,X)$, which is the number of independent ancestors from time $T$ contributing to the pool of alleles of ancestry $B$ at site $m$, divided by the number of individuals of ancestry $B$ at site $m$.
-
+\plr{how about $x$ instead of $X$? above $x$ refers to spatial location.}
 
 
 %\subsection*{Data}
@@ -650,7 +650,7 @@ as seen in figures~\ref{Fig:resistanceToIntrogression1000g} and \ref{Fig:resista
 When present, however, we expect haplotypes including the locally less common allele
 to be longer than the genome-wide average.
 Indeed,
-as shown in Figures \ref{Fig:blockLengths} and \ref{Supp:blockLengthHeatmap},
+as shown in Figures \ref{Fig:blockLengths}, \ref{Fig:blockLengthsZoom} and \ref{Supp:blockLengthHeatmap},
 the mean length of such haplotype blocks are up to three times longer
 than the average for that geographic location.
 
@@ -730,13 +730,14 @@ For linked haplotypes not containing the selected site, the situation is more co
 \includegraphics{figs/blocksAlongChromAncBConditioningHighRes}
 \caption{Mean block length, $l_B(k_i)$, along a simulated chromosome of length $1M$ with selected locus at position $0.5M$. Here each line represents  $l_B(\mathbf{k})$, the mean block lengths in a given deme, and is normalized by mean block length $l_B(k_i)$ along the chromosome in the deme.
     \plr{what is $T$ and $s$? also, add version with different $T$ and/or $s$ to the supplement.}
-}\label{Fig:blockLengths}
+}\label{Fig:blockLengthsZoom}
 \end{figure}
 
 \subsection*{The number of `unfit' ancestors}
 
 \plr{This needs a bit more precise discussion.}
-As expected, we find that $F_B(m)$ is highest on the size of the hybrid zone where individuals of ancestry $B$ predominate. We find that at the selected locus, $F_B(m,X)$ decreases with X, and is lowest far away from the zone center, where ancestry $B$ is at low frequency  (Figure~\ref{Fig:family_size}). As $m$ moves further away from the target of selection, the average family size recovers to expected values under neutrality.
+As expected, we find that $F_B(m,X)$ is highest on the size of the hybrid zone where individuals of ancestry $B$ predominate. 
+We find that at the selected locus, $F_B(m,X)$ decreases with X, and is lowest far away from the zone center, where ancestry $B$ is at low frequency  (Figure~\ref{Fig:family_size}). As $m$ moves further away from the target of selection, the average family size recovers to expected values under neutrality.
 
 One interpretation of this observation is that migrants tend to leave few offspring before being removed from the population by selection, leaving behind small families. In conjunction with block length, measuring $F$ can provide an additional signal for characterizing lineages strongly influenced by selection, by looking at levels of haplotype diversity in populations along a hybrid zone.
 
@@ -918,6 +919,7 @@ Overall, focusing on lengths of ancestry blocks across the genome brings focus t
 \plr{Remove "Future directions", title this "The hybrid filter", and discuss the hybrid filter ideas we had?}
 \subsection*{The hybrid filter}
 \alisa{Could not find a reference to the hybrid filter}
+\plr{don't have to call it the hybrid filter, and it looks like maybe I made up that term, but after reading this paper: \citet{martinsen2001hybrid}; these sorts of things are discussed in \citet{Barton1986}}
 
 We have demonstrated here the potential utility for block length distributions in hybrid zone populations, particularly in populations that are found some distance from the center of the zone. While the focus here, has been on hybrid incompatibilities, the possibility that some loci adaptively introgress across hybrid zones has excited many biologists \citep{Arnold2004}. Future work could take a similar approach to understand how positive selection shapes ancestry block lengths, and predict  signatures of adaptive introgression in hybridizing populations using similar statistics presented here. These could eventually be combined to gain a fuller understanding of the forces shaping patterns of introgression in hybrid zones. 
 
@@ -1117,12 +1119,10 @@ for all the alleles at $r_i, r_{i+1}, \ldots, r_j$ to be of ancestry $A$,
 when a recombination occurrs between $r_k$ and $r_{k+1}$,
 the sequences of alleles at $r_i, \ldots, r_{k}$ and at $r_{k+1}, \ldots, r_j$ must each be of ancestry $A$.
 The first integral term in \eqref{eqn:g_pde} is
-%       p * unifprod_ut(y=yA,ncx=nabvals)
-%       + (1-p) * biprod_ut(yA=yA,yB=yB,zeroind=zeroind,ncx=nabvals)
-\begin{align*} \label{eqn:biprod}
+\begin{align} \label{eqn:biprod}
     \int_a^0 g_B(a,\theta) g_A(\theta,b) d\theta
     + \int_0^b g_A(a,\theta) g_B(\theta,b) d\theta 
-\end{align*}
+\end{align}
 We now require that one of the grid points along the chromosome is exactly at the selected site;
 say this is $r_\ell = 0$.
 The discrete term corresponding to \eqref{eqn:biprod} is
