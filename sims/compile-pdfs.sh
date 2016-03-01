@@ -1,5 +1,7 @@
+#!/bin/bash
 
-dirs="tau50_dir tau100_dir tau150_dir tau250_dir tau750_dir tau1000_dir"
+# dirs="tau50_dir tau100_dir tau150_dir tau250_dir tau750_dir tau1000_dir"
+dirs=$(find . -name "tau*_dir" -type 'd')
 
 figs="adjacentBlocksAlongChromAncBConditioning.pdf adjacentBlocksAlongChromNoConditioning.pdf blocksAlongChromAncBConditioning.pdf blocksAlongChromHeatmapAncBConditioning.pdf blocksAlongChromHeatmap.pdf blocksAlongChromNoConditioning.pdf ratioAdjacentBlocksAlongChromAncBConditioning.pdf ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf ratioAdjacentBlocksAlongChromNoConditioning.pdf density.pdf ecdf.pdf mean.pdf freqplot.pdf LD.pdf adjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf adjacentBlocksAlongChromNoConditioning_nonnormalized.pdf blocksAlongChromAncBConditioning_nonnormalized.pdf blocksAlongChromNoConditioning_nonnormalized.pdf ratioAdjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf ratioAdjacentBlocksAlongChromNoConditioning_nonnormalized.pdf"
 
