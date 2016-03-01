@@ -133,8 +133,8 @@ the process of recombination, forming chromosomal \emph{junctions} in ancestry \
 Patterns of correlated ancestry in admixed populations has been previously described under neutral conditions both in single populations and in contact zones \citep[e.g.][]{Gravel2012,Hellenthal2014,Sedghifar2015}.  
 
 
-While for much of the genome gene flow will eventually erase 
-both geographic clines in ancestry, and strong correlations in ancestry,
+While for much of the genome, gene flow will eventually erase 
+both geographic clines in ancestry, and strong correlations in ancestry across linked markers, 
 subsets of the genome can maintain stable clines in ancestry if selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. 
 % Variation in \yb{ the action of } selection against migrant alleles within the genome results in genome-wide heterogeneity in cline width, as the frequency of foreign ancestry surrounding targets of selection is reduced \citep{Barton1979}. 
 % While these patterns of co-ancestry have been described in multi-locus systems, the \yb{expected length of ancestral tracts around selected loci in admixing populations remains poorly understood}\alisa{, especially in the geographic context of hybrid zones.}
@@ -173,7 +173,7 @@ Using a combination of theory and simulated hybrid zones, we present a model of 
 \subsection*{The Model}
 
 We consider two isolated populations
---- labeled \emph{Species $A$} and \emph{Species $B$} ---  
+--- labeled species $A$ and species $B$ ---   % yb: for consistency with the rest of the MS
 that came into contact $T$ generations in the past.  
 We will say that species $A$ was initially on the ``left'' of the zone of contact, which corresponds to spatial positions $x<0$.  
 After contact, the populations live across continuous geographical space,
@@ -184,7 +184,7 @@ We model selection through a single, underdominant locus:
 at this locus, there are two alleles, one corresponding to each of the ancestral populations.
 Individuals who are heterozygous at this locus produce on average $1-s$ times as many offspring than either homozygote.
 Although most selection in hybrid zones is likely more complex than this simple situation, 
-previous work has shown that such models generate clines that are very similar to models of ecological selection or epistatic systems \cite{Kruuk1999,Barton2000a}.
+previous work has shown that such models generate clines that are very similar to models of ecological selection or epistatic systems \citep{Kruuk1999,Barton2000a}.
 
 As in \citet{Sedghifar2015}, 
 we gain insight by considering where the ancestors of modern-day individuals lived,
@@ -235,7 +235,7 @@ Assuming that: (i) alleles locally assort into diploids randomly,
     \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
 \end{align}
 where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
-as derived in \citet{Bazykin1969}; for discussion of diploidy see \citep{christiansen1995genotypic}.
+as derived in \citet{Bazykin1969}; for discussion of diploidy see \citet{christiansen1995genotypic}.
 Although there is no known exact analytic solution to this equation, even in steady state, 
 a good approximation to the equilibrium solution is that
 $\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
@@ -264,7 +264,7 @@ and thus away from the hybrid zone, but we assume that $s$ is small and ignore t
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
 how the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
-with drift $\sigma^2 \grad \log p(x,t)$ (i.e., it moves at speed $\sigma^2$ in the potential $-\log p$).
+with drift $\sigma^2 \grad \log p(x,t)$ (i.e., it moves at speed $\sigma^2$ in the potential $-\log p$, note that we use ``drift'' as directional movement as in the terminology of diffusion, rather than its population genetic meaning).  % YB for clarity
 % \alisa{note to self to read through appendix when written}
 To see why this is true, note that the probability that the parent of an $A$ allele found at $x$
 lived at position $x+r$ is proportional to $\P\{R=r\} p(x+r)$, where $R$ is the random dispersal distance;
@@ -303,7 +303,7 @@ We will follow its lineage back through time, using $\tau$ to denote ``generatio
 If $X_\tau$ is the geographic location of its ancestor $\tau$ generations ago,
 and $Z_\tau$ is the identity of the selected allele that ancestor carried,
 then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$ (same as previously described movement of a selected allele),
-and that $Z$ jumps between $A$ and $B$ at rate either $r (1-p)$  (from $A$ to $B$)or $r p$ (for $B$ to $A$).
+and that $Z$ jumps between $A$ and $B$ at rate either $r (1-p)$  (from $A$ to $B$) or $r p$ (for $B$ to $A$).
 
 We can describe this process formally in It\^o notation:
 with $B_\tau$ a standard Brownian motion,
@@ -349,7 +349,7 @@ $T_B$ the first time $Z_\tau = B$, and likewise for $T_A$,
 
 \paragraph{Linked clines}
 We can use this diffusion model for lineages to compute expected clines in ancestry,
-i.e., the expected proportion of individuals who inherit from species $A$,
+i.e., the expected proportion of individuals who inherit ancestry from species $A$,
 as a function of space, time, and position on the genome.
 Precisely, we need the probability that 
 an allele sampled $t$ generations after secondary contact at location $x$,
@@ -429,7 +429,7 @@ each of which proceeds as before, independently.
 Then, $g_z(x,T;a,b)$ is then the probability that all branches are found on the $A$ side of the hybrid zone
 at the time of secondary contact $T$ units of time ago.
 
-The resulting equation si similar to \eqref{eqn:q_pde} with a term added for branching,
+The resulting equation is similar to \eqref{eqn:q_pde} with a term added for branching,
 which is written (omitting the $(x,t)$ for conciseness):
 \begin{align}
     \begin{aligned} \label{eqn:g_pde}
@@ -478,7 +478,7 @@ for more detail see Appendix~\ref{apx:haplotype_calcs}.
 We implemented forwards-time simulations of diploid individuals on a one-dimensional grid of demes
 with non-overlapping generations and fixed population sizes (a Wright-Fisher model). Individuals are diploid, with haploid number $n=2$ chromosomes, each of length 1 Morgan. One chromosome pair harbors in its center (at position 0.5M) a single locus that reduces fitness by $s$ in heterozygotes, while the other contains no sites under direct selection.
 
-Each deme has exactly $N_d$ diploid individuals at the start of each generation.
+Each deme has exactly $N_d$ diploid hermaphroditic individuals at the start of each generation.
 At the start of each generation, every individual migrates to a new deme  offset by $\lfloor Z + 1/2 \rfloor$ from their original position,
 where $Z$ is a Gaussian random variable with mean zero and variance $\sigma^2$.
 (The mean displacement is zero, and when comparing to theory we compute $\sigma$ as the standard deviation of this distribution.)
@@ -605,7 +605,7 @@ Although loci not under direct selection can in principle spread across the clin
 in practice it can take quite some time for even unlinked neutral loci to homogenize,
 due to the decreased fitness of heterozygotes \citep{Barton1986}
 and the relative slowness of diffusive movement \citep{Sedghifar2015}.
-We are interested, for samples across a cline $T$ units of time after secondary contact, how far away from the selected locus one has to look to see clines that resemble the genome-wide mean.
+We wish to know, for samples across a cline $T$ units of time after secondary contact, how far away from the selected locus one has to look to see clines that resemble the genome-wide mean.
 
 
 A linked cline will begin to flatten out if there is an appreciable chance that a lineage at the linked locus initially coupled with an $A$ allele 
@@ -629,7 +629,7 @@ substantially larger than $1/T$. However, this distinction appears hard to obser
 %%%%% %%%%%%%%%%
 \subsection*{The distribution of ancestry tract lengths}
 
-The distribution of contiguous ancestry block lengths necessarily contains more information than allele frequency alone. We are interested specifically in the how tracts of ancestry surrounding the selected locus compares to the rest of the genome. 
+The distribution of contiguous ancestry block lengths necessarily contains more information than allele frequency alone. We are interested specifically in how the tracts of ancestry surrounding the selected locus compares to the rest of the genome. 
 The raw data -- ancestry assignments for a few individuals sampled from across space --
 is shown in Figure~\ref{Fig:resistanceToIntrogression1000g},
 showing distinct patterns across geography and the genome.
@@ -734,7 +734,7 @@ Additionally, we find that $l_A(m\pm)$, the length of blocks adjacent to blocks 
 
 \plr{This needs a bit more precise discussion.}
 
-It is possible that there is additional information contained in patterns of within-ancestry haplotype diversity throughout the hybrid zone. Looking at the number of ancestral haplotypes present in the population would provide informationa bout whether the migrant contribution is through relatively few, successful migrants, or through many migrants that each contribute relatively little. 
+It is possible that there is additional information contained in patterns of within-ancestry haplotype diversity throughout the hybrid zone. Looking at the number of ancestral haplotypes present in the population would provide information about whether the migrant contribution is through relatively few, successful migrants, or through many migrants that each contribute relatively little. 
 
 We find that the average family size of a $B$ allele ($F_B(m,x)$) decrease with distance into the $A$ side of the hybrid zone, and is lowest far away from the zone center, where ancestry $B$ is at low frequency (Figure~\ref{Fig:family_size}). As $m$ moves further away from the target of selection, the average family size recovers to expected values under neutrality. This pattern is expected and consistent with the prediction in our models that unfit lineages tend to be recent migrants, which will have smaller families. In conjunction with block length, measuring $F_B$ can provide an additional signal for characterizing lineages strongly influenced by selection.
 
@@ -829,7 +829,7 @@ In contrast, our simulations model regularly spaced demes.
 In reality, populations may be patchily connected, especially at the edges of species ranges where hybrid zones may occur. 
 While we still believe that the genomic signature of long ancestry chunks around selected sites will still hold in these situations, the strength of this expectation is unclear. 
 
-Of particular concern that stems from the above assumption is that our model ignores potential, and likely, sources of stochasticity arising from geographic structure and coalescence/pedigree structure. The latter can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \cite{Liang2014}. With respect to genealogy, the broad agreement between our analytic predictions and simulations (which include an explicit pedigree structure), suggests that this assumption does not have a severe qualitative impact on our major results when populations are moderately high, especially for all but the most recently formed hybrid zones. 
+Of particular concern that stems from the above assumption is that our model ignores potential, and likely, sources of stochasticity arising from geographic structure and coalescence/pedigree structure. The latter can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \citep{Liang2014}. With respect to genealogy, the broad agreement between our analytic predictions and simulations (which include an explicit pedigree structure), suggests that this assumption does not have a severe qualitative impact on our major results when populations are moderately high, especially for all but the most recently formed hybrid zones. 
 
 Lastly, while our theory focusses on a spatially arranged hybrid zone, it is likely that our results extend to alternative models of hybridization including models of assortative mating and hybrid swarms. This is because regardless of the specific demographic model, selection against hybrids will severely limit opportunities for recombination between ancestries around incompatibilities.
 
