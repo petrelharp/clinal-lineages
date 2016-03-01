@@ -1,5 +1,8 @@
 # needs to have defined:
 #   params
+# and have loaded:
+#   sims.sums
+# and source sim-fns.R
 
 # this could be useful for that:
 get_simparams <- function (fname) {

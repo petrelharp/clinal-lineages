@@ -31,7 +31,7 @@ theory.param.list <- list(
       )
 
 
-theory.params <- theory.param.list[[2]]
+theory.params <- theory.param.list[[1]]
 theory.params$ninds <- theory.params$ndemes * theory.params$density
 
 filebase <- sprintf("haplotypes_SIGMA%d_density%d_ndemes%d_s%0.3f_tau%d",
@@ -46,13 +46,14 @@ if (!file.exists(robj.file)) {
 
     # do it on a fine scale: for tau=1000, looks to be over +/- 5 or 6 cM
     # more generally +/- 2/sqrt(tau)
-    rgrid <- setup.grid.1D(x.up=-2/sqrt(theory.params$tau), x.down=2/sqrt(theory.params$tau), N=40)
+    rgrid <- setup.grid.1D(x.up=-2/sqrt(theory.params$tau), x.down=2/sqrt(theory.params$tau), N=61)
+    rgrid$x.mid <- round(rgrid$x.mid,digits=8)
     hap.soln <- forwards_backwards_haplotypes(s=theory.params$s, times=tt, xgrid=xgrid, rgrid=rgrid,
                                sigma=theory.params$sigma, 
                                fwds.grid=fgrid, fwds.soln=fwds.soln )
 
     dir.create("cache",showWarnings=FALSE)
-    save(theory.params, filebase, tt, xgrid, fgrid, fwds.soln, rgrid, hap.soln, file=robj.file)
+    save(filebase, tt, xgrid, fgrid, fwds.soln, rgrid, hap.soln, file=robj.file)
 } else {
     load(robj.file)
 }
@@ -79,7 +80,7 @@ xx = (1:theory.params$ndemes)-0.5-theory.params$ndemes/2
 
 # this is a (locus x deme) matrix giving mean lengths
 #   for haplotype chunks of B ancestry
-mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)])})}))
+mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:length(deme_ID),deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)],na.rm=TRUE)})}))
 
 .spatial.legend <- function () {
     # do the legend for a matplot where one line correponds to a location
@@ -92,16 +93,34 @@ mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:le
 
 
 # this plots mean block length, for only ancestry B
-pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromAncBConditioning_nonnormalized.pdf",sep="_"))
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromAncBConditioning_nonnormalized_comparison.pdf",sep="_"))
 par(mar=c(3.5,3.5,1.5,0.5),mgp=c(2.5,1,0))
 # simulation
 matplot(100*(positions-0.5), 100*mean_per_deme_AncB, type='l', lty=1, col=rainbow(theory.params$ndemes),
-        ylim=range(100*mean_per_deme_AncB,100*t(hap.len.mat)),
+        ylim=range(100*mean_per_deme_AncB,100*t(hap.len.mat),finite=TRUE),
         xlab="Distance from selected locus (cM)",
         ylab="Mean block length (cM)",
         main="Mean block length, ancestry B")
 # theory
 matlines(rgrid$x.mid*100, 100*t(hap.len.mat),
+        lty=2, col=rainbow(length(xgrid$x.mid)) )
+
+.spatial.legend()
+dev.off()
+
+# this plots mean block length, for only ancestry B
+# and divided by the mean length for the deme across loci
+pdf(height=4, width=6.25,file=paste(outstring,"blocksAlongChromAncBConditioning_comparison.pdf",sep="_"))
+par(mar=c(3.5,3.5,1.5,0.5),mgp=c(2.5,1,0))
+# simulation
+matplot(100*(positions-0.5), sweep(mean_per_deme_AncB,2,colMeans(mean_per_deme_AncB,na.rm=TRUE),"/"), 
+        type='l', lty=1, col=rainbow(theory.params$ndemes),
+        ylim=c(0.5,3),
+        xlab="Distance from selected locus (cM)",
+        ylab="Mean block length (cM)",
+        main="Mean block length, ancestry B")
+# theory
+matlines(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")),
         lty=2, col=rainbow(length(xgrid$x.mid)) )
 
 .spatial.legend()
