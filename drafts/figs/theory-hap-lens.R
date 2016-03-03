@@ -152,35 +152,44 @@ dev.off()
 
 # if (FALSE) 
 {
-    pdf(file=paste0(filebase,"_haplotype_lens.pdf"),width=6,height=4,pointsize=10)
-    # mean length against space
-    matplot(rev(xgrid$x.mid), hap.len.mat, type='l', lty=1,
-            main="mean B haplotype length", 
-            col=rainbow(length(rgrid$x.mid)),
-            xlab="spatial position", ylab="mean B haplotype length (incl. zeros)")
-    k.legend <- floor(seq(1,ncol(hap.len.mat),length.out=8))
-    legend("topleft", lty=1, col=rainbow(length(rgrid$x.mid))[k.legend],
-            legend=sprintf("r=%0.0f cM",100*rgrid$x.mid[k.legend]) )
+    pdf(file=paste0(filebase,"_haplotype_lens.pdf"),width=12,height=4,pointsize=10)
+    layout(t(1:3))
 
-    # mean length along the genome
-    matplot(rgrid$x.mid*100, t(hap.len.mat), type='l', lty=1,
-            main="mean B haplotype length", 
-            col=rainbow(length(xgrid$x.mid)),
-            xlab="position along genome (cM)", 
-            ylab="mean B haplotype length (incl. zeros)")
-    k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
-    legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
-            legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+    for (k in 1:length(tt)) {
+        hap.len.mat <- sapply( rgrid$x.mid, function (rr) { 
+                       haplens <- mean_hap_len( hap.pdf, loc=rr )
+                       haplens[k,1+seq_along(xgrid$x.mid)]
+                   } )
 
-    # mean length along the genome, normalized
-    matplot(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")), 
-            type='l', lty=1,
-            main="mean B haplotype length, normalized by location", 
-            col=rainbow(length(xgrid$x.mid)),
-            xlab="position along genome (cM)", 
-            ylab="relative mean B haplotype length (incl. zeros)")
-    k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
-    legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
-            legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+        # mean length against space
+        matplot(rev(xgrid$x.mid), hap.len.mat, type='l', lty=1,
+                main=sprintf("mean B haplotype length, t=%d",tt[k]), 
+                col=rainbow(length(rgrid$x.mid)),
+                xlab="spatial position", ylab="mean B haplotype length (incl. zeros)")
+        k.legend <- floor(seq(1,ncol(hap.len.mat),length.out=8))
+        legend("topleft", lty=1, col=rainbow(length(rgrid$x.mid))[k.legend],
+                legend=sprintf("r=%0.0f cM",100*rgrid$x.mid[k.legend]) )
+
+        # mean length along the genome
+        matplot(rgrid$x.mid*100, t(hap.len.mat), type='l', lty=1,
+                main=sprintf("mean B haplotype length, t=%d",tt[k]), 
+                col=rainbow(length(xgrid$x.mid)),
+                xlab="position along genome (cM)", 
+                ylab="mean B haplotype length (incl. zeros)")
+        k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
+        legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
+                legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+
+        # mean length along the genome, normalized
+        matplot(rgrid$x.mid*100, t(sweep(hap.len.mat,1,rowMeans(hap.len.mat),"/")), 
+                type='l', lty=1,
+                main=sprintf("mean B haplotype length, normalized by location, t=%d",tt[k]), 
+                col=rainbow(length(xgrid$x.mid)),
+                xlab="position along genome (cM)", 
+                ylab="relative mean B haplotype length (incl. zeros)")
+        k.legend <- floor(seq(1,nrow(hap.len.mat),length.out=8))
+        legend("topleft", lty=1, col=rainbow(length(xgrid$x.mid))[k.legend],
+                legend=sprintf("x=%0.2f",xgrid$x.mid[k.legend]) )
+    }
     dev.off()
 }
