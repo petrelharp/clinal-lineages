@@ -148,6 +148,32 @@ the availability of dense genotype data in combination with linkage information
 makes it now possible to use patterns of the block length distribution
 to better understand the processes operating in hybrid zones.
 
+%%%
+%% these deal with environmental variation in fitness
+% Haldane1948 : does 1D stable cline including dominance for step fitness gradient
+% Fisher1950 : continuous gradient in selection
+% Hansen1966 : does numerical solns to discretized ODE including observing minimal patch size
+% Nagylaki1975 : writes down equations in 2D and conditions for stable solns
+%%%
+%% these deal with hybrid zones
+% Bazykin1969 : writes down the stable solution for the one-dimensional cline
+% barton1979dynamics of hybrid zones: looks at how hybrid zones move using a potential; also looks at the strength of stochastic effects. seems to NOT say how fast they relax?
+% barton1979gene flow past a cline : step in frequency of linked neutral allele 
+%    proportional to gradient in frequency and inverse to recomb rate
+%    adaptive introgression occurs quickly 
+% barton1986 and bengtsson : looks at many linked incompatibilities
+%    with barrier B, neutral allele delayed by (B/sigma)^2, 
+%    while adaptively introgressing allele delayed only if (B/sigma)^2 > 1/s.
+%    also does size of step of allele frequency
+% barton2008effect of a barrier to gene flow : on fluctuations in allele frequency, using diffusion approximation; 
+%    finds is more sensitive in 2d than 1d
+%%%
+%% this deals with both:
+% Slatkin1973 : does environmental cline and minimal width of a patch;
+%    shows discontinuous freqs at barriers to dispersal
+%    AND observes that het disadvantage leads to steeper clines,
+%    so maybe environment determines location of cline; het disadvantage the shape
+% May1975 : spatial resolution of adaptation; also does het disadvantage
 \alisa{Better summary of what Barton did.
 Population genetic modeling of hybrid zones has focused largely on the 
 equilibrium states of clines at selected loci \citep{Nagylaki1975,Barton1979a,Barton1986,Slatkin1973,Slatkin1975,May1975,Haldane1948}.  
@@ -267,9 +293,9 @@ Assuming that: (i) alleles locally assort into diploids randomly,
 \end{align}
 where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
 as derived in \citet{Bazykin1969}; for discussion of diploidy see \citet{christiansen1995genotypic}.
-Although there is no known exact analytic solution to this equation, even in steady state, 
-a good approximation to the equilibrium solution is that
-$\lim_{t \to \infty} p(x,t) \approx (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
+Although there is no known exact analytic solution to this equation, 
+the steady-state solution is
+$\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
 This relies on several approximations, but the general conclusions should be quite robust: 
 the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially. 
 Note that rescaling space and time by $\sigma/s$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} results in a dimensionless equation,
