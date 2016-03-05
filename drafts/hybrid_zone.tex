@@ -682,13 +682,13 @@ substantially larger than $1/T$. However, this distinction appears hard to obser
 %%%%% %%%%%%%%%%
 \subsection*{Blocks of ancestry}
 
-The distribution of contiguous ancestry block lengths contains more information than allele frequency alone. We are interested specifically in how the tracts of ancestry surrounding the selected locus compares to the rest of the genome. 
-Ideal raw data -- true ancestry assignments for a few simulated individuals sampled from across space --
+The distribution of contiguous ancestry block lengths contains more information than allele frequency alone. We are specifically interested in how the tracts of ancestry surrounding the selected locus compares to the rest of the genome. 
+Ideal information -- true ancestry assignments for a few simulated individuals sampled from across space -- % YB changed  `raw-data' to information, because ancestry will never be raw-data -- ATGC will
 are shown in Figures \ref{Fig:resistanceToIntrogression100g} ($T=100$ generations) and \ref{Fig:resistanceToIntrogression1000g} ($T=1000$ generations).
 For the more recent hybrid zone ($T=100$), the selected cline has established,
 but linked clines are still flattening.
 After a longer period ($T=1000$),
-clines over much of the chromsome are flat
+clines over much of the chromosome are flat
 (since the width of the entire population is less than $1/\sqrt{T}=31.6\sigma$),
 but a distinct enrichment of each ancestry is observed around the selected site.
 
@@ -709,7 +709,7 @@ This implies the enclosing $A$ haplotype should be no longer than $\sigma\sqrt{s
 \paragraph{Identifying selected loci}
 The statistic $C(m,x)$ shows promise for identifying selected loci under some circumstances.
 As expected, regions surrounding a locus under selection are more resistant to introgression,
-as seen in figures~\ref{Fig:resistanceToIntrogression1000g} and \ref{Fig:resistanceToIntrogression100g}).
+as seen in Figures~\ref{Fig:resistanceToIntrogression1000g} and \ref{Fig:resistanceToIntrogression100g}).
 When present, we expect haplotypes that contain the locally less common allele
 to be longer than the genome-wide average.
 Indeed,
@@ -718,15 +718,15 @@ the mean length of such haplotype blocks is up to three times longer
 than the average for that geographic location,
 peaking quite sharply around the location of the selected site.
 
-Genomes are inherited from the ancestors of $T$ generations ago
+Genomic regions are inherited from ancestors $T$ generations ago
 in blocks of size roughly $1/T$,
 so there will be a long segment of $A$ ancestry
 if many such adjacent blocks are of the same ancestry.
 Ancestries of neighboring blocks are correlated,
-due to the branching process described above,
-but if we assume they are independent, 
-then since the block about location $r$ in an individual at $x$ is of ancestry $A$ with probability $q_A(x,T,r)$,
-we'd expect to see on average $2q_A(x,T,r)/(1-q_A(x,T,r))$ blocks of ancestry $A$ about a given site unlinked to the selected site.
+due to the branching process described above. 
+But, if we assume they are independent, 
+then since the block about location $r$ in an individual at geographic location $x$ is of ancestry $A$ with probability $q_A(x,T,r)$,
+we'd expect to see, on average, $2q_A(x,T,r)/(1-q_A(x,T,r))$ blocks of ancestry $A$ about a given site unlinked to the selected site.
 This implies the mean length $l(x,m)$ would be $2q_A(x,T,r)/(T(1-q_A(x,T,r)))$,
 and the mean conditional length $l_A(x,m)$ would be $2/(T(1-q_A(x,T,r))$.
 Furthermore, we know that if $x=0$ or if $T$ is large and $r$ is not too small, that $q_A$ is close to $1/2$;
@@ -738,12 +738,12 @@ returning to the region where $A$ is common in about $x/(\sigma \sqrt{s})$ gener
 Therefore, a selected $A$ allele found on the $B$ side of the zone
 should carry with it a haplotype of average length $\sigma \sqrt{s}/x$
 that looks like haplotypes from the center of the zone.
-The analysis above suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$;
-this is indeed what is seen at distant sites, for instance, in figure \ref{sfig:blocksAlongChromAncBConditioning_nonnormalized}.
+This analysis suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$;
+this is indeed what is seen at distant sites, for instance, in Figure \ref{sfig:blocksAlongChromAncBConditioning_nonnormalized}.
 Haplotypes at the selected site are expected to be longer, but still of a length proportional to $1/T$,
 suggesting that the normalization in the statistic $C(x,m)$ is appropriate,
 as shown in Figure \ref{Supp:adjacentBlocks},
-although a numericl prediction of the value of $C(x,m)$ is elusive.
+although a numerical prediction of the value of $C(x,m)$ is elusive.
 
 The mean haplotype length found without conditioning on ancestry, $l(x,m)$,
 shows a smaller increase near the selected locus, because most blocks will be of the locally common type, and so do not trace back to regions of different block lengths.
@@ -752,7 +752,7 @@ This is shown in Figures \ref{Fig:meanBlockLengthsUnconditioned}, \ref{Supp:bloc
 Power will be optimal at intermediate values of $s$.
 If selection is too strong, it may be difficult to observe the signal
 due to a lack of introgressed selective sites,
-while if selection is week, the selected lineage does not move very fast,
+while if selection is weak, the selected lineage does not move very fast,
 and so the strength of signal from elevated $l_B(m)$ is diminished. 
 Indeed, if $s$ is less than $x/(\sigma T)$, then only one block of ancestry $A$ is expected to be seen about a selected $A$ allele,
 and $l_A(x,m)$ is expected to be $2/T$.
@@ -819,10 +819,10 @@ could provide additional information about whether introgression is through rela
 or through many migrants that each contribute relatively little. 
 In our simulations, the average local family size of a selected $B$ allele ($F_B(m,x)$) decreases with distance into the $A$ side of the hybrid zone, 
 and is lowest far away from the zone center, where ancestry $B$ is at low frequency (Figure~\ref{Fig:family_size}). 
-Unlinked loci have similar local family sizes similar to neutral simulations,
+Unlinked loci have local family sizes similar to neutral simulations,
 and loci linked to the selected locus have intermediate sizes.
-This pattern is consistent with the prediction in our models that unfit lineages tend to be recent migrants, 
-which will have smaller families. 
+This pattern is consistent with our theoretical results showing that unfit lineages tend to be recent migrants, 
+which will have smaller families.  
 
 %\alisa{add motivation-- additional information in haplotype diversity. Present alternate hypotheses. This ties in with our world view within our model}
 %As expected, we find that the average family size of a $B$ allele decreases with distance into the $A$ side of the hybrid zone. 
