@@ -280,8 +280,8 @@ In other words, the cline is established through diffusion, despite being slowed
 
 \paragraph{Lineages at the selected locus}
 Now suppose that the frequency profile of the selected allele, $p(x,t)$, is known.
-We seek to first understand how lineages of sampled individuals behave at the selected locus,
-from which lineages at linked loci require only a minor modification.
+We seek to first understand how lineages of sampled individuals behave at the selected locus. 
+These results allow us to extend our analysis to lineages at loci linked to the selected locus. 
 
 Consider the collection of $A$ alleles found at geographic location $x$.
 The expected number, among these alleles, that had a parent at location $y$ in the previous generation 
@@ -300,7 +300,7 @@ To see why this is true, note that the probability that the parent of an $A$ all
 lived at position $x-r$ is proportional to $\P\{R=r\} p(x+r)$, where $R$ is the random dispersal distance;
 and so the mean displacement from offspring to parent is $\E[R p(x+R)]/\E[p(x+R)]$.
 % $$ = \E[ R ( p(x) + R p'(x) ) ]/ p(x) + O(R^3) $$
-Using that $\E[R]=0$ and $\E[R^2]=\sigma^2$
+Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$
 and expanding $p()$ to first order about $x$ shows that this mean displacement is approximately $\sigma^2 p'(x)/p(x)$,
 which is $\sigma^2$ multiplied by the gradient of $\log p(x)$.
 
@@ -308,7 +308,7 @@ At a geographic position far from the center, $p=1$ to the left, and is proporti
 Therefore, roughly, lineages on ``their own'' side wander randomly,
 while lineages on ``the wrong'' side are pushed at constant speed $\sigma\sqrt{s}$ 
 back towards the side where they are more common. 
-Since an $A$ allele must by definition have been inherited from the $A$ side of the barrier 
+Since an $A$ allele must, by definition, have been inherited from the $A$ side of the barrier 
 at the time of secondary contact, this push must get more intense the closer it is to the time of secondary contact.
 % \alisa{I want to make a figure from the simulations that show the rapid retreat of wrong ancestries back to where they came from}
 
@@ -320,20 +320,21 @@ reflecting strong differences in selection against heterozygotes,
 even though the stable clines have the same form.
 
 \paragraph{Lineages at linked loci}
-The behavior of a lineage at a linked locus is similar to a selected locus,
-except that when in heterozygotes the lineage may move between backgrounds:
-if we follow back through time a lineage at a locus we find linked to an $A$ allele, 
-it will first tend to be inherited from ancestors to the left (as $A$ lineages drift to the left),
-but if it spends time in the hybrid zone, where recombination between selected backgrounds may happen,
-it may be found to have been inherited from a $B$-carrying individual,
+%YB DID SUBSTANTIAL EDITING OF THIS PARAGRAPH
+The behavior of a lineage at a linked locus is similar to a selected locus. 
+However, there is one important difference -- in heterozygotes the lineage lineage linked to the selected locus may move between backgrounds. 
+Therefore, if we follow back through time a lineage at a locus linked to an $A$ allele, 
+it will first tend to be inherited from ancestors to the left (as $A$ lineages drift to the left). 
+However, with sufficient time in the hybrid zone, recombination allows this linked locus 
+to have been inherited from a $B$-carrying individual,
 whose ancestors will tend to be more from the right.
 
-Suppose we sample an allele today at a locus at recombination distance $r$ from the selected site.
+Suppose we sample an allele today $r$ Morgans from the selected site. 
 We will follow its lineage back through time, using $\tau$ to denote ``generations ago'' to avoid confusion.
 If $X_\tau$ is the geographic location of its ancestor $\tau$ generations ago,
 and $Z_\tau$ is the identity of the selected allele that ancestor carried,
 then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$ 
-(just as previously described for a selected allele),
+(as described for a selected allele),
 and that $Z$ jumps between $A$ and $B$ at rate either $r (1-p)$  (from $A$ to $B$) or $r p$ (from $B$ to $A$).
 
 We can describe this process formally in It\^o notation:
