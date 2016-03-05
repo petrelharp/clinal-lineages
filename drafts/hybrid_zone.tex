@@ -437,12 +437,12 @@ which is computed as $q(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$.
 The equations are solved numerically in R, using the ReacTran package \citep{soetaert2012reactive}.
 
 \paragraph{Haplotype lengths}
-We can also find the probability of seeing an \emph{entire} block of genome (haplotype)
+We now find the probability of maintaining an \emph{entire} block of genome (haplotype) % thought `seeing' was too much about our inference rather than the the biological process
 of a single ancestry at a given location and time.
 Consider a segment of the genome between positions $a$ and $b$, relative to the selected site. 
 We are interested in the probability $g_z(x,t;a,b)$ 
 of finding an entire segment $(a,b)$ of ancestry $A$ in an individual having selected allele of type $z$,
-sampled at spatial location $x$ at time $t$ after the cline has formed.
+sampled at spatial location $x$ at time $t$ after the initiation of gene flow. % I think people sometimes use 'cline formed' to mean when the equilibrium was established, changed for clarity
 
 As in \citet{sedghifar2015spatial}, 
 a given block of genome is inherited along a single lineage ever since the most recent recombination event
@@ -456,9 +456,9 @@ The lineage of a segment of genome moves as a linked locus described in equation
 with recombination distance $r$ equal to the rate at which the segment recombines away from the selected site.
 (If the selected site lies inside the segment, $r=0$.)
 Additionally, at rate equal to the genetic length of the segment,
-a recombination occurs, at which point the segment splits into two segments at a uniformly chosen location between $a$ and $b$,
+recombination occurs, at which point the segment splits in two at a uniformly chosen location between $a$ and $b$,
 each of which proceeds as before, independently. 
-Then, $g_z(x,T;a,b)$ is then the probability that all branches are found on the $A$ side of the hybrid zone
+$g_z(x,T;a,b)$ is then the probability that all branches are found on the $A$ side of the hybrid zone
 at the time of secondary contact $T$ units of time ago.
 
 The resulting equation is similar to \eqref{eqn:q_pde} with a term added for branching,
@@ -491,17 +491,17 @@ The boundary conditions are $g_A(x,0;a,b)=1$ and $g_B(x,0;a,b)=0$.
 Notice that equations \eqref{eqn:g_pde}
 are hierarchical in $(a,b)$:
 the equation for haplotype identity probabilities on a segment $(a,b)$ depends only on those probabilities for segments contained in $(a,b)$.
-This allows for efficient numerical solutions,
+This allows for numerical solutions, %`efficient` may be an overstatement
 described in more detail in Appendix \ref{apx:haplotype_calcs}.
 
 
 \paragraph{Correlations in ancestry}
 To compute correlations in local ancestry
 (i.e., ``ancestry disequilibrium'', as in \citet{pool2015mosaic,Schumer2016}),
-we need only follow lineages at two sites, instead of an entire region,
-the model described above requires only minor modifications,
-and our numerical code can be used directly;
-for more detail see Appendix~\ref{apx:haplotype_calcs}.
+we need only follow lineages at two sites, instead of an entire region. 
+Doing so requires only minor modifications of the model, above. 
+Moreover, direct use of our numerical code provides a measure of the correlation in ancestry between markers. 
+See Appendix~\ref{apx:haplotype_calcs} for more detail.
 
 
 %%%%%%%% %%%%%%%%%%
