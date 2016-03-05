@@ -33,10 +33,10 @@
 % 
 % 
 % \begin{document}
-% \setcounter{table}{0}
-% \renewcommand{\thetable}{S\arabic{table}}
-% \setcounter{figure}{0}
-% \renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{S\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
 
 \begin{figure}
     \includegraphics{figs/linked-frequencies-longtime}
@@ -111,10 +111,21 @@
 \end{figure}
 
 
+
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau100}
 \caption{Randomly sampled chromosomes  across a hybrid zone of age $\tau=100$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
  }\label{Fig:resistanceToIntrogression100g}
+\end{figure}
+
+
+\begin{figure}
+    \includegraphics{{figs/simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_blocksAlongChromAncBConditioning_nonnormalized}.pdf}
+    \caption{
+        \textbf{Mean haplotype lengths of $A$ haplotypes}, $l(x,m)$,
+        across the genome (horizontal axis) and at differntial spatial locations (colored lines),
+        from a simulation with 50 demes having 500 individuals each, $s=0.01$, $\sigma=1$, and after $T=1000$ generations.
+    } \label{sfig:blocksAlongChromAncBConditioning_nonnormalized}
 \end{figure}
 
 
@@ -190,6 +201,7 @@
         due to genetic drift.
     } \label{sfig:condAlleleFreq_tau1280_comparison}
 \end{figure}
+
 
 
 
