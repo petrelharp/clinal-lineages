@@ -96,7 +96,7 @@ across genomic and geographic space.
 By understanding how lineages move across the hybrid zone, in a model without coalescence, 
 we describe how clines form and how parental haplotypes are broken up during introgression.
 Clines form in about $1/s$ generations, where $s$ is the strength of selection against hybrids,
-and linked clines persist over a  physical scale of $1/T$, where $T$ is the age of the hybrid zone. 
+and linked clines persist over a  physical scale of $1/T$, where $T$ is the age, in generations, of the hybrid zone. 
 Locally disadvantageous alleles tend to exist as small families,
 whose lineages trace back to the side from which they originated at speed $\sqrt{s}$ dispersal distances per generation.
 The lengths of continuous tracts of ancestry provide an additional source of information:
@@ -168,7 +168,7 @@ In the extreme case of zero fitness in first-generation hybrids, for example, pa
 If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has be used to infer the extent of hybridization and timing of secondary contact \citep{Price2009, Hellenthal2014}. 
 In addition to facilitating demographic inference, heterogeneous patterns of ancestry across the genome can help identify putative targets of selection in hybridizing populations  \citep{Porter1997, Gompert2012}. 
 
-If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected locus will be removed rapidly from the population, preventing introgression in surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
+If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected locus will be removed rapidly from the population, preventing introgression of surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
 as many ancestors of the locally common type as do neutral haplotypes.
 
 Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
@@ -643,7 +643,7 @@ show this comparison with a lower population density than in Figure \ref{alleleF
 and separating linked clines based on the identity of the linked selected allele.
 The agreement is good over hundreds of generations, but by $T=1280$ generations,
 stochasticity has substantially moved allele frequencies range-wide
-(which is unsurprising, as the total population size is only 5,000 diploids).
+(which is unsurprising, as the total population size is only 5,000 diploids) \citep{Polechova2011}.
 
 
 Loci not under direct selection can in principle spread across the cline unimpeded. 
@@ -726,7 +726,7 @@ Ancestries of neighboring blocks are correlated,
 due to the branching process described above. 
 But, if we assume they are independent, 
 then since the block about location $r$ in an individual at geographic location $x$ is of ancestry $A$ with probability $q_A(x,T,r)$,
-we'd expect to see, on average, $2q_A(x,T,r)/(1-q_A(x,T,r))$ blocks of ancestry $A$ about a given site unlinked to the selected site.
+we'd expect to see, on average, $2q_A(x,T,r)/(1-q_A(x,T,r))$ \alisa{consecutive} blocks of ancestry $A$ about a given site unlinked to the selected site.
 This implies the mean length $l(x,m)$ would be $2q_A(x,T,r)/(T(1-q_A(x,T,r)))$,
 and the mean conditional length $l_A(x,m)$ would be $2/(T(1-q_A(x,T,r))$.
 Furthermore, we know that if $x=0$ or if $T$ is large and $r$ is not too small, that $q_A$ is close to $1/2$;
@@ -738,7 +738,7 @@ returning to the region where $A$ is common in about $x/(\sigma \sqrt{s})$ gener
 Therefore, a selected $A$ allele found on the $B$ side of the zone
 should carry with it a haplotype of average length $\sigma \sqrt{s}/x$
 that looks like haplotypes from the center of the zone.
-This analysis suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$;
+This analysis suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$ \alisa{should this be $2/T$?};
 this is indeed what is seen at distant sites, for instance, in Figure \ref{sfig:blocksAlongChromAncBConditioning_nonnormalized}.
 Haplotypes at the selected site are expected to be longer, but still of a length proportional to $1/T$,
 suggesting that the normalization in the statistic $C(x,m)$ is appropriate,
@@ -877,7 +877,7 @@ genome scans may have the power to extract fine-grained regions near selected lo
 \yb{Our results focus on the length distribution of ancestry blocks --- a statistic that can only be obtained in the few systems for which dense genetic markers and phase information is known. 
 However, as the cost of sequencing continues to drop and long-phased reads become more common, the patterns described here could further aid in the identification of selected sites in hybrid zones in many non-model taxa. 
 In the meantime, patterns of elevated pairwise LD, which is easily computed from readily available low-density and unphased genomic data, could offer an alternative path forward for empirical work. 
-IImportantly, the numerical solutions derived above readily and efficiently predict correlations in ancestry, and so our results can be applied immediately to genotype data for any taxa with markers placed on a genetic map.}    
+Importantly, the numerical solutions derived above readily and efficiently predict correlations in ancestry, and so our results can be applied immediately to genotype data for any taxa with markers placed on a genetic map.}    
 
 Ancestry assignments have the additional benefit that relatively unbiased estimates are possible even with markers of problematic ascertainment
 such as those on SNP arrays.
