@@ -842,23 +842,24 @@ which will have smaller families.
 
 \alisa{Using a combination of theory and simulations, we present a description of the process of cline formation and haplotype structure in a relatively young (i.e. non-equilibrium) hybrid zone.
 We show that clines establish over time $1/s$, and that lineages of selected loci tend to move back towards their `ancestral home' when in a geographic region where they  are unfit. 
-This occurs at speed $\sigma\sqrt{s}$. Based on this we predict, and observe in simulations, that blocks of ancestry surrounding these selected loci are longer, especially when distant from the center of the cline. 
-This extends previous theoretical work on hybrid zones, which has primarily focused on stable clines in allele frequency and  suggests approaches to interpreting patterns of variation in hybrid zone populations, as well as detecting targets of purifying selection in hybrid zones.}
-The resolution of the peak is expected to scale with $1/T$, as this is the physical scale over which linked clines persist. 
+This occurs at speed $\sigma\sqrt{s}$. Based on this we predict, and observe in simulations, that blocks of ancestry surrounding these selected loci are longer, especially when distant from the center of the cline, than those surrounding neutral loci. 
+This extends previous theoretical work on hybrid zones, which has primarily focused on stable clines in allele frequency. 
+Additionally, our work suggests that the ancestry block length distribution can help detect targets of purifying selection in hybrid zones.}  
+The resolution of this approach is expected to scale with $1/T$, as this is the physical scale over which linked clines persist.  
 
 \subsection*{Genomic signals associated with targets of selection}
 
-Popular approaches to identifying the loci that are experiencing selection in hybrid zones 
+Popular approaches to identifying loci under selection in hybrid zones 
 involve identifying alleles that are exceptional in terms of frequency across space, or genome-wide admixture proportion \citep{Porter1997,Gompert2012}.  
-The availability of genomic data has made it possible to use recombination as an additional source of information.
+The availability of genomic data has made it possible to use local ancestry as an additional source of information. 
 In particular, ancestry deconvolution facilitated by programs such as  hapMIX \citep{Price2009}, LAMP \citep{Sankararaman2008} and fineSTRUCTURE \citep{Lawson2012} 
-has been used extensively to infer the demographic history of hybridization/admixture from present day samples \citep[e.g. ][]{Hellenthal2014}. 
-In this paper, we have described how selection against hybrid incompatibilities 
-results in long contiguous blocks of ancestry around these loci,
-because regions surrounding selected loci introgress less readily, 
-and so introgressed alleles have been inherited from ``their'' side of the zone more recently.
-We get quantitative understanding fromt he fact that lineages of
-loci under selection moving as Brownian motion that is pushed at speed $\sigma \sqrt{s}$ towards its ancestral side.
+can inform the demographic history of hybridization/admixture from present day samples \citep[e.g. ][]{Hellenthal2014}. 
+We described how selection against hybrid incompatibilities  
+results in long contiguous blocks of ancestry around these loci. 
+This is because regions surrounding selected loci do not readily introgress, 
+and so introgressed alleles have been inherited from ``their'' side of the zone recently. %removed `more and less bc we are not comparing anything in this sentence'
+We get quantitative understanding from the fact that lineages of
+loci under selection move as Brownian motion pushed at speed $\sigma \sqrt{s}$ towards its ancestral side.
 In other words, disadvantageous alleles that have encroached deep into the other side of the hybrid zone have done so by chance and, since they do not persist for long on the ``wrong'' side, are likely to have done so relatively recently. Haplotypes surrounding the selected locus therefore have had relatively few opportunities for recombination with different ancestries and this is reflected in longer blocks of contiguous ancestry.
 
 \yb{remove this? or, what figure?}
@@ -872,7 +873,11 @@ The ratio of mean adjacent block lengths $C(x,m)$ shows a very sharp peak at the
 suggesting that, despite the fact that haplotypes surrounding incompatibilities might be quite long, 
 genome scans may have the power to extract fine-grained regions near selected loci from the large chunks of ancestry that will often flank these regions. 
 
-While these statistics presented here are currently detectable only in the few systems for which dense genetic markers and phase information is known, as the cost of sequencing continues to drop and long-phased reads become more common, the patterns described here could further aid in the identification of selected sites in hybrid zones. In the meantime, patterns of elevated pairwise LD, which is more easily computed from readily available low-density and unphased genomic data, could offer a less-powerful alternative to these findings. 
+% many modifications here
+\yb{Our results focus on the length distribution of ancestry blocks --- a statistic that can only be obtained in the few systems for which dense genetic markers and phase information is known. 
+However, as the cost of sequencing continues to drop and long-phased reads become more common, the patterns described here could further aid in the identification of selected sites in hybrid zones in many non-model taxa. 
+In the meantime, patterns of elevated pairwise LD, which is easily computed from readily available low-density and unphased genomic data, could offer an alternative path forward for empirical work. 
+IImportantly, the numerical solutions derived above readily and efficiently predict correlations in ancestry, and so our results can be applied immediately to genotype data for any taxa with markers placed on a genetic map.}    
 
 Ancestry assignments have the additional benefit that relatively unbiased estimates are possible even with markers of problematic ascertainment
 such as those on SNP arrays.
@@ -892,22 +897,23 @@ Here we review the assumptions we made and their likely impact.
 \paragraph{The nature of selection}
 Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, we believe that this is unlikely to drastically influence our findings, as previous studies have demonstrated that underdominant loci share similar properties with more realistic models (e.g., ecological selection \citep{Barton1989,Barton1993}). 
 
-Our assumption of a single selected locus may have greater consequences. While our model is likely to be relevant to cases in which there are only a small number of targets of selection scattered throughout the genome, our predictions may differ significantly from situations in which the density of selected sites is higher. 
+Our assumption of a single selected locus may have greater consequences. Our model is most relevant to scenarios with few targets of selection scattered throughout the genome, and therefore, our predictions may differ significantly from situations in which the density of selected sites is higher. 
 Having numerous selected sites within one ancestry block increases the strength of selection, and the relatively short map distances between linked incompatibilities generates a longer unit which is not readily broken up by recombination. Both factors are expected to result in regions that are surrounded by even longer segments of unbroken ancestry, and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection. 
 \yb{provide citation.}
  
 
-To speed calculations and simulations, throughout we have assumed a homogeneous, one-dimensional geographical range.
-Theoretical work also assumed a large population density, 
+To speed calculations and simulations, we assumed a homogeneous, one-dimensional geographical range.
+Our analytical results further assumed a large population density, 
 effectively working with a deterministic model that ignores coalescence and associated stochasticity.
 In contrast, our simulations model regularly spaced demes of finite size.
 In reality, populations may be patchily connected, especially at the edges of species ranges where hybrid zones may occur. 
 The degree to which inhomogeneous geography would affect the predictions depends on how patchy the zone is;
 the differential equations provide a way to evaluate this in specific circumstances.
 
-It is particularly unfortunate 
-that our analytic calculations do not capture stochasticity arising from coalescence/pedigree structure. 
-The latter can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \citep{liang2014lengths}. 
+%It is particularly unfortunate 
+%that our analytic calculations do not capture stochasticity arising from coalescence/pedigree structure. 
+Extending our analytical results to capture stochasticity arising from coalescence/pedigree structure represents an important future direction.  
+Ignoring pedigree structure can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \citep{liang2014lengths}. 
 Indeed, correlated fluctuations visible in simulations (e.g., Figure \ref{Fig:blockLengths})
 are likely due to coupling due to demographic stochasticity;
 and simulations at lower density show larger fluctuations than those at higher density.
@@ -917,7 +923,7 @@ suggests that this assumption does not have a severe impact on our major results
 
 
 \subsection*{Theory and simulation}
-In this work, we have taken two complementary approaches,
+We have taken two complementary approaches,
 using both simulation and theory, and comparing the two.
 As usual, simulations make fewer biological simplifications,
 while theory provides more generalizable conclusions.
@@ -937,10 +943,9 @@ about 1 second to compute predicted clines, as opposed to hours for the full sim
 However, due to the high dimensionality of the haplotype problem (spatial position $\times$ time $\times$ endpoints of the haplotype),
 numerical solutions for mean haplotype lengths along the genome can be as computationally intensive as simulations
 (although are substantially less noisy).
-More work could be done to develop more efficient methods of solution,
-but it may be better to perform more biologically realistic forwards-time simulations that includes coalescence and drift.
-Nonetheless, the PDE approach is easily modified to provide predictions for spatial and temporally inhomogeneous systems --
-for instance, across maps of real landscapes.
+More work could be done to develop more efficient methods of solution, 
+but it may be better to perform more biologically realistic forwards-time simulations that includes coalescence and drift to better characterize the block length distribution.
+If however the correlation in ancestry, rather than the block-length distribution, is of interest the PDE approach may be preferable because it is easily modified to provide predictions for spatial and temporally inhomogeneous systems -- for instance, across maps of real landscapes.
 
 %, and is an example of the more general idea of duality for particle systems \alisa{I think this may be beyond the average ME reader?}. 
 %\plr{Tracking lineages is duality, has nothing to do with 1D, though.}
@@ -1129,7 +1134,7 @@ should both be scaled by $\sigma^2$.
 
 %%%%%%% %%%%%%%%%%%%%
 \section{Numerical calculation of haplotype probabilities}
-\label{apx:haplotype_calcs}.
+\label{apx:haplotype_calcs}
 
 In this section, we give details for how we found numerical solutions
 to the partial differential equations (PDE) of the text,
