@@ -1,10 +1,10 @@
 
-source("../../sims/sim-fns.R",chdir=TRUE)
+source("../sims/sim-fns.R",chdir=TRUE)
 library(ReacTran)
 library(Matrix)
-source("../../notes/tran.1D.R",chdir=TRUE) # fix for log.A
-source("../../notes/cline-fns.R",chdir=TRUE)
-source("../../sims/chunks_fns.R",chdir=TRUE)
+source("../notes/tran.1D.R",chdir=TRUE) # fix for log.A
+source("../notes/cline-fns.R",chdir=TRUE)
+source("../sims/chunks_fns.R",chdir=TRUE)
 
 
 ###
@@ -17,6 +17,7 @@ get_simparams <- function (fname) {
 
 
 positions = seq(0.2,0.8,0.01)
+positions = seq(0.48,0.52,0.001)
 
 sel.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums.Robj"
 sel.params <- get_simparams( sel.sim.file )
@@ -47,7 +48,7 @@ if (!file.exists("plot_frequency_clines.Robj")) {
             IND_DATA=sims.sums[[1]]$ind.ancest, 
             demeID=demeID, 
             VECTOR_OF_POS=positions, 
-            CHR=2, 
+            CHR=1, 
             ndemes=neu.params$ndemes)
 
     save(B_freq, B_neu, file="plot_frequency_clines.Robj")
@@ -56,16 +57,16 @@ if (!file.exists("plot_frequency_clines.Robj")) {
 }
 
 
-pdf(file="alleleFrequencies_sim.pdf",height=4,width=6,pointsize=10)
+pdf(file="alleleFrequencies_sim_s0.01_tau100_closely_linked.pdf",height=4,width=6,pointsize=10)
 par(mar=c(3.5,3.5,0.5,0.5))
-    matplot(B_neu/1000,xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5,x=seq(-24.5,24.6,1))
+    matplot(1-B_neu/1000,xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5,x=seq(-24.5,24.6,1),ylim=c(0,1))
     for(i in 1:30){
-        matpoints(B_freq[,c(i,62-i)]/1000,type="l",col=(rainbow(43))[32-i],lty=1,lwd=0.75,x=seq(-24.5,24.6,1))
+        matpoints(1-B_freq[,c(i,62-i)]/1000,type="l",col=(rainbow(43))[32-i],lty=1,lwd=0.75,x=seq(-24.5,24.6,1))
     }
-    points(B_freq[,31]/1000,col="red",lwd=2,type="l",x=seq(-24.5,24.6,1))
+    points(1-B_freq[,31]/1000,col="red",lwd=2,type="l",x=seq(-24.5,24.6,1))
     mtext("Geographic position",side=1,line=2)
     mtext(expression(p[B]),side=2,line=2.5)
-    legend("bottomright",legend = c("r=0","r=0.05","r=0.1","r=0.2","r=0.3","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
+    legend("bottomright",legend = c("r=0","r=0.005","r=0.01","r=0.02","r=0.03","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
 dev.off()
 
 

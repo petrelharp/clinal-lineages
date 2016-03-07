@@ -69,7 +69,7 @@
     \caption{
         \textbf{Comparison of simulated to theoretical clines:}
         As in Figure \ref{alleleFreq_tau100},
-        frequency of ancestry B,
+        frequency of ancestry $B$,
         across geography and at several physical positions on the genome,
         at $T=100$ generations after secondary contact,
         and at $s=0.1$.
@@ -85,28 +85,28 @@
 \begin{figure}
 \includegraphics{figs/alleleFrequencies_sim_s01_tau100_closely_linked.pdf}
 \caption{
-    Frequency of ancestry B,
+    Frequency of ancestry $B$,
     across geography and at several physical positions on the genome, simulated for a hybrid zone
      $T=100$ generations after secondary contact,
     and with $s=0.01$.
-        50 demes, each with a population size of 500 diploid individuals, were simulated across the hybrid zone.
+        50 demes, each with a population size of 500 diploid individuals.
     Each line represents a locus some distance $r$ away from the true target of selection, 
     and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
-    identical parameters except $s=0$.
+    identical parameters except that $s=0$.
 }\label{alleleFreq_tau100_weaker_s}
 \end{figure}
 
 \begin{figure}
 \includegraphics{figs/alleleFrequencies_sim_s1_tau1000.pdf}
 \caption{
-    Frequency of ancestry B,
+    Frequency of ancestry $B$,
     across geography and at several physical positions on the genome, simulated for a hybrid zone
      $T=1000$ generations after secondary contact,
     and with $s=0.1$.
-        50 demes, each with a population size of 500 diploid individuals, were simulated across the hybrid zone.
+        50 demes, each with a population size of 500 diploid individuals.
     Each line represents a locus some distance $r$ away from the true target of selection, 
     and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
-    identical parameters except $s=0$.
+    identical parameters except that $s=0$.
  }\label{alleleFreq_tau1000}
 \end{figure}
 
@@ -114,7 +114,7 @@
 
 \begin{figure}
 \includegraphics[width=\textwidth]{figs/plot_chromosomes_tau100}
-\caption{Randomly sampled chromosomes  across a hybrid zone of age $\tau=100$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$. Regions surrounding the selected site are failing to introgress.
+\caption{Randomly sampled chromosomes  across a hybrid zone of age $T=100$. Here we compare chromosomes of length 1M from a neutral zone to one that has a single under-dominant locus ($s=0.1$) in the middle of the chromosome (indicated by black arrow). Red blocks along the chromosome denote ancestry $B$, and orange blocks are ancestry $A$.
  }\label{Fig:resistanceToIntrogression100g}
 \end{figure}
 
@@ -122,16 +122,40 @@
 \begin{figure}
     \includegraphics{{figs/simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_blocksAlongChromAncBConditioning_nonnormalized}.pdf}
     \caption{
-        \textbf{Mean haplotype lengths of $A$ haplotypes}, $l(x,m)$,
+        \textbf{Mean haplotype lengths of $A$ haplotypes} \alisa{Should this be $B$ haplotypes? That is what the figure title seems to indicate}, $l(x,m)$ \alisa{this would need to be changed to either $l_A$ or $l_B$},
         across the genome (horizontal axis) and at differntial spatial locations (colored lines),
         from a simulation with 50 demes having 500 individuals each, $s=0.01$, $\sigma=1$, and after $T=1000$ generations.
     } \label{sfig:blocksAlongChromAncBConditioning_nonnormalized}
 \end{figure}
 
+\begin{figure}
+\includegraphics[width=\textwidth]{{figs/results_runid_753324_chr1_start0.48_stop0.52_by0.001_blocksAlongChromNoConditioning_nonnormalized}.pdf}
+\caption{
+    \textbf{Mean enclosing block length $l(m,x)$}, across the genome (horizontal axis)
+    and at different geographic positions (different colored lines).
+    Results are from a simulation with 120 demes of 200 diploids each, selection $s=.05$, dispersal $\sigma=3$, 
+    and after $T=500$ generations.
+}\label{Fig:meanBlockLengthsUnconditioned}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics{figs/blocksAlongChromAncBConditioning}
+\caption{
+    \textbf{Normalized mean enclosing block length}, $l_B(m,x)$, after $T=1000$ generations,
+    against position relative to the selected locus (horizontal axis)
+    located in the center of a 1M chromosome.
+    Each line shows the mean block length at that spatial and genomic position
+    divided by the mean over the chromosome at that location;
+    the simulation was run with $s=1$ and $\sigma=1$,
+    50 demes, each containing 500 diploid individuals.
+}\label{Fig:blockLengths}
+\end{figure}
+
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromHeatmapAncBConditioning}
-\caption{Heatmap of mean block length $l_B(m_i)$ along a simulated chromosome. }\label{Supp:blockLengthHeatmap}
+\caption{Heatmap of mean block length $l_B(m)$ along a simulated chromosome. }\label{Supp:blockLengthHeatmap}
 \end{figure}
 
 
@@ -139,35 +163,35 @@
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromNoConditioning}
-\caption{Heatmap of mean block length $l_\bullet(m_i)$ surrounding a given position along the genome with a single underdominant site ($s=0.01, \tau=1000$). }\label{Supp:blockLengthNoAnc}
+\caption{Heatmap of mean block length $l(m)$ surrounding a given position along the genome with a single underdominant site ($s=0.01, T=1000$). }\label{Supp:blockLengthNoAnc}
 \end{figure}
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromHeatmap}
-\caption{Heatmap of mean block length $l_\bullet(m_i)$ along a simulated chromosome with a single underdominant site ($s=0.01, \tau=1000$) }\label{Supp:blockLengthHeatmapNoAnc}
+\caption{Heatmap of mean block length $l(m)$ along a simulated chromosome with a single underdominant site ($s=0.01, T=1000$) }\label{Supp:blockLengthHeatmapNoAnc}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/adjacentBlocksAlongChromAncBConditioning}
-\caption{Mean block length of $l_A(m_i\cdot)$ across chromosome with single under dominant site ($s=0.01, \tau=1000$)}\label{Supp:adjacentBlocks}
+\caption{Mean block length of $l_A(m\pm)$ across chromosome with single under dominant site, conditioning on ancestry $B$ at the selected locus. ($s=0.01, T=1000$)}\label{Supp:adjacentBlocks}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/ratioAdjacentBlocksAlongChromAncBConditioning}
-\caption{Ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and adjacent block lengths across a simulated chromosome with a single underdominant site ($s=0.01, \tau=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme.}\label{Supp:ratioBlockAdjacent}
+\caption{Ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and adjacent block lengths across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme.}\label{Supp:ratioBlockAdjacent}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/ratioAdjacentBlocksAlongChromHeatmapAncBConditioning}
-\caption{Heatmap of $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site ($s=0.01, \tau=1000$). }\label{Supp:ratioBlockAdjacentHeatmap}
+\caption{Heatmap of $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$). }\label{Supp:ratioBlockAdjacentHeatmap}
 \end{figure}
 
 
 \begin{figure}
-    \includegraphics{figs/cond_freqs_comparison_tau_80}
+    \includegraphics[height=0.8\textheight]{figs/cond_freqs_comparison_tau_80}
     \caption{
         \textbf{Conditional frequencies of ancestry $A$ at $\tau=80$},
         comparing simulation and theory, with $\sigma=3$ deme spacings, $s=0.05$, and 50 individuals per deme.
@@ -201,6 +225,7 @@
         due to genetic drift.
     } \label{sfig:condAlleleFreq_tau1280_comparison}
 \end{figure}
+
 
 
 

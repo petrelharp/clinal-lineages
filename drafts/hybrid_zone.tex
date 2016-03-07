@@ -227,7 +227,7 @@ Individuals who are heterozygous at this locus produce on average $1-s$ times as
 Although most selection in hybrid zones is likely more complex than this simple situation, 
 previous work has shown that such models generate clines that are very similar to models of ecological selection or epistatic systems \citep{Kruuk1999,Barton2000a}.
 
-As in \citet{sedghifar2015spatial}, consider where the ancestors of modern-day individuals lived,
+As in \citet{sedghifar2015spatial}, we consider where the ancestors of modern-day individuals lived,
 i.e., where their lineages fall across geography as we look further back towards the time of first contact.
 We say that a locus in a sampled individual is of \emph{ancestry} $A$ if it has been inherited from an individual of species $A$ at the time of secondary contact,
 i.e., if its lineage traces back to a spatial position $x<0$.
@@ -248,8 +248,7 @@ a key factor in these models is the density and fecundity of heterozygotes.
 \includegraphics{figs/BM_schematic}
 \caption{
     \textbf{A schematic figure of the lineages along which a segment of genome has been inherited,}
-    i.e., showing where the ancestors lived from whom the haplotype was inherited (horizontal axis),
-    and how long ago they lived (vertical axis).
+    i.e., showing where (horizontal axis) and when (vertical axis) the ancestors, from whom the haplotype was inherited, lived.
     The segment contains the $B$ alelle at the selected locus.
     The black line shows the lineage at the selected site in the sampled individual in the present day (at $\tau=0$).
     The center of the hybrid zone is at geographic position $x=0$; in the region $x>0$, ancestry $A$ is less common,
@@ -275,8 +274,8 @@ and analytics, mostly in terms of partial differential equations needing numeric
 
 \paragraph{Establishment of the cline at the selected locus}
 Deterministic theory predicts that after secondary contact,
-the two alleles at the selected locus will form a stable cline \citep{barton1979gene},
-affecting neighboring loci as well.
+the two alleles at the selected locus will form a stable cline,
+affecting neighboring loci as well \citep{barton1979gene, Barton1986}.
 First, we turn our attention to how the cline at the selected locus itself is formed.
 Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, 
@@ -352,7 +351,7 @@ even though the stable clines have the same form.
 \paragraph{Lineages at linked loci}
 %YB DID SUBSTANTIAL EDITING OF THIS PARAGRAPH
 The behavior of a lineage at a linked locus is similar to a selected locus. 
-However, there is one important difference -- in heterozygotes the lineage lineage linked to the selected locus may move between backgrounds. 
+However, there is one important difference -- in heterozygotes the lineage linked to the selected locus may move between backgrounds. 
 Therefore, if we follow back through time a lineage at a locus linked to an $A$ allele, 
 it will first tend to be inherited from ancestors to the left (as $A$ lineages drift to the left). 
 However, with sufficient time in the hybrid zone, recombination allows this linked locus 
@@ -576,7 +575,7 @@ The simulations were executed in R, with scripts available at
     Each line represents a locus some distance $r$ away from the true target of selection, 
     with $r=0$ representing the locus under selection. 
     Grey lines represent the same positions from a simulation with
-    identical parameters except $s=0$.
+    identical parameters except that $s=0$.
     Corresponding theoretical quantities are shown juxtaposed in Figure \ref{sfig:alleleFreq_tau100_comparison};
     the same plot is shown with weaker selection in Figure \ref{alleleFreq_tau100_weaker_s} and at a longer time in Figure \ref{alleleFreq_tau1000}.
 }\label{alleleFreq_tau100}
@@ -731,7 +730,7 @@ than those that do not contain the selected site at the same spatial location,
 because lineages containing the selected site have usually been inherited from the $A$ side of the cline recently. 
 As discussed above, we expect these lineages move at speed roughly $\sigma\sqrt{s}$,
 so (selected) $A$ alleles at distance $x$ from the cline center
-to have last had an ancestor on the $A$ side of the cline around $x/(\sqrt{s}\sigma)$ generations ago 
+to have last had an ancestor on the $A$ side of the cline around $x/(\sigma\sqrt{s})$ generations ago 
 (compared to $x^2/\sigma^2$ for a neutral allele).
 This implies the enclosing $A$ haplotype should be no longer than $\sigma\sqrt{s}/x$.
 %\plr{(check predicted decay of mean length $1/x$ in simulations?)}
@@ -754,9 +753,9 @@ so there will be a long segment of $A$ ancestry
 if many such adjacent blocks are of the same ancestry.
 Ancestries of neighboring blocks are correlated,
 due to the branching process described above. 
-But, if we assume they are independent, 
+But, if we assume they are \emph{independent}, 
 then since the block about location $r$ in an individual at geographic location $x$ is of ancestry $A$ with probability $q_A(x,T,r)$,
-we'd expect to see, on average, $2q_A(x,T,r)/(1-q_A(x,T,r))$ \alisa{consecutive} blocks of ancestry $A$ about a given site unlinked to the selected site.
+we would expect to see, on average, $2q_A(x,T,r)/(1-q_A(x,T,r))$ \alisa{consecutive} blocks of ancestry $A$ about a given site unlinked \alisa{unlinked, or linked?} to the selected site.
 This implies the mean length $l(x,m)$ would be $2q_A(x,T,r)/(T(1-q_A(x,T,r)))$,
 and the mean conditional length $l_A(x,m)$ would be $2/(T(1-q_A(x,T,r))$.
 Furthermore, we know that if $x=0$ or if $T$ is large and $r$ is not too small, that $q_A$ is close to $1/2$;
@@ -768,12 +767,14 @@ returning to the region where $A$ is common in about $x/(\sigma \sqrt{s})$ gener
 Therefore, a selected $A$ allele found on the $B$ side of the zone
 should carry with it a haplotype of average length $\sigma \sqrt{s}/x$
 that looks like haplotypes from the center of the zone.
-This analysis suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$ \alisa{should this be $2/T$?};
+This analysis suggests that $A$ haplotypes in the center of the zone should be of average length $4/T$;
 this is indeed what is seen at distant sites, for instance, in Figure \ref{sfig:blocksAlongChromAncBConditioning_nonnormalized}.
 Haplotypes at the selected site are expected to be longer, but still of a length proportional to $1/T$,
 suggesting that the normalization in the statistic $C(x,m)$ is appropriate,
 as shown in Figure \ref{Supp:adjacentBlocks},
 although a numerical prediction of the value of $C(x,m)$ is elusive.
+\alisa{Above argument assumes independence between lineages. Does this make block lengths conservative? }
+
 
 The mean haplotype length found without conditioning on ancestry, $l(x,m)$,
 shows a smaller increase near the selected locus, because most blocks will be of the locally common type, and so do not trace back to regions of different block lengths.
@@ -781,7 +782,7 @@ This is shown in Figures \ref{Fig:meanBlockLengthsUnconditioned}, \ref{Supp:bloc
 
 Power will be optimal at intermediate values of $s$.
 If selection is too strong, it may be difficult to observe the signal
-due to a lack of introgressed selective sites,
+due to a lack of introgressed selected sites,
 while if selection is weak, the selected lineage does not move very fast,
 and so the strength of signal from elevated $l_B(m)$ is diminished. 
 Indeed, if $s$ is less than $x/(\sigma T)$, then only one block of ancestry $A$ is expected to be seen about a selected $A$ allele,
@@ -808,35 +809,13 @@ For similar reasons, power and resolution are best at intermediate $T$.
 \end{figure}
 
 
-\begin{figure}
-\includegraphics[width=\textwidth]{{figs/results_runid_753324_chr1_start0.48_stop0.52_by0.001_blocksAlongChromNoConditioning_nonnormalized}.pdf}
-\caption{
-    \textbf{Mean enclosing block length $l(m,x)$}, across the genome (horizontal axis)
-    and at different geographic positions (different colored lines).
-    Results are from a simulation with 120 demes of 200 diploids each, selection $s=.05$, dispersal $\sigma=3$, 
-    and after $T=500$ generations.
-}\label{Fig:meanBlockLengthsUnconditioned}
-\end{figure}
 
-
-\begin{figure}
-\includegraphics{figs/blocksAlongChromAncBConditioning}
-\caption{
-    \textbf{Normalized mean enclosing block length}, $C(m,x)$, after $T=1000$ generations,
-    against position relative to the selected locus (horizontal axis)
-    located in the center of a 1M chromosome.
-    Each line shows the mean block length at that spatial and genomic position
-    divided by the mean over the chromosome at that location;
-    the simulation was run with $s=1$ and $\sigma=1$,
-    50 demes, each containing 500 diploid individuals.
-}\label{Fig:blockLengths}
-\end{figure}
 
 
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioningHighRes}
-\caption{Mean block length, $l_B(m)$, along a simulated chromosome of length $1M$ with selected locus of $s=0.01$ at position $0.5M$ in a hybrid zone of $T=1000$. Here each line represents  $l_B(m)$, in a given deme, and is normalized by dividing by mean $l_B(m)$ along the chromosome within the deme. Chromosome were sampled across the hybrid zone, which consists of 50 demes, each containing 500 diploid individuals. This figure represents the same simulation and statistic as Fig.~\ref{Fig:blockLengths}, on a finer genomic scale.
+\caption{\textbf{Normalized mean enclosing block length}, $l_B(m)$, along a simulated chromosome of length $1M$ with selected locus of $s=0.01$ at position $0.5M$ in a hybrid zone of $T=1000$. Here each line represents  $l_B(m)$, in a given deme, and is normalized by dividing by mean $l_B(m)$ along the chromosome within the deme. Chromosome were sampled across the hybrid zone, which consists of 50 demes, each containing 500 diploid individuals. This figure represents the same simulation and statistic as Fig.~\ref{Fig:blockLengths}, on a finer genomic scale.
 }\label{Fig:blockLengthsZoom}
 \end{figure}
 
@@ -863,7 +842,7 @@ which will have smaller families.
 
 \begin{figure}
 \includegraphics{figs/number_of_ancestors_tau1000}
-\caption{The number of individuals of ancestry $B$ per number of ancestors from secondary contact occurring $T=1000$ generations ago, represented across geographic space. The hybrid zone is 50 demes, each containing 500 diploid individuals.
+\caption{\textbf{Mean family size of haplotypes.} The number of individuals of ancestry $B$ per number of ancestors ($F_B(m,x)$) from secondary contact occurring $T=1000$ generations ago, represented across geographic space. The hybrid zone is 50 demes, each containing 500 diploid individuals.
  Each red or orange line represents a site some distance away (ranging from 0 - 0.01) from the selected site (here $s=0.01$ and $\sigma=1$). Yellow lines are corresponding positions on an unlinked chromosome with no selected loci, and grey lines are corresponding positions in a simulation with no selection.  Bold lines depict the target of selection when present, and corresponding position on chromosomes not harboring any selected sites.}\label{Fig:family_size}
 \end{figure}
 
@@ -892,8 +871,8 @@ We get quantitative understanding from the fact that lineages of
 loci under selection move as Brownian motion pushed at speed $\sigma \sqrt{s}$ towards its ancestral side.
 In other words, disadvantageous alleles that have encroached deep into the other side of the hybrid zone have done so by chance and, since they do not persist for long on the ``wrong'' side, are likely to have done so relatively recently. Haplotypes surrounding the selected locus therefore have had relatively few opportunities for recombination with different ancestries and this is reflected in longer blocks of contiguous ancestry.
 
-\yb{remove this? or, what figure?}
-Through our simulations we find also that blocks of ancestry that are have crossed the hybrid zone and are closely linked to the selected site without overlapping it (i.e., blocks that are adjacent to the block containing the selected site) are shorter than average for the spatial location. 
+%\yb{remove this? or, what figure?}
+Through our simulations we find also that blocks of ancestry that are have crossed the hybrid zone and are closely linked to the selected site without overlapping it (i.e., blocks that are adjacent to the block containing the selected site) are shorter than average for the spatial location (Figure~\ref{Supp:adjacentBlocks}). 
 An intuitive explanation for this pattern is that loci physically linked to a selected site have recently come from the center of the zone or beyond. 
 Compared to other chromosomes in their new geographic location, these migrants will have on average longer $B$ haplotypes at the selected locus, and shorter $A$ haplotypes nearby. 
 
@@ -928,8 +907,7 @@ Here we review the assumptions we made and their likely impact.
 Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, we believe that this is unlikely to drastically influence our findings, as previous studies have demonstrated that underdominant loci share similar properties with more realistic models (e.g., ecological selection \citep{Barton1989,Barton1993}). 
 
 Our assumption of a single selected locus may have greater consequences. Our model is most relevant to scenarios with few targets of selection scattered throughout the genome, and therefore, our predictions may differ significantly from situations in which the density of selected sites is higher. 
-Having numerous selected sites within one ancestry block increases the strength of selection, and the relatively short map distances between linked incompatibilities generates a longer unit which is not readily broken up by recombination. Both factors are expected to result in regions that are surrounded by even longer segments of unbroken ancestry, and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection. 
-\yb{provide citation.}
+Having numerous selected sites within one ancestry block increases the strength of selection, and the relatively short map distances between linked incompatibilities generates a longer unit which is not readily broken up by recombination. Both factors are expected to result in regions that are surrounded by even longer segments of unbroken ancestry, and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection \citep{Slatkin1975b}. 
  
 
 To speed calculations and simulations, we assumed a homogeneous, one-dimensional geographical range.
@@ -1014,8 +992,8 @@ If however the correlation in ancestry, rather than the block-length distributio
 \subsection*{Patterns of divergence}  
 A number of studies have described heterogeneous patterns of genetic divergence across the genome. 
 Work on these ``islands of divergence'' \citep{turner2005genomic,Nosil2009} and related patterns have been largely descriptive \citep{Cruickshank2014,Noor2009}.
-This paper contributes to a model-based understanding of 
-how migration and selection influence such patterns across the genome of hybridizing populations. 
+Our study here contributes to a model-based understanding of 
+how migration and selection may influence such patterns across the genome of hybridizing populations. 
 Overall, focusing on lengths of ancestry blocks across the genome brings focus to the processes of migration and selection 
 rather than high-level summaries that are somewhat abstracted from the evolutionary process. 
 
