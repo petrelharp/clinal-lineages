@@ -127,20 +127,22 @@ However, when formerly isolated populations come into contact before reproductiv
 %can be labeled according to which ancestral population is is inherited from, and local 
 Interbreeding and migration between such populations  
 % YB It seems like the fact that such ancestry can be labeled is more important later, but probably shouldn't be a focus here. 
-creates a gradient of ancestry across geographic space, %YB removed `assignments' as it seems like it is the ancestry, not its assignment, that is of interest
+creates a gradient of alleles derived from the two populations across geographic space, %YB removed `assignments' as it seems like it is the ancestry, not its assignment, that is of interest
 centered on their point of contact \citep[reviewed in][]{Barton1985}. 
 If the populations are sufficiently diverged, 
 this process leaves a distinct pattern of variation across the genome, 
 in which long tracts of divergent haplotypes from each ancestral population  
 are broken up by historical recombination events,
-forming chromosomal \emph{junctions} in ancestry \citep{Fisher1954, Chapman2002, baird2003distribution}. 
-Limited opportunities for recombination in recent hybrid zones generates substantial correlations in ancestry (and hence, genotype) between distant markers, and
-patterns of correlated ancestry in admixed populations has been previously described the history of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,sedghifar2015spatial}.  
+forming chromosomal {junctions} in ancestry \citep{Fisher1954, Chapman2002, baird2003distribution}. 
+% Limited opportunities for recombination in recent hybrid zones generates substantial correlations in ancestry (and hence, genotype) between distant markers, and
+These
+patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,sedghifar2015spatial}.  
 
 
 While for much of the genome, gene flow will eventually erase 
 both geographic clines in ancestry and strong correlations in ancestry across linked markers, 
-subsets of the genome can maintain stable clines in ancestry if selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{Barton1979a}. 
+subsets of the genome can maintain stable clines in ancestry if selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{barton1979gene}. 
+% previously had wrong Barton '79 here
 Studies of hybrid zones have primarily been based on single-site statistics such as clines,
 but today, 
 the availability of dense genotype data in combination with linkage information 
@@ -148,7 +150,7 @@ makes it now possible to use patterns of the block length distribution
 to better understand the processes operating in hybrid zones.
 
 There is substantial theoretical work on genetic clines.
-We study those maintained \emph{only} by selection against hybrids -- \emph{tension zones} --
+We study those maintained only by selection against hybrids -- \emph{tension zones} --
 as in \citet{Bazykin1969}, reviewed in \citet{Barton1985}.
 Clines may also be maintained by environmental gradients \citep{Haldane1948,fisher1950frequencies};
 although these are in principle different,
@@ -157,7 +159,7 @@ that while the environment may determine the location of a cline,
 the fitness of the heterozygote will likely determine the shape of the cline,
 and \citet{Barton1986} show that the shapes of several sorts of stable clines are similar.
 There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,Barton2008,Polechova2011},
-and quantifying the barrier to gene flow caused by clines \citep{Barton1979,Barton1989,Barton1993,Barton2000}.
+and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000}.
 In this work, we focus on \emph{transient} patterns after the initial formation of a tension zone,
 in particular describing haplotype patterns.
 Although the selected cline establishes quickly, transient patterns can persist for quite some time,
@@ -168,17 +170,17 @@ This is particularly suited to understanding transient patterns,
 although because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002neutral},
 incorporating genetic drift is not straightforward.
 Common to nearly all studies is the use of the
-reaction-diffusion equations that govern the deterministic, high-density limit \citep[][as in]{Nagylaki1975},
+reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
 or the discrete analogues \citep{hanson1966effects}.
 
 % \alisa{
 % Population genetic modeling of hybrid zones has focused largely on the 
-% equilibrium states of clines at selected loci \citep{Nagylaki1975,Barton1979a,Barton1986,Slatkin1973,Slatkin1975,May1975,Haldane1948}.  
+% equilibrium states of clines at selected loci \citep{Nagylaki1975,barton1979dynamics,Barton1986,Slatkin1973,Slatkin1975,May1975,Haldane1948}.  
 % Since stronger selection reduces the amount of genetic mixing,
 % these models predict the narrowest clines 
 % (i.e., the most rapid changes in allele frequencies)
 % at loci close to selected loci, and wider clines at less tightly linked loci.
-% In particular \citet{Barton1979,Barton1986} have described patterns of clinal variation at loci linked to targets of selection.  
+% In particular \citet{barton1979gene,Barton1986} have described patterns of clinal variation at loci linked to targets of selection.  
 % This provides some expectation for how selection shapes covariance in ancestry at a single locus over geographic space.
 % Our aim here is to extend this to include expectations for how selection shapes covariance in ancestry across the genome.}
 
@@ -237,7 +239,7 @@ is illustrated in Figure~\ref{Fig:schematic}.
 We say that a block of genome is on the $A$ \emph{background} if it is physically linked to an allele of ancestry $A$ at the selected locus;
 if a block of ancestry $A$ includes the selected site then it is necessarily on the $A$ background.
 Because the identity of the selected allele determines how selection acts on the haplotype,
-and because linked variation can only move between the $A$ and the $B$ background in heterozygotes, 
+and because linked alleles can only move between the $A$ and the $B$ background in heterozygotes, 
 a key factor in these models is the density and fecundity of heterozygotes.
 
 
@@ -273,7 +275,7 @@ and analytics, mostly in terms of partial differential equations needing numeric
 
 \paragraph{Establishment of the cline at the selected locus}
 Deterministic theory predicts that after secondary contact,
-the two alleles at the selected locus will form a stable cline \citep{Barton1979},
+the two alleles at the selected locus will form a stable cline \citep{barton1979gene},
 affecting neighboring loci as well.
 First, we turn our attention to how the cline at the selected locus itself is formed.
 Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
@@ -283,19 +285,24 @@ and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
 Let $\sigma^2$ be the mean squared distance between parent and offspring 
 (i.e., the variance of the distribution of dispersal distance).
 Assuming that: (i) alleles locally assort into diploids randomly, 
-(ii) habitat and dispersal are homogeneous, and 
-(iii) $s$ and $\sigma$ are small, then the commonly-used equation that $p$ solves is
+(ii) habitat and dispersal are homogeneous,
+(iii) $s$ and $\sigma$ are small, 
+and (iv) population density is large,
+then the commonly-used equation that $p$ solves is
 \begin{align} \label{eqn:cline_pde}
     \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
 \end{align}
 where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
-as derived in \citet{Bazykin1969}; for discussion of diploidy see \citet{christiansen1995genotypic}.
+as in \citet{Bazykin1969}; 
+this can be derived as in \citet{Nagylaki1975};
+for discussion of diploidy see \citet{christiansen1995genotypic}.
 Although there is no known exact analytic solution to this equation, 
 the steady-state solution is
 $\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
 This relies on several approximations, but the general conclusions should be quite robust: 
 the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially. 
-Note that rescaling space and time by $\sigma/s$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} results in a dimensionless equation,
+Note that rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
+results in a dimensionless equation \citep{Slatkin1973},
 implying that the cline establishes over a timescale of the order $1/s$. 
 In other words, the cline is established through diffusion, despite being slowed down somewhat by selection against heterozygotes. 
 
@@ -303,8 +310,8 @@ In other words, the cline is established through diffusion, despite being slowed
 
 \paragraph{Lineages at the selected locus}
 Now suppose that the frequency profile of the selected allele, $p(x,t)$, is known.
-We seek to first understand how lineages of sampled individuals behave at the selected locus. 
-These results allow us to extend our analysis to lineages at loci linked to the selected locus. 
+We seek to first understand how lineages of sampled individuals behave at the selected locus,
+and next extend the analysis to lineages at loci linked to the selected locus. 
 
 Consider the collection of $A$ alleles found at geographic location $x$.
 The expected number, among these alleles, that had a parent at location $y$ in the previous generation 
@@ -315,7 +322,7 @@ but biased towards locations where the selected allele they carry is at higher f
 and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.)
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
-how the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
+that the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
 with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
 (i.e., it moves at speed $\sigma^2$ in the potential $-\log p$).
 % \alisa{note to self to read through appendix when written}
