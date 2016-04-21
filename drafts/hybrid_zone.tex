@@ -276,7 +276,7 @@ a key factor in these models is the density and fecundity of heterozygotes.
 \subsection*{Analysis}
 
 In this section we aim to give both heuristics for how lineages move, 
-that are helpful in establishing order-of-magnitude estimates,
+that are helpful in providing intuition and for establishing order-of-magnitude estimates,
 and analytics, mostly in terms of partial differential equations needing numerical solution.
 
 \paragraph{Establishment of the cline at the selected locus}
@@ -284,23 +284,32 @@ Deterministic theory predicts that after secondary contact,
 the two alleles at the selected locus will form a stable cline,
 affecting neighboring loci as well \citep{barton1979gene, Barton1986}.
 First, we turn our attention to how the cline at the selected locus itself is formed.
-Let $p(x,t)$ denote the frequency of the $A$ allele at spatial location $x$ and time $t$.  
+Write $p(x,t)$ for the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, 
-and that $p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
+and the $A$ allele is initially fixed on the left, so
+$p(x,0) = 1$ if $x<0$ and $p(x,0)=0$ if $x>0$.
 % (In discrete computations, a deme at $x=0$ has $p(0,0)=1/2$.)
-Let $\sigma^2$ be the mean squared distance between parent and offspring 
-(i.e., the variance of the distribution of dispersal distance).
+We assume that dispersal is local and unbiased;
+and that the mean squared displacement between parent and offspring
+in the direction perpendicular to the cline
+is $\sigma^2$.
 Assuming that: (i) alleles locally assort into diploids randomly, 
 (ii) habitat and dispersal are homogeneous,
 (iii) $s$ and $\sigma$ are small, \alisa{relative to $N$ and $\tau$ respectively?}
 and (iv) population density is large,
-then the commonly-used equation that $p$ solves is
+then as in \citet{Bazykin1969},
+the commonly-used equation that $p$ solves is
 \begin{align} \label{eqn:cline_pde}
-    \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
+    \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) .
 \end{align}
-where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian,
-as in \citet{Bazykin1969}; 
-this can be derived as in \citet{Nagylaki1975};
+where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian.
+\plr{change $\dot p$ to $\frac{d}{dt}p$, and $\Delta$ to the second derivative?}
+This says that the local rate of change of the frequency of $A$ ($\dot p$)
+is equal to the net rate at which $A$ alleles arrive by local dispersal ($\sigma^2/2 \Delta p$)
+and a logistic term proportional to the difference in reproductive rate between $A$ and $a$ alleles
+due to local proportions of heterozygotes,
+which is $s(2p-1)$ (up to an error of size $s^2$).
+This can be derived as in \citet{Nagylaki1975};
 for discussion of diploidy see \citet{christiansen1995genotypic}.
 As we show below the solutions provide an good approximation across the range of realistic values of $s$.
 Although there is no known exact analytic solution to this equation, 
@@ -311,7 +320,10 @@ the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially.
 Note that rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
 results in a dimensionless equation \citep{Slatkin1973},
 implying that the cline establishes over a timescale of the order $1/s$. 
-In other words, the cline is established through diffusion, despite being slowed down somewhat by selection against heterozygotes. 
+Since this is how long it takes diffusion at rate $\sigma^2$ to smooth across a region of width $\sigma/\sqrt{s}$,
+this means we can think of
+the cline as established by diffusion, 
+despite being slowed down somewhat by selection against heterozygotes. 
 
 
 
@@ -329,22 +341,28 @@ but biased towards locations where the selected allele they carry is at higher f
 and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.)
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
-that the lineage of an $A$ allele moves as Brownian motion with speed $\sigma$
-with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
+that the lineage of an $A$ allele moves as Brownian motion driven by dispersal
+with mean displacement proportional to the derivative of $\log p$.
+This has the effect of pulling $A$ lineages towards regions where they are more common
+% with speed $\sigma$
+% with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
 (i.e., it moves at speed $\sigma^2$ in the potential $-\log p$).
 % \alisa{note to self to read through appendix when written}
 To see why this is true, note that the probability that the parent of an $A$ allele found at $x$
-lived at position $x-r$ is proportional to $\P\{R=r\} p(x+r)$, where $R$ is the random dispersal distance;
-and so the mean displacement from offspring to parent is $\E[R p(x+R)]/\E[p(x+R)]$.
-% $$ = \E[ R ( p(x) + R p'(x) ) ]/ p(x) + O(R^3) $$
+lived at position $x-r$ is proportional to $\P\{R=-r\} p(x-r)$, where $R$ is the random dispersal distance;
+and so the mean displacement from offspring to parent is $-\E[R p(x-R)]/\E[p(x-R)]$.
+% $$ = \E[ -R ] - \E[R]^2 p'(x)/p(x) + \E[R^2] p'(x)/p(x) + O(R^3) $$
 Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$
 and expanding $p()$ to first order about $x$ shows that this mean displacement is approximately $\sigma^2 p'(x)/p(x)$,
 which is $\sigma^2$ multiplied by the gradient of $\log p(x)$.
+This description holds even when the frequency profile of the $A$ allele changes with time (replacing $p(x)$ by $p(x,t)$).
 
-At a geographic position far from the center, $p=1$ to the left, and is proportional to  $\exp(-x\sqrt{s}/\sigma)$ to the right.
+At equilibrium, the $A$ allele is nearly fixed at a geographic position far to the left ($p \approx 1$),
+and is rare far to the right, with mean frequency at distance $x$ proportional to $\exp(-x\sqrt{s}/\sigma)$.
 Therefore, roughly, lineages on ``their own'' side wander randomly,
 while lineages on ``the wrong'' side are pushed at constant speed $\sigma\sqrt{s}$ 
-back towards the side where they are more common. 
+back towards the side where they are more common
+(since here $\log p$ is $\sqrt{s}/\sigma$ and the speed is $\sigma^2$). 
 Since an $A$ allele must, by definition, have been inherited from the $A$ side of the barrier 
 at the time of secondary contact, this push must get more intense the closer it is to the time of secondary contact.
 % \alisa{I want to make a figure from the simulations that show the rapid retreat of wrong ancestries back to where they came from}
@@ -359,7 +377,8 @@ even though the stable clines have the same form.
 \paragraph{Lineages at linked loci}
 The behavior of a lineage at a linked locus is similar to a selected locus. 
 However, there is one important difference -- 
-in heterozygotes the lineage linked to the selected locus may move between backgrounds. 
+in heterozygotes the lineage linked to the selected locus may
+recombine onto the other selected background.
 Therefore, if we follow back through time a lineage at a locus linked to an $A$ allele, 
 it will first tend to be inherited from ancestors to the left (as $A$ lineages drift to the left). 
 However, with sufficient time in the hybrid zone, recombination allows this linked locus 
@@ -367,31 +386,38 @@ to have been inherited from a $B$-carrying individual,
 whose ancestors will tend to be more from the right.
 
 Suppose we sample an allele today $r$ Morgans from the selected site. 
-We will follow its lineage back through time, using $\tau$ to denote ``generations ago'' to avoid confusion.
+We will follow its lineage back through time, using $\tau$ to denote ``generations ago''
+and reserving $t$ for time measured in the usual direction.
 If $X_\tau$ is the geographic location of its ancestor $\tau$ generations ago,
 and $Z_\tau$ is the identity of the selected allele that ancestor carried,
 then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$ 
-(as described for a selected allele),
+(as described above for a selected allele),
 and that $Z$ jumps between $A$ and $B$ at rate either $r (1-p)$  (from $A$ to $B$) or $r p$ (from $B$ to $A$),
 by the assumption of locally random assortment of alleles
-(see Appendix \ref{apx:lineage_derivation}).
+(see Appendix \ref{apx:lineage_derivation} for a more precise description).
 
 We can describe this process formally in It\^o notation:
 with $B_\tau$ a standard Brownian motion,
-$T_B$ the most recent time that $Z_\tau = B$, and likewise for $T_A$,
+$T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise for $T_A$,
 \begin{align}
     \begin{aligned} \label{eqn:lineage_motion}
-        dX_\tau &= \begin{cases}
-             \sigma^2 \grad \log(p(X_\tau,\tau)) d\tau + \sigma dB_\tau \qquad & \text{if } Z_\tau = A \\
-             \sigma^2 \grad \log(1-p(X_\tau,\tau)) d\tau + \sigma dB_\tau \qquad & \text{if } Z_\tau = B 
+        dX_\tau &= dB_\tau + \begin{cases}
+             \sigma^2 \grad \log(p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = A \\
+             \sigma^2 \grad \log(1-p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = B 
         \end{cases} \\
         % \P\{ Z_{\tau+\epsilon} = B \given Z_\tau = A \} &= \epsilon r (1-p(X_\tau,\tau)) + O(\epsilon^2) \\
         % \P\{ Z_{\tau+\epsilon} = A \given Z_\tau = B \} &= \epsilon r p(X_\tau,\tau) + O(\epsilon^2)  .
-        \P\{ T_B &> \tau+u \given Z_\tau = A \} = \exp\left( - r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \right) \\
-        \P\{ T_A &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
+        \P\{ T_B(\tau) &> \tau+u \given Z_\tau = A \} = \exp\left( - r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \right) \\
+        \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
     \end{aligned}
 \end{align}
-
+In the first expression, giving the distribution of how the lineage location changes,
+the first term ($\sigma dB_\tau$) is Brownian noise driven by dispersal,
+and the second is the mean displacement, which moves the lineage ``downhill'' on either $-\log p$ or $-\log (1-p)$
+($\grad$ is the gradient),
+depending on which selected allele the lineage is linked to.
+The second and third expressions say that a lineage switches from an $A$ to $B$ background
+at rate $r$ multiplied by the local proportion of $B$ alleles, which is $(1-p)$.
 
 
 \begin{figure}
@@ -449,6 +475,13 @@ The description above implies that $q_z$ solves the following Kolmogorov backwar
 \end{align}
 with boundary conditions $q_A(x,0,r)=1$ and $q_B(x,0,r)=0$, 
 and where $\grad$ is the gradient, and $\Delta$ is the Laplacian.
+The three terms in these equations come from Brownian movement of a linages,
+the tendency of a lineage to inherit from regions where its type is more common,
+and recombination between selected backgrounds, respectively.
+Equivalently,
+the first term ($\Delta q$) reflects the smoothing action of local dispersal,
+the second is the net flux induced by reduced fitness in the hybrid zone,
+and the third is the contribution of recombination.
 %\alisa{this is fwd-in-time notation. should we change it to bwd-in-time?}
 %\plr{This equation should be forwards in time, since it's the Kolmogorov backward equation
 %applied to a backwards-time process!}
@@ -463,7 +496,8 @@ so that equation \eqref{eqn:q_pde} can be written more compactly as
     \dot q_A &= G^A q_A + r (1-p) (q_B-q_A) \\
     \dot q_B &= G^B q_B + r p (q_A-q_B) .
 \end{align*}
-In technical terms, $G^A$ and $G^B$ are the generators of the diffusions of lineages of selected alleles of ancestry $A$ and $B$, respectively.
+In technical terms, $G^A$ and $G^B$ are the generators of the diffusions of lineages of selected alleles of ancestry $A$ and $B$, respectively;
+informally, they encode the stochastic motion of lineages at the selected loci.
 
 
 \paragraph{Numerical computation}
@@ -472,24 +506,23 @@ we can solve the partial differential equations \eqref{eqn:cline_pde} and \eqref
 For instance, Figure \ref{fig:linked_cline_heatmaps} shows a heatmap of $p(x,t,r)$, 
 the expected frequency of ancestry $A$ at location $x$ and time $t$ 
 at a site at recombination distance $r$ from the selected site,
-which is computed as $q(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$. 
+which is computed as the frequency of ancestry $A$ on each selected background weighted by the freequencies of each background:
+$q(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$. 
 The equations are solved numerically in R, using the ReacTran package \citep{soetaert2012reactive}.
 
 \paragraph{Haplotype lengths}
-We now find the frequency at which \emph{entire} blocks of genome (haplotype) 
-% YB: thought `seeing' was too much about our inference rather than the the biological process
-% PLR: hm, it's not 'maintaining' either, since the block might have been broken up along the way.
+We now find the frequency at which \emph{entire} blocks of genome (haplotypes) 
 of a single ancestry are found, at a given location and time.
 Consider a segment of the genome between positions $a$ and $b$, relative to the selected site. 
 We are interested in the probability $g_z(x,t;a,b)$ 
 of finding an entire segment $(a,b)$ of ancestry $A$ in an individual having selected allele of type $z$,
-sampled at spatial location $x$ at time $t$ after the initiation of gene flow. % I think people sometimes use 'cline formed' to mean when the equilibrium was established, changed for clarity
+sampled at spatial location $x$ at time $t$ after the initiation of gene flow. 
 
 As in \citet{sedghifar2015spatial}, 
 a given block of genome is inherited along a single lineage ever since the most recent recombination event
 that fell within that block.
 Prior to this, there are two lineages to follow (see Figure~\ref{Fig:schematic}),
-and so lineages act like a particular class of labeled, branching diffusions,
+and so lineages behave as labeled, branching diffusions,
 where the total branching rate is conserved. 
 We do not consider subsequent coalescence.
 The general description of the process, again looking backwards in time, is as follows:
@@ -499,9 +532,12 @@ with recombination distance $r$ equal to the rate at which the segment recombine
 Additionally, at rate equal to the genetic length of the segment,
 recombination occurs, at which point the segment splits in two at a uniformly chosen location between $a$ and $b$,
 each of which proceeds as before, independently. 
-In this description,  % don't like to have math at the start of a sentence
+In this description,
 $g_z(x,T;a,b)$ is then the probability that all branches are found on the $A$ side of the hybrid zone
 at the time of secondary contact $T$ units of time ago.
+We will write $r(a,b)$ for the distance from the segment to the selected site:
+always taking $a \le b$,
+$r(a,b)=0$ if $a \le 0 \le b$ and $r(a,b)=\min(|a|,|b|)$ otherwise.
 
 The resulting equation is similar to \eqref{eqn:q_pde} with a term added for branching,
 which is written (omitting the $(x,t)$ for conciseness):
@@ -511,20 +547,29 @@ which is written (omitting the $(x,t)$ for conciseness):
         &= G^A g_A(a,b) + r(a,b) (1-p) (g_A(a,b)-g_B(a,b))
             \\ {} & \qquad 
             + (1-p) \left( 
-                \int_a^0 g_B(a,\theta) g_A(\theta,b) d\theta
-                + \int_0^b g_A(a,\theta) g_B(\theta,b) d\theta 
+                \int_a^{\min(0,b)} g_B(a,\theta) g_A(\theta,b) d\theta
+                + \int_{\max(0,a)}^b g_A(a,\theta) g_B(\theta,b) d\theta 
             \right)
             \\ {} & \qquad 
             + p \int_a^b {
                 g_A(a,\theta) g_A(\theta,b) 
             } d\theta
-            - (b-a) g_A(a,b)  
-    \end{aligned} ,
+            - (b-a) g_A(a,b)  ,
+    \end{aligned} 
 \end{align}
-where $\theta$ is the genomic position of a recombination event, 
-the integral $\int_a^0$ is zero if $a>0$ and likewise $\int_0^b$ is zero if $b<0$;
-and $r(a,b)$ is the distance from the segment to the selected site:
-$r(a,b)=0$ if $ab<0$ and $r(a,b)=\min(|a|,|b|)$ otherwise.
+Here the first term ($G^A g_A$) represents spatial mixing,
+and the second term results from recombinations \emph{between} the block and the selected site 
+in heterozygotes, which switch the identity of the linked, selected locus
+(the factor $(1-p)$ is the probability that the block, initially linked to an $A$ allele, encounters a $B$ allele
+under the assumption of locally random mating).
+In the integrals, $\theta$ is the genomic position of the recombination event occuring \emph{inside} the block.
+The third term accounts for such recombinations in a heterozygote: 
+the portion of the block nearest the selected site remains linked to an $A$ allele, 
+and the remaining portion becomes linked to a $B$ allele
+(and we say that the integral $\int_a^{\min(0,b)}$ is zero if $a>0$ 
+and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$).
+The last integral results from recombination inside the block in homozygotes for $A$,
+and the final term balances the outflux due to all recombinations.
 The equation for $g_B(x,t;a,b)$ is identical after exchanging $A \leftrightarrow B$ and
 $p \leftrightarrow (1-p)$.
 The boundary conditions are $g_A(x,0;a,b)=1$ and $g_B(x,0;a,b)=0$.
