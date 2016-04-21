@@ -111,6 +111,206 @@ and identify candidate targets of selection.
 \linenumbers
 \doublespacing
 
+\section*{Responses}
+Editor Comments to Author:
+
+Both reviewers appreciate the paper, but also make several criticisms.  I am considerably more positive, and believe that those criticisms that are justified can be dealt with quite easily (see below).  If the revision can be returned (very) quickly, it might be possible to still make the special issue, but otherwise, the paper would appear separately.
+
+Reviewer 1 would like to see development of the finding that ancestral blocks are longer around a selected locus into a practical test.  I think that this would be a substantial project for the future, and that it is valuable to first explain and understand the theoretical prediction, as is done here.  Those analysing actual data can of course look for this pattern without needing an already implemented test.
+
+Rev. 1 is also concerned that only under dominance is simulated.  However, it is clear that any form of selection that gives the same marginal selection coefficient will give essentially the same effect: a large body of work on clines shows that different selective mechanisms are indistinguishable, and it is reasonable for the authors to rely on that.  Theother main concern was about the novelty of Eqs 4, 5; these are indeed standard (which I think the authors intended by referring to them as the Kolmogorov backward equations).  I don't know of a reference where they have been written in exactly this form, but the recombination terms and the diffusion terms in Eq. 4 both go back a long way.
+
+Rev 2 is mainly concerned about the fit between theory and simulations.  I am not worried about this, since the deterministic mathematics stands independently, and the numerical computations are straightforward.  The stochastic simulations are useful mainly as illustrations of the process.  Theory and simulations are compared in the supplementary material; it should be stated more clearly how closely these match. (A precise fit is not expected anyway because there is substantial drift).  Rev. 2 also worries that the simulations are over a rather narrow range; I suspect that the authors should have results that address sensitivity to the boundaries.  Regarding specific point 1, I don't know of a previous derivation of exactly these equations, but similar equations have been used widely, and I don't think that he authors suggest otherwise.
+
+Sincerely,
+
+
+Prof. Nick Barton
+Subject Editor, Molecular Ecology
+
+AE comments
+
+This is a nice analysis of how neutral genome introgresses past a cline maintained by selection against heterozygotes.  There has been a good deal of work on related problems, but mostly assuming equilibrium, and mostly on the forwards evolution of allele frequencies, rather than tracing back the ancestry of blocks of genome.  The theory presented here is therefore new, and directly relevant to interpreting genomes sampled from hybrid zones.
+
+Fig 1 caption - "alelle"
+\alisa{fixed}
+
+116 - "s and sigma are small" - but relative to what?  This is ot at all obvious.
+\alisa{I think this is relative to $N$ and $\tau$ respectively?}
+
+156 - Surely if time is rescaled as wel as distance and genome length, everything should look the same?  All the results, and to a good approximation the simulations, are in the 
+continuous regime where we can rescale.
+\alisa{I think our point is that these are different for the same scaling of $\tau$?}
+
+- A comment on two dimensions would be helpful.  Ancestral lineages simply diffuse transversely at a rate sigma, independent of their motion parallel to the cline.
+\alisa{Not sure where this would go? Maybe in the discussion? Do we just say that we ignore two dimensions and this is an ok approximation?} 
+
+240 - This is a discrete deme model, so dispersal cannt follow a continuouus Gaussian. I guess what is happening is that sigma is chosen larger relative to deme spacing.  However, there is some approximation here, and the approach will fail if sigma is small relatve to deme spacing.
+\alisa{I think that what we have is ok? Of course if $\sigma$ is tiny then maybe not, but obviously we have chosen the deme spacing to work with our choice of $\sigma$}
+
+299 - Missing semicolon?
+\alisa{fixed}
+
+420 - "are have"
+\alisa{fixed}
+
+495 - "reality" means "simulation" here??
+\alisa{I think we do mean ``reality" here, but alternate opinions welcome}
+
+
+- Some appendices might be transferred to supplementary material - the derivations are fairly standard.
+\alisa{Our decision to keep the derivations in appendices was with consideration for the readership of Molecular Ecology}
+
+
+Reviewer Comments to Author:
+Reviewer: 1
+
+Recommendation: Reject, encourage resubmission
+
+Comments:
+
+This manuscript presents a discussion of patterns of linkage and allele frequency clines in a hybrid zone between two populations, under a scenario of mild hybrid incompatibility. It presents deterministic equations for the distribution of ancestral haplotypes along the genome and argues that the lengths of ancestry segments can be used to infer selection.
+
+The idea of using the lengths of ancestry blocks to detect selection in hybrid zones is interesting, and I had not encountered it before. This article will likely be of most interest to theorists, however, as the discussion of the practical confounders of the selection test is limited. A serious limitation of the test is that it only detects selection against heterozygotes. The claim that this would not affect results, on l.453-456:
+
+
+"Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, we believe that this is unlikely to drastically influence our findings, as previous studies have demonstrated that underdominant loci share similar properties with more realistic models"
+
+is unconvincing.
+
+\alisa{We agree with the comments of the AE on the matter, and have added some additional text to the introduction that hopefully convinces that this is ok.}
+
+
+From a theoretical perspective, the article makes modest but valid contributions, and  Equation 4 and 5 are potentially interesting extensions to equation (1). The practical benefit of using these equations rather than forward simulations appears limited.
+
+\alisa{This is a point we have considered ourselves. We present these equations as a way of building our model up to address haplotype lengths. Both analytical expressions and simulations are presented so that they each support the conclusions of the other.}
+
+While reading the manuscript, I found it difficult to distinguish the most important observations from more tangential observations. The manuscript reads like a long list of observations, and would benefit from more focus on the main findings and more structure.
+\alisa{I have no good comment for this right now, but am trying to edit the manuscript to address this.}
+
+Specific points:
+1-
+Since the recombination-based terms in Eqs 4 and 5 do not depend on the spatially explicit part of the model or on the selection term, I would be surprised if they had not been derived somewhere.
+
+2-
+Eq5:
+If $a<b<\theta<0$, then I interpret $gtheta,b) = 0$. If correct, this should be specified.  Alternately, the bounds of the integral could be modified to account for this situation.
+\alisa{I don't think that this is true? I think that the situation described here is accounted for by the other terms?}
+
+3-
+As an example of a section that felt unstructured, consider the discussion starting at l.347.  This long paragraph starts with a long list of observations, without giving a hint as to where we are going. Beginning the paragraph with the main idea for the paragraph would be useful.
+\alisa{Working on how to fix this in the ms now}
+
+4-
+Minor issues:
+
+"In the notation above, $qz(x, t, r) = Px{Zt = A}$. "
+I did not see the notation $P^x$ above, and the RHS does not depend on small z.
+\alisa{(This is at l180) Should the $=$ be a $:=$}
+
+l.120 As we show below the solutions provide an good approximation
+\alisa{fixed}
+
+l.144: It seems like the x+r and x-r should have the same sign.
+\alisa{I think may be correct?}
+l 199:
+
+$g_z(x, T, a,b)$ is defined as: " We are interested in the probability gz(x, t; a, b) of finding an entire segment (a, b) of ancestry A in an individual having selected allele of type z, ... "
+
+This definition does not make it clear that the probability is conditional on z; P(A|z) vs P(A,z).
+
+\alisa{I dont't actually agree with this... thoughts?}
+
+l.606: Reference issues
+\alisa{This is a reference that is expected to appear in the same issue, so we do not have page numbers. The hope is that this can be filled in during final proofs for the issue}
+
+
+Additional Questions:
+By selecting ?Yes? you are opting in to the Publons service and data about this review (including your name and the review itself) will be transferred to Publons. You may opt-out of the service at any time. : No
+
+Quality of Science: Experimentally and/or theoretically excellent reliable data, no fatal flaws
+
+Importance of Science: Research addresses a consequential question in ecology, evolution, behaviour, or conservation
+
+Quality of Presentation: Ideas and methods mostly clear, but grammar and/or spelling is poor, format does not follow guidelines, and /or there is redundancy between sections
+
+Does this manuscript require significant reduction in length? If 'Yes", please indicate where shortening is required in your specific comments: Yes
+
+Does the Data Accessibility section list all the datasets needed to recreate the results in the manuscript? If ?No?, please specify which additional data are needed in your comments to the authors.: Yes
+
+
+
+Reviewer: 2
+
+Recommendation: Reject, encourage resubmission
+
+Comments:
+REVIEW:
+
+In this paper, the authors extend previous work on the diffusion of neutral alleles in a secondary-contact zone to include selection against hybrids. Building on the classic diffusion model for the dynamics of a cline at a selected locus, they formalize the dynamics of linked neutral loci and investigate the distribution of ancestry block-lengths around the selected locus.
+
+The authors obtain numerical results for the flattening of the cline at a neutral locus linked to an under-dominant selected locus in the absence of genetic drift. They also outline scaling arguments for the rates of movement and length of the introgressing blocks around the selected locus. Simulations are set up to test the theoretical predictions and illustrate other interesting patterns such as the distribution of haplotype (ancestry block?) lengths.
+
+Unfortunately, the fit of the theoretical predictions to simulations is largely not shown, and those comparisons in the manuscript are limited to the frequency dynamics of the neutral alleles (Figure S3). The predictive theoretical results are based on scaling arguments - but it is not clear which of these results are uniquely derived in this paper.
+
+\alisa{Our hope was that the simulations and theory would provide qualitative support for one another. Some predictions made by the theory e.g. time and spatial scales do seem to correspond. We will try to do a better job of signposting our unique contributions??}
+
+The authors also aim to characterize the movement of the genomic block that contains a selected locus through a hybrid zone. Yet, the size of the simulated habitat barely covers the cline width, and the simulation results may be sensitive to the boundaries.
+
+\alisa{Should we be running more sims? Nick seems to think we have done this, but I don't think we have.}
+
+Overall, this MS presents some interesting insights, and the formalization of the block dynamics can be useful. However, I think that more work is needed to explain and test (by simulations) the novel predictions. Currently, the theory and the matching simulations are largely presented separately.
+
+
+Detailed comments:
+
+Figure 1: Plotting the haplotypes to the side of the plot would help.
+\alisa{We have remade Figure 1, with additional information that we hope will help with interpretation}
+
+Simulations;
+l. 245. As the theory is set up in the absence of genetic drift, and, correspondingly, the local population size is large, it is unclear how a deme with 500 individuals could become empty in a Wright-Fisher model.  The (narrow) width of the habitat also needs justification.
+\alisa{It is true that the demes are never empty. However, this is the way the simulation is coded in order to account for the possibility if smaller population sizes are ever simulated.}
+
+Figure 3:
+What are the replicate lines for the same ?r?? Why re the lines for r = 0 all slightly displaced to the right? Also, it would appear that the color scheme in associated Figure S2 (bottom) is mismatched with the legend, shifted to the red part of the spectrum. After fixing this, I think that the Figure S2 should be in the main text instead of Fig. 3.
+
+\alisa{We believe that the displacement is likely due to drift. (We could do a repeated sim to show this?)}
+
+Results
+l. 299 Total population size is irrelevant when predicting the effects of genetic drift (besides, some simulations only have 50 demes across, not 100). In a one-dimensional habitat, one uses N sigma sqrt(s) to judge whether the effect of genetic drift is likely to be negligible.
+\alisa{We are concerned here with linked loci, so the $N\sigma\sqrt{s}$ rule of thumb does not necessarily apply here? Also, within demes, population size is much smaller (500?)}
+
+Scaling arguments, p. 14, 15: Please give a citation with the known scaling, and take more care with the novel ones.  l.339: I think the sentence about the maximum length of the enclosing haplotype, sigma sqrt(s) / x is mis-phrased: presumably this should be a statement on the distribution (expected size?) of the introgressing block length at distance x, as a lucky block can travel many sigmas in one generation?
+
+\alisa{I don't think this is misphrased?}
+
+Discussion:
+It is important to make the reader aware that even neutral clines do not just keep flattening ? genetic drift leads to a finite cline width even for neutral clines. Despite the occasional mention of genetic drift, the MS does not clearly state that the parameter space is chosen such that genetic drift is weak and does not indicate when this is a reasonable assumption (see comment on l. 299).
+\alisa{We should add a line or two in the discussion about drift. However, IBD is perhaps not relevant over the timescales we are considering and is not necessarily ancestry informative, and since we are not interested in the equilibrium state, it is not clear that we need to worry about this limit. }
+
+
+p.27 rates, e.g. Eq. (7,8 ): I find the explanation of the rates a bit unclear. I understand that the recombinant AB can arise either by A reproducing at rate $s_A$ and recombining with B, or B reproducing at rate $s_B$ and recombining with A ? such that the neutral locus of the type A is kept. Or alternatively, the BA recombinant arises, where the neutral locus at B is kept. Which one of the two happens has a probability of 1/2.
+\alisa{We'll work on making this more understandable.}
+
+The "" Data Accessibility section" is missing. The folder at ....  appears to be a working folder with lots of other files and the r-scripts hidden under a ?sim? directory. The README file appears insufficient to allow orientation in the scripts, and worryingly, it has an ?oh, wrong recombination distance? note to it.
+\alisa{Ok. This probably needs to be fixed.}
+
+The Acknowledgements section is missing.
+\alisa{I had noticed this. This will be added.}
+
+
+Additional Questions:
+Do you want to get credit for reviewing this manuscript on Publons? By selecting ?Yes? you are opting in to the Publons service and data about this review (including your name and the review itself) will be transferred to Publons. You may opt-out of the service at any time. : Yes
+
+Quality of Science: Mostly competent, but suffering from flaws of a technical or analytical nature
+
+Importance of Science: Research addresses a consequential question in ecology, evolution, behaviour, or conservation
+
+Quality of Presentation: Writing is clear, methods and data analyses are transparent, ideas make sense, proper grammar and spelling is employed, redundancy is avoided
+
+Does this manuscript require significant reduction in length? If 'Yes", please indicate where shortening is required in your specific comments: No
+
+Does the Data Accessibility section list all the datasets needed to recreate the results in the manuscript? If ?No?, please specify which additional data are needed in your comments to the authors.: No
 
 %%%%% %%%%%% %%%%%%%
 \section*{Introduction}
@@ -123,7 +323,7 @@ and identify candidate targets of selection.
 %  but haplotype blocks should be helpful
 %  here we look at that stuff
 
-Much of the process of speciation commonly involves populations diverging with relatively little gene flow \citep{Coyne2004}.  
+The process of speciation commonly involves populations diverging with relatively little gene flow \citep{Coyne2004}.  
 % Gene flow between formerly isolated populations is possible if reproductive isolation is not complete.
 However, when formerly isolated populations come into contact before reproductive isolation is complete, some gene flow is possible.
 %As two such populations interbreed , each portion of each individual's genome 
@@ -146,31 +346,30 @@ While for much of the genome, gene flow will eventually erase
 both geographic clines in ancestry and strong correlations in ancestry across linked markers, 
 subsets of the genome can maintain stable clines in ancestry if selection against migrant, or hybrid, genotypes impedes gene flow across the hybrid zone \citep{barton1979gene}. 
 % previously had wrong Barton '79 here
-Studies of hybrid zones have primarily been based on single-site statistics such as clines,
-but today, 
-the availability of dense genotype data in combination with linkage information 
+Studies of hybrid zones have primarily been based on single-site statistics (e.g. clines),
+but the recent availability of dense genotype data in combination with linkage information 
 makes it now possible to use patterns of the block length distribution
 to better understand the processes operating in hybrid zones.
 
 There is substantial theoretical work on genetic clines.
-We study those maintained only by selection against hybrids -- \emph{tension zones} --
+We focus on those maintained only by selection against hybrids -- \emph{tension zones} --
 as in \citet{Bazykin1969}, reviewed in \citet{Barton1985}.
 Clines may also be maintained by environmental gradients \citep{Haldane1948,fisher1950frequencies};
 although these are in principle different,
 \citet{Slatkin1973} pointed out, in a far-reaching general analysis,
 that while the environment may determine the location of a cline,
 the fitness of the heterozygote will likely determine the shape of the cline,
-and \citet{barton1986barrier} show that the shapes of several sorts of stable clines are similar.
+and \citet{barton1986barrier} show that \alisa{clines under several different forms of selection are similar in shape.}
 There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,barton2008effect,Polechova2011},
-and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000}.
+and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000} \alisa{and much of this focuses on equilibrium states}.
 In this work, we focus on \emph{transient} patterns after the initial formation of a tension zone,
 in particular describing haplotype patterns.
 Although the selected cline establishes quickly, transient patterns can persist for quite some time,
-and haplotypes can potentially carry substantial information about the formation of recent zones.
+and \alisa{ancestry} haplotypes can potentially carry substantial information about the formation of recent zones.
 To do this, we take the reverse-time perspective,
 understanding the temporal dynamics of the system by describing properties of the \emph{lineages} tracing back from the zone.
-This is particularly suited to understanding transient patterns,
-although because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002continuous},
+This is particularly suited to understanding transient patterns 
+although, because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002continuous},
 incorporating genetic drift is not straightforward.
 Common to nearly all studies is the use of the
 reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
@@ -193,11 +392,11 @@ and therefore contains clues concerning the age of the hybrid zone and the relat
 In addition to interpreting non-equilibrium patterns of diversity in hybrid zones, 
 this could be especially important for understanding the impact of selection on the mixing of ancestral genomes. %and, consequently, the maintenance of species distinctness. 
 In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
-If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has be used to infer the extent of hybridization and timing of secondary contact \citep{Price2009, Hellenthal2014}. 
+If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has been used to infer the extent of hybridization and timing of secondary contact \citep{Price2009, Gravel2012}. 
 In addition to facilitating demographic inference, heterogeneous patterns of ancestry across the genome can help identify putative targets of selection in hybridizing populations  \citep{Porter1997, Gompert2012}. 
 
 If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected locus will be removed rapidly from the population, preventing introgression of surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
-as many ancestors of the locally common type as do neutral haplotypes.
+as many ancestors of the locally common type as do neutral haplotypes. \alisa{This reasoning is applicable to both instances of under dominance and ecological (e.g. local adaptation) }
 
 Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
 as they relate to hybrid zone age, genetic distance from selected locus and geographic distance from hybrid zone center. 
@@ -248,7 +447,7 @@ a key factor in these models is the density and fecundity of heterozygotes.
 
 %%%%%%%%
 \begin{figure}
-\includegraphics{figs/BM_schematic.pdf}
+\includegraphics[clip,width=\textwidth,trim=0cm 0cm 0cm 0.05cm]{figs/BM_schematic_new2.pdf}
 \caption{
     \textbf{A schematic figure of the lineages along which a segment of genome has been inherited,}
     showing the location (horizontal axis) and time (vertical axis) at which the ancestors 
@@ -277,13 +476,14 @@ a key factor in these models is the density and fecundity of heterozygotes.
 
 In this section we aim to give both heuristics for how lineages move, 
 that are helpful in providing intuition and for establishing order-of-magnitude estimates,
-and analytics, mostly in terms of partial differential equations needing numerical solution.
+and analytics, mostly in terms of partial differential equations needing numerical solution. \alisa{For simplicity, we ignore coalescence.}
 
 \paragraph{Establishment of the cline at the selected locus}
 Deterministic theory predicts that after secondary contact,
 the two alleles at the selected locus will form a stable cline,
 affecting neighboring loci as well \citep{barton1979gene, Barton1986}.
-First, we turn our attention to how the cline at the selected locus itself is formed.
+First, we turn our attention to how the cline at the selected locus itself is formed. 
+\alisa{This has been previously described, but is presented here as it provides a framework for further development of our model}
 Write $p(x,t)$ for the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, 
 and the $A$ allele is initially fixed on the left, so
@@ -311,7 +511,7 @@ due to local proportions of heterozygotes,
 which is $s(2p-1)$ (up to an error of size $s^2$).
 This can be derived as in \citet{Nagylaki1975};
 for discussion of diploidy see \citet{christiansen1995genotypic}.
-As we show below the solutions provide an good approximation across the range of realistic values of $s$.
+As we show below the solutions provide a good approximation across the range of realistic values of $s$.
 Although there is no known exact analytic solution to this equation, 
 the steady-state solution is
 $\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
@@ -328,7 +528,7 @@ despite being slowed down somewhat by selection against heterozygotes.
 
 
 \paragraph{Lineages at the selected locus}
-Now suppose that the frequency profile of the selected allele, $p(x,t)$, is known.
+Now suppose that the frequency profile of the selected allele, $p(x,t)$, is known as a function of time and space.
 We seek to first understand how lineages of sampled individuals behave at the selected locus,
 and next extend the analysis to lineages at loci linked to the selected locus. 
 
@@ -338,7 +538,7 @@ is proportional to the number of $A$ alleles that were at $y$ multiplied by the 
 In other words, lineages move as a random walk determined by the dispersal kernel,
 but biased towards locations where the selected allele they carry is at higher frequency.
 (Lineages are also biased towards regions with higher fecundity,
-and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.)
+and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.) \alisa{could this reference to small $s$ be confusing?}
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
 that the lineage of an $A$ allele moves as Brownian motion driven by dispersal
@@ -346,13 +546,13 @@ with mean displacement proportional to the derivative of $\log p$.
 This has the effect of pulling $A$ lineages towards regions where they are more common
 % with speed $\sigma$
 % with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
-(i.e., it moves at speed $\sigma^2$ in the potential $-\log p$).
+(i.e., it moves at speed $\sigma^2$ in the potential $-\log p$). \alisa{What does potential here mean?}
 % \alisa{note to self to read through appendix when written}
 To see why this is true, note that the probability that the parent of an $A$ allele found at $x$
 lived at position $x-r$ is proportional to $\P\{R=-r\} p(x-r)$, where $R$ is the random dispersal distance;
 and so the mean displacement from offspring to parent is $-\E[R p(x-R)]/\E[p(x-R)]$.
 % $$ = \E[ -R ] - \E[R]^2 p'(x)/p(x) + \E[R^2] p'(x)/p(x) + O(R^3) $$
-Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$
+Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$ \alisa{perhaps a brief explanation of how this works}
 and expanding $p()$ to first order about $x$ shows that this mean displacement is approximately $\sigma^2 p'(x)/p(x)$,
 which is $\sigma^2$ multiplied by the gradient of $\log p(x)$.
 This description holds even when the frequency profile of the $A$ allele changes with time (replacing $p(x)$ by $p(x,t)$).
@@ -411,6 +611,7 @@ $T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise f
         \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
     \end{aligned}
 \end{align}
+\alisa{Explain in words}
 In the first expression, giving the distribution of how the lineage location changes,
 the first term ($\sigma dB_\tau$) is Brownian noise driven by dispersal,
 and the second is the mean displacement, which moves the lineage ``downhill'' on either $-\log p$ or $-\log (1-p)$
@@ -473,8 +674,9 @@ The description above implies that $q_z$ solves the following Kolmogorov backwar
             r p(x,t) (q_A(x,t,r)-q_B(x,t,r))  ,
     \end{aligned} 
 \end{align}
+\alisa{Use our words}
 with boundary conditions $q_A(x,0,r)=1$ and $q_B(x,0,r)=0$, 
-and where $\grad$ is the gradient, and $\Delta$ is the Laplacian.
+and where $\grad$ is the gradient, and $\Delta$ is the Laplacian \alisa{describing the rate of change}. 
 The three terms in these equations come from Brownian movement of a linages,
 the tendency of a lineage to inherit from regions where its type is more common,
 and recombination between selected backgrounds, respectively.
@@ -501,7 +703,7 @@ informally, they encode the stochastic motion of lineages at the selected loci.
 
 
 \paragraph{Numerical computation}
-To determine how the cline at a linked locus is expected to relax,
+To determine how the cline at a linked locus is expected to relax, \alisa{and to confirm the behavior of our model to previously established results,}
 we can solve the partial differential equations \eqref{eqn:cline_pde} and \eqref{eqn:q_pde} numerically.
 For instance, Figure \ref{fig:linked_cline_heatmaps} shows a heatmap of $p(x,t,r)$, 
 the expected frequency of ancestry $A$ at location $x$ and time $t$ 
@@ -511,7 +713,7 @@ $q(x,t,r) = p(x,t) q_A(x,t,r) + (1-p(x,t)) q_B(x,t,r)$.
 The equations are solved numerically in R, using the ReacTran package \citep{soetaert2012reactive}.
 
 \paragraph{Haplotype lengths}
-We now find the frequency at which \emph{entire} blocks of genome (haplotypes) 
+We now develop our model further to find the frequency at which \emph{entire} blocks of genome (haplotypes) 
 of a single ancestry are found, at a given location and time.
 Consider a segment of the genome between positions $a$ and $b$, relative to the selected site. 
 We are interested in the probability $g_z(x,t;a,b)$ 
@@ -557,6 +759,8 @@ which is written (omitting the $(x,t)$ for conciseness):
             - (b-a) g_A(a,b)  ,
     \end{aligned} 
 \end{align}
+
+\alisa{Need to be related to Figure 1}
 Here the first term ($G^A g_A$) represents spatial mixing,
 and the second term results from recombinations \emph{between} the block and the selected site 
 in heterozygotes, which switch the identity of the linked, selected locus
@@ -566,8 +770,8 @@ In the integrals, $\theta$ is the genomic position of the recombination event oc
 The third term accounts for such recombinations in a heterozygote: 
 the portion of the block nearest the selected site remains linked to an $A$ allele, 
 and the remaining portion becomes linked to a $B$ allele
-(and we say that the integral $\int_a^{\min(0,b)}$ is zero if $a>0$ 
-and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$).
+(\alisa{to consider cases where the selected locus lies outside the interval [a,b], i.e.,} we say that the integral $\int_a^{\min(0,b)}$ is zero if  $a>0$ 
+and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$) .
 The last integral results from recombination inside the block in homozygotes for $A$,
 and the final term balances the outflux due to all recombinations.
 The equation for $g_B(x,t;a,b)$ is identical after exchanging $A \leftrightarrow B$ and
@@ -774,7 +978,7 @@ Ideal information -- true ancestry assignments for a few simulated individuals s
 are shown in Figures \ref{Fig:resistanceToIntrogression100g} ($T=100$ generations) and \ref{Fig:resistanceToIntrogression1000g} ($T=1000$ generations).
 For the more recent hybrid zone ($T=100$), the selected cline has established,
 but linked clines are still flattening.
-After a longer period ($T=1000$),
+After a longer period ($T=1000$), \alisa{I see, this is what reviewer was saying about flatness, but shouldn't our sims produce IBD?}
 clines over much of the chromosome are flat
 (since the width of the entire population is less than $1/\sqrt{T}=31.6\sigma$),
 but a distinct enrichment of each ancestry is observed around the selected site.
@@ -783,14 +987,14 @@ We expect that, in the absence of selection, blocks of $A$ ancestry across the g
 will tend to be shorter the further one goes into the $B$ side of the cline,
 because they have had more opportunities to recombine with $B$ haplotypes. 
 This is seen in Figure \ref{Fig:meanBlockLengthsUnconditioned}.
-However, we expect that stretches of $A$ ancestry containing a selected site will be longer
+However, we expect that stretches of $A$ ancestry \emph{containing a selected site} will be longer
 than those that do not contain the selected site at the same spatial location,
 because lineages containing the selected site have usually been inherited from the $A$ side of the cline recently. 
 As discussed above, we expect these lineages move at speed roughly $\sigma\sqrt{s}$,
 so (selected) $A$ alleles at distance $x$ from the cline center
 have last had an ancestor on the $A$ side of the cline around $x/(\sqrt{s}\sigma)$ generations ago 
 (compared to $x^2/\sigma^2$ for a neutral allele).
-This implies the enclosing $A$ haplotype should be no longer than $\sigma\sqrt{s}/x$.
+This implies the enclosing $A$ haplotype surrounding the locus should be no longer than $\sigma\sqrt{s}/x$.
 %\plr{(check predicted decay of mean length $1/x$ in simulations?)}
 
 \paragraph{Identifying selected loci}
@@ -805,7 +1009,8 @@ the mean length of such haplotype blocks is up to three times longer
 than the average for that geographic location,
 peaking quite sharply around the location of the selected site.
 
-Genomic regions are inherited from ancestors $T$ generations ago
+\alisa{To provide some intuition about the physical scale of this signal, we note that}
+genomic regions are inherited from ancestors $T$ generations ago
 in blocks of size roughly $1/T$.
 There will be a long segment of $A$ ancestry
 if many such adjacent blocks are all inherited from the $A$ side.
@@ -844,8 +1049,7 @@ although a numerical prediction of the value of $C(x,m)$ is elusive.
 
 
 The mean haplotype length found without conditioning on ancestry, $l(x,m)$,
-shows a smaller increase near the selected locus, because most blocks will be of the locally common type, and so do not trace back to regions of different block lengths.
-This is shown in Figures \ref{Fig:meanBlockLengthsUnconditioned}, \ref{Supp:blockLengthHeatmapNoAnc} and \ref{Supp:blockLengthNoAnc}.
+shows a smaller increase near the selected locus, because most blocks will be of the locally common type, and so do not trace back to regions of different block lengths (Figures \ref{Fig:meanBlockLengthsUnconditioned}, \ref{Supp:blockLengthHeatmapNoAnc} and \ref{Supp:blockLengthNoAnc}).
 
 Power will be optimal at intermediate values of $s$.
 If selection is too strong, it may be difficult to observe the signal
@@ -945,7 +1149,7 @@ An intuitive explanation for this pattern is that loci physically linked to a se
 Compared to other chromosomes in their new geographic location, these migrants will have on average longer $B$ haplotypes at the selected locus, and shorter $A$ haplotypes nearby. 
 
 Our results suggest that a few natural statistical summaries could help identify selected loci in hybrid zones. 
-Specifically, the statistic $l_z(k)$ -- the genetic length of ancestry surrounding a site of a given lineage -- and similarly,  and similarly $C(k)$, could provide a simple and informative summary. 
+Specifically, the statistic $l_z(k)$ -- the genetic length of ancestry surrounding a site of a given lineage --  and similarly $C(k)$, could provide a simple and informative summary. 
 The ratio of mean adjacent block lengths $C(x,m)$ shows a very sharp peak at the selected site,
 suggesting that, despite the fact that haplotypes surrounding incompatibilities might be quite long, 
 genome scans may have the power to extract fine-grained regions near selected loci from the large chunks of ancestry that will often flank these regions. 
@@ -1083,12 +1287,14 @@ unconditionally adaptive loci are expected to easily introgress across hybrid zo
 Future work could take a similar approach to understand how positive selection shapes ancestry block lengths, and predict  signatures of adaptive introgression in hybridizing populations using similar statistics presented here. These could eventually be combined to gain a fuller understanding of the forces shaping patterns of introgression in hybrid zones. 
 In particular, beneficial alleles tightly linked to incompatibilities
 cannot introgress until recombination separates them;
-our model describes at least roughly how quickly this should happen.
+our model \alisa{provides some rough expectation on how quickly this should happen}. 
 
 %The best characterized example of adaptive introgression comes from the vitamin K epoxide reductase subcomponent 1 (vkorc1), which seems to have spread from Algerian mice \emph{Mus spretus} to house mice \emph{Mus musculus} from because it confers resistance to the anticoagulant rodenticide, warfarin. \citep{Song2011}. 
 %Future work could dress expected genomic signatures of adaptive introgression in hybridizing populations using the number and length of haplotypes of non-native ancestry. 
 %Doing so requires an understanding of how positive selection shapes ancestry block lengths in these cases. 
 
+\section*{Acknowledgements}
+We thank Graham Coop, Nancy Chen, Emily Josephs, Kristin Lee, Nick Barton and two anonymous reviewers for helpful feedback and suggestions. \alisa{More info here}
 
 \bibliographystyle{molecularEcology}
 \bibliography{library,references}
