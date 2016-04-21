@@ -253,16 +253,19 @@ a key factor in these models is the density and fecundity of heterozygotes.
     \textbf{A schematic figure of the lineages along which a segment of genome has been inherited,}
     showing the location (horizontal axis) and time (vertical axis) at which the ancestors 
     of a hypothetical sampled haplotype lived.
-    The segment contains the $B$ alelle at the selected locus.
-    The black line shows the lineage at the selected site in the sampled individual in the present day (at $\tau=0$).
+    At the time of sampling ($\tau=0$), the segment contains the $B$ allele at the selected locus.
+    Paths of lineages in space, backwards in time, are depicted by blue and yellow lines. Splitting 
+    events  represent recombination events along the sampled segment.
+    The thick blue line represents the path of the selected locus. The colors of the other paths indicate 
+    the identity at the linked selected locus (blue: linked to allele $B$. yellow: linked to allele $A$). 
     The center of the hybrid zone is at geographic position $x=0$; in the region $x<0$, ancestry $B$ is less common,
     and because of negative selection, the selected lineage spends little time there.
-    Red dots represent ancestral recombination events that fall in the given segment of genome in an ancestor;
-    these can cause the lineage to branch (lineages at linked sites are depicted as colored lines),
-    or can switch lineages at linked sites between selected backgrounds 
-    (yellow lineages are linked to the $A$ selected locus; blue are linked to $B$).
-    Here the initial haplotype is broken up into 3 chunks over 100 generations,
-    which switch between selected backgrounds once.
+  %  Red dots represent ancestral recombination events that fall in the given segment of genome in an ancestor;
+  %  these can cause the lineage to branch (lineages at linked sites are depicted as colored lines),
+  %  or can switch lineages at linked sites between selected backgrounds 
+  %  (yellow lineages are linked to the $A$ selected locus; blue are linked to $B$).
+  %  Here the initial haplotype is broken up into 3 chunks over 100 generations,
+  %  which switch between selected backgrounds once.
     Based on position of the lineages at $\tau=100$ generations ago,
     from left to right the segments are of ancestry $(A,B,B)$.
 }\label{Fig:schematic}
@@ -289,7 +292,7 @@ Let $\sigma^2$ be the mean squared distance between parent and offspring
 (i.e., the variance of the distribution of dispersal distance).
 Assuming that: (i) alleles locally assort into diploids randomly, 
 (ii) habitat and dispersal are homogeneous,
-(iii) $s$ and $\sigma$ are small, 
+(iii) $s$ and $\sigma$ are small, \alisa{relative to $N$ and $\tau$ respectively?}
 and (iv) population density is large,
 then the commonly-used equation that $p$ solves is
 \begin{align} \label{eqn:cline_pde}
@@ -682,7 +685,7 @@ show this comparison with a lower population density than in Figure \ref{alleleF
 and separating linked clines based on the identity of the linked selected allele.
 The agreement is good over hundreds of generations, but by $T=1280$ generations,
 stochasticity has substantially moved allele frequencies range-wide
-\citep[which is unsurprising, as the total population size is only 5,000 diploids][]{Polechova2011}.
+\citep[which is unsurprising, as the total population size is only 5,000 diploids:][]{Polechova2011}.
 
 
 Loci not under direct selection can in principle spread across the cline unimpeded. 
@@ -815,7 +818,7 @@ For similar reasons, power and resolution are best at intermediate $T$.
 
 
 \begin{figure}
-\includegraphics[width=\textwidth]{figs/plot_chromosomes_tau1000.pdf}
+\includegraphics[width=\textwidth]{figs/plot_chromosomes_tau1000_zoomed.pdf}
 \caption{
     \textbf{Ancestry blocks for randomly sampled chromosomes} across a hybrid zone of age $T=1000$.  % YB changed from `assignment' to `blocks' because we are interested in the blocks not the assignment of them...
     Here we compare chromosomes of length 1M from a neutral zone to a zone that has a single under-dominant locus with $s=0.1$
@@ -892,7 +895,7 @@ We get quantitative understanding from the fact that lineages of
 loci under selection move as Brownian motion pushed at speed $\sigma \sqrt{s}$ towards its ancestral side.
 In other words, disadvantageous alleles that have encroached deep into the other side of the hybrid zone have done so by chance and, since they do not persist for long on the ``wrong'' side, are likely to have done so relatively recently. Haplotypes surrounding the selected locus therefore have had relatively few opportunities for recombination with different ancestries and this is reflected in longer blocks of contiguous ancestry.
 
-Through our simulations we find also that blocks of ancestry that are have crossed the hybrid zone and are closely linked to the selected site without overlapping it (i.e., blocks that are adjacent to the block containing the selected site) are shorter than average for the spatial location (Figure~\ref{Supp:adjacentBlocks}). 
+Through our simulations we find also that blocks of ancestry that have crossed the hybrid zone and are closely linked to the selected site without overlapping it (i.e., blocks that are adjacent to the block containing the selected site) are shorter than average for the spatial location (Figure~\ref{Supp:adjacentBlocks}). 
 An intuitive explanation for this pattern is that loci physically linked to a selected site have recently come from the center of the zone or beyond. 
 Compared to other chromosomes in their new geographic location, these migrants will have on average longer $B$ haplotypes at the selected locus, and shorter $A$ haplotypes nearby. 
 
