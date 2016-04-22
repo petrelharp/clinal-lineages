@@ -4,5 +4,8 @@
 *.bbl
 *.blg
 *.fff
+*.out
 htmls
 simulation_*
+*.o
+*.so

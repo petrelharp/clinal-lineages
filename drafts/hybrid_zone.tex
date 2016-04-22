@@ -185,6 +185,8 @@ Common to nearly all studies is the use of the
 reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
 or the discrete analogues \citep{hanson1966effects}.
 
+\plr{Need to cite Durrett and Cox's stuff here, especially \citet{durrett2007width}.}
+
 % \alisa{
 % Population genetic modeling of hybrid zones has focused largely on the 
 % equilibrium states of clines at selected loci \citep{Nagylaki1975,barton1979dynamics,barton1986barrier,Slatkin1973,Slatkin1975,May1975,Haldane1948}.  
@@ -305,16 +307,21 @@ in the direction perpendicular to the cline
 is $\sigma^2$.
 Assuming that: (i) alleles locally assort into diploids randomly, 
 (ii) habitat and dispersal are homogeneous,
-(iii) $s$ and $\sigma$ are small, \alisa{relative to $N$ and $\tau$ respectively?}
-and (iv) population density is large,
+and (iii) population density is large,
+% and (iv) $s$ and $\sigma$ are small, \alisa{relative to $N$ and $\tau$ respectively?}
 then as in \citet{Bazykin1969},
-the commonly-used equation that $p$ solves is
+the commonly-used equation that $p$ approximately solves is
 \begin{align} \label{eqn:cline_pde}
-    \dot p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) .
+    \frac{d}{dt} p = \frac{\sigma^2}{2} \Delta p + s p (1-p) (2p-1) ,
 \end{align}
-where $\dot p(t,x)$ is the time derivative and $\Delta p$ is the Laplacian.
-\plr{change $\dot p$ to $\frac{d}{dt}p$, and $\Delta$ to the second derivative?}
-This says that the local rate of change of the frequency of $A$ ($\dot p$)
+where $\Delta p$ is the Laplacian.
+\plr{change $\Delta$ to the second derivative?}
+The equation is approximate because it 
+omits terms of order $s^2$
+(so deviations from the prediction occur over $1/s^2$ generations),
+and relies on the Central Limit Theorem to approximate generation-to-generation dispersal by the Gaussian
+(so if dispersal is non-Gaussian, will fit best over longer time scales, say, tens of generations).  \revpoint{AE}{2}
+This says that the local rate of change of the frequency of $A$ ($\frac{d}{dt} p$)
 is equal to the net rate at which $A$ alleles arrive by local dispersal ($\sigma^2/2 \Delta p$)
 and a logistic term proportional to the difference in reproductive rate between $A$ and $a$ alleles
 due to local proportions of heterozygotes,
@@ -327,14 +334,23 @@ the steady-state solution is
 $\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin1969}. 
 This relies on several approximations, but the general conclusions should be quite robust: 
 the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially. 
-Note that rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
-results in a dimensionless equation \citep{Slatkin1973},
+Rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
+results in a dimensionless equation \citep{Slatkin1973}, \linelabel{ll:rescaling}
 implying that the cline establishes over a timescale of the order $1/s$. 
 Since this is how long it takes diffusion at rate $\sigma^2$ to smooth across a region of width $\sigma/\sqrt{s}$,
 this means we can think of
 the cline as established by diffusion, 
 despite being slowed down somewhat by selection against heterozygotes. 
 
+For simplicity we mostly work with one-dimensional clines,
+but the mathematics applies as well to two-dimensional systems with some modifications:
+for instance, if the hybrid zone is a straight line, 
+the description above applies to motion of a lineage transverse to the hybrid zone.  \revpoint{AE}{4}
+It is for this reason that we use $\Delta$ for the second derivative and $\grad$ for the first derivative,
+as these carry over without change to two dimensions;
+in fact, if the landscape is heterogeneous or dispersal is non-Gaussian,
+the theory still holds replacing $\Delta$ by the appropriate operator.
+Note, however, that in two dimensions drift can have a much stronger effect \citep{cox1995hybrid,barton2010phylogeography,durrett2007width}.
 
 
 \paragraph{Lineages at the selected locus}
@@ -377,12 +393,15 @@ Since an $A$ allele must, by definition, have been inherited from the $A$ side o
 at the time of secondary contact, this push must get more intense the closer it is to the time of secondary contact.
 % \alisa{I want to make a figure from the simulations that show the rapid retreat of wrong ancestries back to where they came from}
 
-Note that this description gives more information than the steady-state cline $p(x)$,
+This description gives more information than the steady-state cline $p(x)$,
 which depends only on $\sigma/\sqrt{s}$.
-Here we see that lineages with $\sigma=10$ and $s=.16$ move quite differently
-to lineages with $\sigma=1$ and $s=.0016$,
+Here we see that lineages with $\sigma=10$ and $s=.16$ move much faster
+than lineages with $\sigma=1$ and $s=.0016$,
 reflecting strong differences in selection against heterozygotes,
 even though the stable clines have the same form.
+Even though a rescaling of space and time as described above can make the models equivalent,
+this difference in lineage speed can be seen through the action of recombination, which we explore next.
+\revpoint{AE}{3}
 
 \paragraph{Lineages at linked loci}
 The behavior of a lineage at a linked locus is similar to a selected locus. 
@@ -473,12 +492,12 @@ In the notation above,
 The description above implies that $q_z$ solves the following Kolmogorov backward equation:
 \begin{align}
     \begin{aligned}  \label{eqn:q_pde}
-    \dot q_A(x,t,r) 
+    \frac{d}{dt} q_A(x,t,r) 
             &= \sigma^2 \grad \log(p(x,t)) \cdot \grad q_A(x,t,r) 
                 + \frac{\sigma^2}{2} \Delta q_A(x,t,r) 
             \\ &\qquad {} + 
                 r (1-p(x,t))(q_B(x,t,r)-q_A(x,t,r))  \\
-    \dot q_B(x,t,r) &= \sigma^2 \grad \log(1-p(x,t)) \cdot \grad q_B(x,t,r) 
+    \frac{d}{dt} q_B(x,t,r) &= \sigma^2 \grad \log(1-p(x,t)) \cdot \grad q_B(x,t,r) 
             + \frac{\sigma^2}{2} \Delta q_B(x,t,r)
             \\ &\qquad {} + 
             r p(x,t) (q_A(x,t,r)-q_B(x,t,r))  ,
@@ -505,8 +524,8 @@ and
 $G^B = \sigma^2 \grad \log(1-p(x,t)) \cdot \grad + (\sigma^2/2) \Delta$,
 so that equation \eqref{eqn:q_pde} can be written more compactly as
 \begin{align*}
-    \dot q_A &= G^A q_A + r (1-p) (q_B-q_A) \\
-    \dot q_B &= G^B q_B + r p (q_A-q_B) .
+    \frac{d}{dt} q_A &= G^A q_A + r (1-p) (q_B-q_A) \\
+    \frac{d}{dt} q_B &= G^B q_B + r p (q_A-q_B) .
 \end{align*}
 In technical terms, $G^A$ and $G^B$ are the generators of the diffusions of lineages of selected alleles of ancestry $A$ and $B$, respectively;
 informally, they encode the stochastic motion of lineages at the selected loci.
@@ -555,7 +574,7 @@ The resulting equation is similar to \eqref{eqn:q_pde} with a term added for bra
 which is written (omitting the $(x,t)$ for conciseness):
 \begin{align}
     \begin{aligned} \label{eqn:g_pde}
-        \dot g_A(a,b) 
+        \frac{d}{dt} g_A(a,b) 
         &= G^A g_A(a,b) + r(a,b) (1-p) (g_A(a,b)-g_B(a,b))
             \\ {} & \qquad 
             + (1-p) \left( 
@@ -612,9 +631,11 @@ We implemented forwards-time simulations of a one-dimensional grid of demes
 with non-overlapping generations and fixed population sizes (a Wright-Fisher model). Individuals are diploid, with haploid number $n=2$ chromosomes, each of length 1 Morgan. One chromosome pair harbors, at position 0.5M, a single locus that reduces fitness by $s$ in heterozygotes, while the other contains no sites under direct selection.
 
 Each deme has exactly $N_d$ diploid hermaphroditic individuals at the start of each generation.
-Then, every individual can migrate to a new deme  offset by $\lfloor Z + 1/2 \rfloor$ from their original position,
+Then, every individual can migrate to a new deme offset by $\lfloor Z + 1/2 \rfloor$ from their original position,
 where $Z$ is a Gaussian random variable with mean zero and variance $\sigma^2$.
-(The mean displacement is zero, and when comparing to theory we compute $\sigma$ as the standard deviation of this distribution.)
+(Here $\lfloor z \rfloor$ is the largest integer less than or equal to $z$,
+so this equivalently takes a centered Gaussian displacement and assigns it to the nearest deme. \revpoint{AE}{5}
+The mean displacement is zero, and when comparing to theory we compute $\sigma$ as the standard deviation of this distribution.)
 Migrants past either end of the range remain at the terminal demes.
 Then, 
 fitnesses are computed (heterozygotes at the selected locus have fitness $1-s$; homozygotes have fitness 1),
@@ -1028,7 +1049,7 @@ which we have written down.
 As there are no known analytical solutions to these PDE,
 we have constructed numerical solutions (and provide the source code for doing this).
 A main role of these solutions in our work has been to verify that theory based on the diffusion model of lineages
-matches reality.
+matches realistic, individual-based models.  \revpoint{AE}{8}
 These solutions easily and quickly provide predictions of joint frequencies at small numbers of loci:
 about 1 second to compute predicted clines, as opposed to hours for the full simulation.
 However, due to the high dimensionality of the haplotype problem (spatial position $\times$ time $\times$ endpoints of the haplotype),
@@ -1333,6 +1354,7 @@ as written, it would be easy to modify the code to allow space to be inhomogeneo
 
 %% response to reviews
 % to remove these, change 'ifreviewresponses' up top
+\singlespacing
 \includereviews
 
 \end{document}

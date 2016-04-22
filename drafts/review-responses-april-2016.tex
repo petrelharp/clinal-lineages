@@ -5,6 +5,12 @@
 % \begin{document}
 
 
+%%%%%%
+%%
+%%  Don't reorder the reviewer points; that'll mess up the automatic referencing!
+%%
+%%%%%
+
 \begin{minipage}[b]{2.5in}
   Resubmission Cover Letter \\
   {\it Molecular Ecology}
@@ -71,54 +77,67 @@ This is a nice analysis of how neutral genome introgresses past a cline maintain
 \reply
 Fixed.
 
-\begin{point}{l.116}
-``s and sigma are small'' - but relative to what?  This is not at all obvious.
+\begin{point}{\revref}
+``$s$ and $\sigma$ are small'' - but relative to what?  This is not at all obvious.
 \end{point}
 
 \reply
-\alisa{I think this is relative to $N$ and $\tau$ respectively?}
+We just meant that in the rescaling argument for a discrete model this is required formally,
+without giving it enough thought.
+We've added more thoughtful discussion.
 
-\begin{point}{l.156}
-Surely if time is rescaled as wel as distance and genome length, everything should look the same?  All the results, and to a good approximation the simulations, are in the continuous regime where we can rescale.
+\begin{point}{\revref}
+Surely if time is rescaled as well as distance and genome length, everything should look the same?  
+All the results, and to a good approximation the simulations, are in the continuous regime where we can rescale.
 \end{point}
 
 \reply
-\alisa{I think our point is that these are different for the same scaling of $\tau$?}
+Good point; we in fact outlined this rescaling at \llname{ll:rescaling}.
+It still seems fair to say there is ``more information'' here, because we can pick up the difference in time scaling
+using haplotypes and linkage;
+we've edited this paragraph to make the point better.
 
 \begin{point}{}
- A comment on two dimensions would be helpful.  Ancestral lineages simply diffuse transversely at a rate sigma, independent of their motion parallel to the cline.
+A comment on two dimensions would be helpful.  
+Ancestral lineages simply diffuse transversely at a rate $\sigma$, independent of their motion parallel to the cline.
 \end{point}
 
 \reply
-\alisa{Not sure where this would go? Maybe in the discussion? Do we just say that we ignore two dimensions and this is an ok approximation?} 
+We've added a short note on this (with more references) \revref.
 
-\begin{point}{l.240}
-This is a discrete deme model, so dispersal cannt follow a continuouus Gaussian. I guess what is happening is that sigma is chosen larger relative to deme spacing.  However, there is some approximation here, and the approach will fail if sigma is small relatve to deme spacing.
+\begin{point}{\revref}
+This is a discrete deme model, so dispersal can't follow a continuous Gaussian. 
+I guess what is happening is that $\sigma$ is chosen larger relative to deme spacing.  
+However, there is some approximation here, and the approach will fail if $\sigma$ is small relatve to deme spacing.
 \end{point}
 
 \reply
-\alisa{I think that what we have is ok? Of course if $\sigma$ is tiny then maybe not, but obviously we have chosen the deme spacing to work with our choice of $\sigma$}
+There might be some confusion about our use of the floor function, which we now explicitly explain.
+It's a good point more generally that if $\sigma$ is smaller than the deme spacing this scheme won't get dispersal with $\sigma$ close to the $\sigma$ that we plug into the Gaussian;
+it's for this reason that we compute numerically what $\sigma$ actually is when comparing simulation to theory.
 
-\begin{point}{l.299}
+\begin{point}{}
 Missing semicolon?
 \end{point}
 
 \reply
 Fixed.
 
-\begin{point}{l.420}
+\begin{point}{}
 ``are have''
 \end{point}
 
 \reply
 Fixed.
 
-\begin{point}{l.495}
+\begin{point}{\revref}
 ``reality'' means ``simulation'' here??
 \end{point}
 
 \reply
+Well, we hope to mean ``reality'', but perhaps ``verify that theory matches reality'' is too strong; we've adjusted the wording.
 \alisa{I think we do mean ``reality" here, but alternate opinions welcome}
+\plr{I changed to ``realistic, individual-based models''.}
 
 \begin{point}{}
  Some appendices might be transferred to supplementary material -- the derivations are fairly standard.
@@ -126,6 +145,7 @@ Fixed.
 
 \reply
 \alisa{Our decision to keep the derivations in appendices was with consideration for the readership of Molecular Ecology}
+\plr{I'm fine with moving some; not super clear on the difference anyhow...}
 
 
 %%%%%%%%%%%%%%
