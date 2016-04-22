@@ -3,5 +3,6 @@
 .*.swp
 *.bbl
 *.blg
+*.fff
 htmls
 simulation_*
