@@ -1,14 +1,24 @@
 # To run a simulation 
 
 Edit `run_sims.R` and execute it.
+The parameters are at the top of the file:
+```
+params = list(
+    SIGMA = 3,        # sigma for dispersal, in deme spacings
+    ndemes = 100,     # number of demes
+    deme_size = 50,   # number of diploid individuals per deme
+    S = 0.05,         # selection coefficient, s
+    zone_age = 10     # number of generations to run simulation for
+)
+```
 
 It will create files in the format `simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_`,
-including some useful plots
+including some useful plots.
 
 
 # To create the "comparison to theory" document
 
-first `devtools::install_github("petrelharp/templater")` and then run e.g.
+First `devtools::install_github("petrelharp/templater")` and then run e.g.
 ```
 make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_comparison-to-theory.html
 ```
