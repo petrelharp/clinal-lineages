@@ -24,7 +24,8 @@ make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_compariso
 ```
 or even
 ```
-for x in $(find simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/ -name "*_simsums_chunks.Robj")
+SIMDIR=simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/
+for x in $(find $SIMDIR -name "*_simsums_chunks.Robj")
 do 
     y=$(echo $x | sed -e 's/_simsums_chunks.Robj/_comparison-to-theory.html/') 
     make $y
