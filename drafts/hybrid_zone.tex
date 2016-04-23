@@ -170,12 +170,15 @@ although these are in principle different,
 that while the environment may determine the location of a cline,
 the fitness of the heterozygote will likely determine the shape of the cline,
 and \citet{barton1986barrier} show that \alisa{clines under several different forms of selection are similar in shape.}
+\plr{(What forms of selection?)}
 There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,barton2008effect,Polechova2011},
 and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000} \alisa{and much of this focuses on equilibrium states}.
+
 In this work, we focus on \emph{transient} patterns after the initial formation of a tension zone,
 in particular describing haplotype patterns.
 Although the selected cline establishes quickly, transient patterns can persist for quite some time,
 and \alisa{ancestry} haplotypes can potentially carry substantial information about the formation of recent zones.
+\plr{(I think we just want to say ``haplotypes'', because ``ancestry haplotypes'' isn't a thing, and although we do only study the sort of information about haplotype patterns we can get by painting by ancestry, the statement holds in general.)}
 To do this, we take the reverse-time perspective,
 understanding the temporal dynamics of the system by describing properties of the \emph{lineages} tracing back from the zone.
 This is particularly suited to understanding transient patterns 
@@ -208,7 +211,8 @@ If hybrids have non-zero fitness, some amount of introgression can occur, and th
 In addition to facilitating demographic inference, heterogeneous patterns of ancestry across the genome can help identify putative targets of selection in hybridizing populations  \citep{Porter1997, Gompert2012}. 
 
 If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected locus will be removed rapidly from the population, preventing introgression of surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
-as many ancestors of the locally common type as do neutral haplotypes. \alisa{This reasoning is applicable to both instances of under dominance and ecological (e.g. local adaptation) }
+as many ancestors of the locally common type as do neutral haplotypes. \alisa{This reasoning is applicable to both instances of under dominance and ecological (e.g. local adaptation).}
+\plr{(ecological what?)}
 
 Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
 as they relate to hybrid zone age, genetic distance from selected locus and geographic distance from hybrid zone center. 
@@ -288,14 +292,17 @@ a key factor in these models is the density and fecundity of heterozygotes.
 
 In this section we aim to give both heuristics for how lineages move, 
 that are helpful in providing intuition and for establishing order-of-magnitude estimates,
-and analytics, mostly in terms of partial differential equations needing numerical solution. \alisa{For simplicity, we ignore coalescence.}
+and analytics, mostly in terms of partial differential equations needing numerical solution. 
+\alisa{For simplicity, we ignore coalescence.}
+\plr{(say why and what that means: e.g., deterministic dynamics)}
 
 \paragraph{Establishment of the cline at the selected locus}
 Deterministic theory predicts that after secondary contact,
 the two alleles at the selected locus will form a stable cline,
 affecting neighboring loci as well \citep{barton1979gene, Barton1986}.
 First, we turn our attention to how the cline at the selected locus itself is formed. 
-\alisa{This has been previously described, but is presented here as it provides a framework for further development of our model}
+\alisa{This has been previously described, but is presented here as it provides a framework for further development of our model.}
+\plr{(I presume it's been described, but I don't think we found a reference that actually did this, right?  So maybe say it's ``well-known in the field'' or something?  Also, no-one seems to have looked at lineages, and as our final point says, we actually get some more information out of this perspective.)}
 Write $p(x,t)$ for the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, 
 and the $A$ allele is initially fixed on the left, so
@@ -335,8 +342,9 @@ $\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin196
 This relies on several approximations, but the general conclusions should be quite robust: 
 the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially. 
 Rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
-results in a dimensionless equation \citep{Slatkin1973}, \linelabel{ll:rescaling}
+results in a dimensionless equation,
 implying that the cline establishes over a timescale of the order $1/s$. 
+(This sort of rescaling is common in the literature, e.g., \citep{fisher1950frequencies,Slatkin1973}.)  \linelabel{ll:rescaling}
 Since this is how long it takes diffusion at rate $\sigma^2$ to smooth across a region of width $\sigma/\sqrt{s}$,
 this means we can think of
 the cline as established by diffusion, 
@@ -363,8 +371,10 @@ The expected number, among these alleles, that had a parent at location $y$ in t
 is proportional to the number of $A$ alleles that were at $y$ multiplied by the per-generation probability of dispersing from $y$ to $x$. 
 In other words, lineages move as a random walk determined by the dispersal kernel,
 but biased towards locations where the selected allele they carry is at higher frequency.
-(Lineages are also biased towards regions with higher fecundity,
-and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.) \alisa{could this reference to small $s$ be confusing?}
+% (Lineages are also biased towards regions with higher fecundity,
+% and thus away from the hybrid zone, but we assume that $s$ is small and ignore this.) 
+% \alisa{could this reference to small $s$ be confusing?}
+% \plr{it's confusing because it's differences in fecundity that bias the lineage since they create the net flux of A alleles to the right, even though there's a different term in how a lineage moves for the difference in previous-generation fecundity, that we're ignoring. I'm removing the statement.}
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
 that the lineage of an $A$ allele moves as Brownian motion driven by dispersal
@@ -372,13 +382,16 @@ with mean displacement proportional to the derivative of $\log p$.
 This has the effect of pulling $A$ lineages towards regions where they are more common
 % with speed $\sigma$
 % with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
-(i.e., it moves at speed $\sigma^2$ in the potential $-\log p$). \alisa{What does potential here mean?}
-% \alisa{note to self to read through appendix when written}
+(the analogous physical system is a particle that moves at speed $\sigma^2$ in the potential $-\log p$). 
+\alisa{What does potential here mean?}
+\plr{(It means like a gravity well.  Clear now that it says ``particle''?)}
 To see why this is true, note that the probability that the parent of an $A$ allele found at $x$
 lived at position $x-r$ is proportional to $\P\{R=-r\} p(x-r)$, where $R$ is the random dispersal distance;
-and so the mean displacement from offspring to parent is $-\E[R p(x-R)]/\E[p(x-R)]$.
+and so the mean displacement from offspring to parent is $-\E[R p(x-R)]/\E[p(x-R)]$.  \revpoint{1}{9}
 % $$ = \E[ -R ] - \E[R]^2 p'(x)/p(x) + \E[R^2] p'(x)/p(x) + O(R^3) $$
-Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$ \alisa{perhaps a brief explanation of how this works}
+Using the fact that $\E[R]=0$ and $\E[R^2]=\sigma^2$ 
+\alisa{(perhaps a brief explanation of how this works)}
+\plr{(That's what the rest of the sentence is? Work it out, and if you still think it needs more detail, add it?)}
 and expanding $p()$ to first order about $x$ shows that this mean displacement is approximately $\sigma^2 p'(x)/p(x)$,
 which is $\sigma^2$ multiplied by the gradient of $\log p(x)$.
 This description holds even when the frequency profile of the $A$ allele changes with time (replacing $p(x)$ by $p(x,t)$).
@@ -440,7 +453,8 @@ $T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise f
         \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
     \end{aligned}
 \end{align}
-\alisa{Explain in words}
+\alisa{Explain in words.}
+\plr{(I hope that comment came before I added these words? Or do you want different ones?)}
 In the first expression, giving the distribution of how the lineage location changes,
 the first term ($\sigma dB_\tau$) is Brownian noise driven by dispersal,
 and the second is the mean displacement, which moves the lineage ``downhill'' on either $-\log p$ or $-\log (1-p)$
@@ -486,9 +500,9 @@ where $z$ can be either $A$ or $B$.
 We denote this probability $q_z(x,t,r)$.
 In the notation above,
 \begin{align}
-    q_z(x,t,r) = \P^x \{Z_t = A\} .
+    q_z(x,t,r) = \P^x \{Z_t = A \given X_0 = x, \; Z_0 = z\} .
 \end{align}
-(Recall that $Z$ depends implicitly on $r$.)
+(Recall that $Z$ depends implicitly on $r$.) \revpoint{1}{7}
 The description above implies that $q_z$ solves the following Kolmogorov backward equation:
 \begin{align}
     \begin{aligned}  \label{eqn:q_pde}
@@ -503,9 +517,11 @@ The description above implies that $q_z$ solves the following Kolmogorov backwar
             r p(x,t) (q_A(x,t,r)-q_B(x,t,r))  ,
     \end{aligned} 
 \end{align}
-\alisa{Use our words}
+\alisa{Use our words} \plr{(what does that mean)}
 with boundary conditions $q_A(x,0,r)=1$ and $q_B(x,0,r)=0$, 
-and where $\grad$ is the gradient, and $\Delta$ is the Laplacian \alisa{describing the rate of change}. 
+and where $\grad$ is the gradient, and $\Delta$ is the Laplacian 
+\alisa{describing the rate of change}. 
+\plr{(the Laplacian is describing the rate of change? I don't follow.)}
 The three terms in these equations come from Brownian movement of a linages,
 the tendency of a lineage to inherit from regions where its type is more common,
 and recombination between selected backgrounds, respectively.
@@ -532,7 +548,9 @@ informally, they encode the stochastic motion of lineages at the selected loci.
 
 
 \paragraph{Numerical computation}
-To determine how the cline at a linked locus is expected to relax, \alisa{and to confirm the behavior of our model to previously established results,}
+To determine how the cline at a linked locus is expected to relax, 
+\alisa{and to confirm the behavior of our model to previously established results,}
+\plr{(got a reference for that?)}
 we can solve the partial differential equations \eqref{eqn:cline_pde} and \eqref{eqn:q_pde} numerically.
 For instance, Figure \ref{fig:linked_cline_heatmaps} shows a heatmap of $p(x,t,r)$, 
 the expected frequency of ancestry $A$ at location $x$ and time $t$ 
@@ -544,10 +562,14 @@ The equations are solved numerically in R, using the ReacTran package \citep{soe
 \paragraph{Haplotype lengths}
 We now develop our model further to find the frequency at which \emph{entire} blocks of genome (haplotypes) 
 of a single ancestry are found, at a given location and time.
-Consider a segment of the genome between positions $a$ and $b$, relative to the selected site. 
+Suppose we sample an individual at spatial location $x$ and time $t$ after the initiation of gene flow,
+and genotype them on the genomic segment between positions $a$ and $b$, relative to the selected site. 
 We are interested in the probability $g_z(x,t;a,b)$ 
-of finding an entire segment $(a,b)$ of ancestry $A$ in an individual having selected allele of type $z$,
-sampled at spatial location $x$ at time $t$ after the initiation of gene flow. 
+of finding an entire segment $(a,b)$ of ancestry $A$ 
+given that the individual has selected allele of type $z$.
+\revpoint{1}{10}
+For instance, $g_B(0,10;0,.2)$ is the probability that an individual carrying a selected $B$ allele sampled at the center of the zone
+at $t=10$ has a block of $A$ ancestry for 0.2 Morgans to the right of the selected site.
 
 As in \citet{sedghifar2015spatial}, 
 a given block of genome is inherited along a single lineage ever since the most recent recombination event
@@ -588,7 +610,6 @@ which is written (omitting the $(x,t)$ for conciseness):
             - (b-a) g_A(a,b)  ,
     \end{aligned} 
 \end{align}
-
 \alisa{Need to be related to Figure 1}
 Here the first term ($G^A g_A$) represents spatial mixing,
 and the second term results from recombinations \emph{between} the block and the selected site 
@@ -598,9 +619,10 @@ under the assumption of locally random mating).
 In the integrals, $\theta$ is the genomic position of the recombination event occuring \emph{inside} the block.
 The third term accounts for such recombinations in a heterozygote: 
 the portion of the block nearest the selected site remains linked to an $A$ allele, 
-and the remaining portion becomes linked to a $B$ allele
-(\alisa{to consider cases where the selected locus lies outside the interval [a,b], i.e.,} we say that the integral $\int_a^{\min(0,b)}$ is zero if  $a>0$ 
-and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$) .
+and the remaining portion becomes linked to a $B$ allele;
+\alisa{to account for cases where the selected locus lies outside the interval [a,b],} 
+we say that the integral $\int_a^{\min(0,b)}$ is zero if  $a>0$ 
+and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$.
 The last integral results from recombination inside the block in homozygotes for $A$,
 and the final term balances the outflux due to all recombinations.
 The equation for $g_B(x,t;a,b)$ is identical after exchanging $A \leftrightarrow B$ and
@@ -643,7 +665,7 @@ and in each deme $N_d$ pairs of parents are chosen, with replacement,
 with probability proportional to their fitness and selfing allowed.
 Since migration is not conservative, demes may have no available parents;
 in this case, parents are chosen from other demes with probability proportional to fitness
-multiplied by $\exp(-x^2/\sigma^2)$, where $x$ is the distance to the other deme.
+multiplied by $\exp(-x^2/\sigma^2)$, where $x$ is the distance to the other deme. \revpoint{2}{4}
 The next generation is formed by carrying out meiosis in each parent
 and combining the resulting gametes such that each pair of parents leaves one descendant.
 Meiosis results in alternating blocks of the gamete's chromosome
@@ -749,7 +771,7 @@ Although our analytical model does not account for coalescence, we are able to p
 \section*{Results}
 
 
-\subsection*{Single-loci: clines}
+\subsection*{Single locus clines}
 
 As expected, clines in simulations form and begin to flatten, 
 with ancestry frequencies at the selected site maintaining a stable shape,
@@ -766,8 +788,9 @@ and separating linked clines based on the identity of the linked selected allele
 The agreement is good over hundreds of generations, but by $T=1280$ generations,
 stochasticity has substantially moved allele frequencies range-wide
 \citep[which is unsurprising, as the total population size is only 5,000 diploids:][]{Polechova2011}.
+\revpoint{2}{6}
 
-
+\plr{(This next bit is one of these scaling arguments that Reviewer 2 wants clarified.  Again, I don't know who's described how the cline relaxes, do you?  I think at least the "speed of a lineage" bit is new, but don't want to make a big deal out of it.  Not sure how to signpost this.}
 Loci not under direct selection can in principle spread across the cline unimpeded. 
 In practice, however, it can take quite some time for even unlinked neutral loci to homogenize,
 due to the decreased fitness of heterozygotes \citep{barton1986barrier}
@@ -825,7 +848,8 @@ As discussed above, we expect these lineages move at speed roughly $\sigma\sqrt{
 so (selected) $A$ alleles at distance $x$ from the cline center
 have last had an ancestor on the $A$ side of the cline around $x/(\sqrt{s}\sigma)$ generations ago 
 (compared to $x^2/\sigma^2$ for a neutral allele).
-This implies the enclosing $A$ haplotype surrounding the locus should be no longer than $\sigma\sqrt{s}/x$.
+This implies the scale on which $A$ haplotypes are found surrounding the locus should be no longer than about $\sigma\sqrt{s}/x$.
+\revpoint{2}{8}
 %\plr{(check predicted decay of mean length $1/x$ in simulations?)}
 
 \paragraph{Identifying selected loci}
@@ -1191,11 +1215,21 @@ These four things happen at rates:
     & x\xrightarrow{BA}y & \qquad w_{BA}(x,y) &= r p(x) (1-p(x)) \frac{s_A(x)+s_B(x)}{2} N(x) m(x,y) \\
     & x\xrightarrow{BB}y & \qquad w_{BB}(x,y) &= (1-p(x)) s_B(x) \left(1 - r p(x) \right) N(x) m(x,y) 
 \end{align}
+For instance,  \revpoint{2}{10}
+there are $p(x) N(x)$ type $A$ individuals at $x$, that reproduce at rate $s_A(x)$;
+the chance that each reproduction is with a type $B$ is $(1-p(x))$, 
+and the chance there is a recombination that gives the offspring genotype $AB$ is $r/2$;
+the offspring has probability $m(x,y)$ to disperse to $y$;
+the total rate at which individuals at $x$ with the $A$ allele produce offspring at $y$ with the $B$ allele is the product of these terms,
+$p(x) N(x) s_A(x) (1-p(x)) r / 2$.
+The second and third rates (for $x\xrightarrow{AB}y$ and $x\xrightarrow{BA}y$) are the same;
+they are this value plus the corresponding term
+for individuals carrying the $B$ allele producing offspring that carry the $A$ allele.
 
 Note that at equilibrium, we require $N$ to solve
-\begin{align}
+\begin{align*}
   0 = \sum_y N(y) m(y,x) \left\{ p(y)s_A(y)(1-p(x)) - (1-p(y))s_B(y)p(x) \right\} .
-\end{align}
+\end{align*}
 
 \subsection*{Lineage movement}
 
@@ -1205,10 +1239,10 @@ currently in a type A individual at location $x$
 jumps to another type A individual at location $y$ is equal to the rate of influx of migrants from $y$
 divided by the number of A alleles at $x$,
 or
-\begin{align}
+\begin{align*}
   r_A(x,y) &= \frac{w_{AA}(y,x)}{p(x)N(x)} \\
   &= N(y) p(y) s_A(y) m(y,x) \frac{ 1 }{ N(x) p(x) } .
-\end{align}
+\end{align*}
 
 Let $X_t$ denote the position of the lineage of a selected locus of time $A$ at time $t$ in the past,
 and let $f$ be test function with $f(\rho)=0$.
@@ -1224,27 +1258,31 @@ Then,
 
 Now suppose that $m(x,y)$ is symmetric, and depends on a parameter $\sigma$ so that as $\sigma \to 0$,
 the associated random walk converges to Brownian motion, so that for an arbitrary smooth function $f$,
-\begin{align}
+\begin{align*}
     \lim_{\sigma \to 0} \sum_y \frac{ m(x,y) ( f(y) - f(x) ) }{\sigma^2} = \frac{1}{2} \dderiv{x} f(x) .
-\end{align}
+\end{align*}
 Write $f'(x) = \deriv{x}f(x)$, and note that
-\begin{align}
+\begin{align*}
     \frac{1}{\sigma^2} \sum_y g(y) m(y,x) (f(y)-f(x)) 
     &= \frac{1}{\sigma^2} \sum_y m(y,x) \left( g(y) f(y) - g(x) f(x) + (g(x)-g(y)) f(x) \right) \\
     &= \frac{1}{\sigma^2} \sum_y m(y,x) \left( g(y) f(y) - g(x) f(x) \right) \\
     & \qquad - f(x) \frac{1}{\sigma^2} \sum_y m(y,x) (g(y)-g(x)) \\
     &\xrightarrow{\sigma \to 0} \frac{1}{2} \dderiv{x}\left( g(x)f(x) \right) - \frac{1}{2} f(x) \dderiv{x} g(x) \\
-    &= \frac{1}{2} \left( g(x) f'(x) + 2 g'(x) f'(x) + f(x) g''(x) - f(x) g''(x) \right) \\
-    &= \frac{1}{2} g(x) f''(x) + g'(x) f'(x) . \label{eqn:deriv_limit}
+    &= \frac{1}{2} \left( g(x) f'(x) + 2 g'(x) f'(x) + f(x) g''(x) - f(x) g''(x) \right) ,
+\end{align*}
+which tells us the differential operator that best approximates the discrete sum:
+\begin{align}
+    \frac{1}{\sigma^2} \sum_y g(y) m(y,x) (f(y)-f(x)) 
+    &\xrightarrow{\sigma \to 0} \frac{1}{2} g(x) f''(x) + g'(x) f'(x) . \label{eqn:deriv_limit}
 \end{align}
 
 Under these assumptions, combining \eqref{eqn:discrete_generator} and \eqref{eqn:deriv_limit},
-\begin{align}
+\begin{align*}
     \deriv{t} \E[f(X_{t/\sigma^2}) \given X_0=x ] &\xrightarrow{\sigma \to 0} 
     \frac{1}{2} s_A(x) \dderiv{x} f(x) 
     + \frac{1}{N(x)p(x)} \deriv{x} \left\{ N(x)p(x) s_A(x) \right\}  \deriv{x} f(x) \\
     &= \frac{1}{2} s_A(x) f''(x) + \left( s_A'(x) + \log(N(x)p(x))' s_A(x) \right) f'(x) ,
-\end{align}
+\end{align*}
 i.e.\ $X_{t/\sigma^2}$ converges to a diffusion with mean displacement
 (``drift'' in diffusion terminology) $\frac{1}{ N(x)p(x)} \deriv{x} ( N(x) p(x) s_A(x) )$ and killed at rate $\rho k(x)$.
 

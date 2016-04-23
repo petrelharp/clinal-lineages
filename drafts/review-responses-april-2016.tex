@@ -44,7 +44,7 @@ Rev. 1 is also concerned that only under dominance is simulated.  However, it is
 \end{quote}
 
 \begin{quote}
-Reviewer 2 is mainly concerned about the fit between theory and simulations.  I am not worried about this, since the deterministic mathematics stands independently, and the numerical computations are straightforward.  The stochastic simulations are useful mainly as illustrations of the process.  Theory and simulations are compared in the supplementary material; it should be stated more clearly how closely these match. (A precise fit is not expected anyway because there is substantial drift).  Rev. 2 also worries that the simulations are over a rather narrow range; I suspect that the authors should have results that address sensitivity to the boundaries.  Regarding specific point 1, I don't know of a previous derivation of exactly these equations, but similar equations have been used widely, and I don't think that he authors suggest otherwise.
+Reviewer 2 is mainly concerned about the fit between theory and simulations.  I am not worried about this, since the deterministic mathematics stands independently, and the numerical computations are straightforward.  The stochastic simulations are useful mainly as illustrations of the process.  Theory and simulations are compared in the supplementary material; it should be stated more clearly how closely these match. (A precise fit is not expected anyway because there is substantial drift).  Rev. 2 also worries that the simulations are over a rather narrow range; I suspect that the authors should have results that address sensitivity to the boundaries.  Regarding specific point 1, I don't know of a previous derivation of exactly these equations, but similar equations have been used widely, and I don't think that the authors suggest otherwise.
 \end{quote}
 
 \noindent \hspace{4em}
@@ -189,12 +189,12 @@ Since the recombination-based terms in Eqs 4 and 5 do not depend on the spatiall
 \reply
 \plr{yaniv doing that}
 
-\begin{point}{Eq.5}
+\begin{point}{Eq.\ref{eqn:g_pde}}
 If $a<b<\theta<0$, then I interpret $g(\theta,b) = 0$. If correct, this should be specified.  Alternately, the bounds of the integral could be modified to account for this situation.
 \end{point}
 
 \reply
-\plr{peter did this}
+Thanks for catching the mistake; we modified the bounds of the integral.
 
 \begin{point}{}
 As an example of a section that felt unstructured, consider the discussion starting at l.347.  This long paragraph starts with a long list of observations, without giving a hint as to where we are going. Beginning the paragraph with the main idea for the paragraph would be useful.
@@ -203,13 +203,13 @@ As an example of a section that felt unstructured, consider the discussion start
 \reply
 \alisa{Working on how to fix this in the ms now}
 
-\begin{point}{``In the notation above, $q_z(x, t, r) = P^x{Z_t = A}$.''}
+\begin{point}{\revref}
+``In the notation above, $q_z(x, t, r) = P^x{Z_t = A}$.''
 I did not see the notation $P^x$ above, and the RHS does not depend on small z.
 \end{point}
 
 \reply
-\alisa{(This is at l180) Should the $=$ be a $:=$}
-\plr{peter will fix this}
+Good point; we've used a more common notation to specify that $X_0=x$ (and $Z_0=z$ now).
 
 \begin{point}{} 
 ``As we show below the solutions provide an good approximation''
@@ -218,21 +218,20 @@ I did not see the notation $P^x$ above, and the RHS does not depend on small z.
 \reply
 Fixed.
 
-\begin{point}{l.144}
+\begin{point}{\revref}
 It seems like the x+r and x-r should have the same sign.
 \end{point}
 
 \reply
-\plr{peter did this}
+That's correct; we've fixed the sign issues.
 
-\begin{point}{l.199}
+\begin{point}{\revref}
 $g_z(x, T, a,b)$ is defined as: \textit{``We are interested in the probability $g_z(x, t; a, b)$ of finding an entire segment $(a, b)$ of ancestry $A$ in an individual having selected allele of type $z$, \ldots ''}
-
 This definition does not make it clear that the probability is conditional on $z$; $\P(A|z)$ vs $\P(A,z)$.
 \end{point}
 
 \reply
-\plr{peter will do this}
+This was indeed confusing; it's rewritten to be hopefully less confusing.
 
 \begin{point}{l.606}
 Reference issues
@@ -270,7 +269,8 @@ Reference issues
 \reply
 \alisa{Our hope was that the simulations and theory would provide qualitative support for one another. Some predictions made by the theory e.g. time and spatial scales do seem to correspond. We will try to do a better job of signposting our unique contributions??}
 
-\plr{peter to add sentence saying this is standard, ref slatkin, barton}
+The rescaling arguments we provide  are of a standard sort in the literature;
+we've inserted comments to this effect, at \llname{ll:rescaling} \plr{and elsewhere?}.
 
 \plr{alisa to see if we can add any more from what we've done}
 
@@ -295,13 +295,18 @@ Overall, this MS presents some interesting insights, and the formalization of th
 \alisa{We have remade Figure 1, with additional information that we hope will help with interpretation}
 \plr{alisa to refer to these events in discussion of terms in figure 5}
 
-\begin{point}{l. 245}
+\begin{point}{\revref}
  As the theory is set up in the absence of genetic drift, and, correspondingly, the local population size is large, it is unclear how a deme with 500 individuals could become empty in a Wright-Fisher model.  The (narrow) width of the habitat also needs justification.
 \end{point}
 
 \reply
-\alisa{It is true that the demes are never empty. However, this is the way the simulation is coded in order to account for the possibility if smaller population sizes are ever simulated.}
-\plr{peter to add note about width of sims in the section describing simulations}
+Although most of the simulations shown in the main text have high population densities,
+we have in fact run simulations with considerably lower densities, 
+as shown for instance in figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau320_comparison}, and \ref{sfig:condAlleleFreq_tau1280_comparison}.
+\alisa{It is true that the demes are never empty.}
+\plr{(It happened in sims that I ran.)}
+\alisa{However, this is the way the simulation is coded in order to account for the possibility if smaller population sizes are ever simulated.}
+\plr{add reference to more low pop density figures if added}
 
 \begin{point}{Figure 3:}
 What are the replicate lines for the same $r$? Why re the lines for $r = 0$ all slightly displaced to the right? Also, it would appear that the color scheme in associated Figure S2 (bottom) is mismatched with the legend, shifted to the red part of the spectrum. After fixing this, I think that the Figure S2 should be in the main text instead of Fig. 3.
@@ -309,11 +314,11 @@ What are the replicate lines for the same $r$? Why re the lines for $r = 0$ all 
 
 \reply
 \alisa{We believe that the displacement is likely due to drift. (We could do a repeated sim to show this?)}
+\plr{I'm ok with switching S2 and 3; that seems like a good idea.  About the horizontal shift: I think that when I noticed this we figured out that it was because the center of the cline wasn't being plotted quite at zero for some reason?  If I recall correctly, we thought maybe it was drift but it wasn't.}
+\plr{Alisa to clarify figure legend.}
+\plr{peter or alisa fix S2: this is in \url{Plot_frequency_clines.R}}
 
-\plr{alisa to clarify figure legend}
-\plr{peter or alisa fix S2}
-
-\begin{point}{l. 299}
+\begin{point}{\revref}
 Total population size is irrelevant when predicting the effects of genetic drift (besides, some simulations only have 50 demes across, not 100). In a one-dimensional habitat, one uses $N \sigma \sqrt{s}$ to judge whether the effect of genetic drift is likely to be negligible.
 \end{point}
 
@@ -328,16 +333,15 @@ Total population size is irrelevant when predicting the effects of genetic drift
 \reply
 \plr{see above}
 
-\begin{point}{l.339}
- I think the sentence about the maximum length of the enclosing haplotype, $\sigma \sqrt{s} / x$ is mis-phrased: presumably this should be a statement on the distribution (expected size?) of the introgressing block length at distance x, as a lucky block can travel many sigmas in one generation?
+\begin{point}{\revref}
+ I think the sentence about the maximum length of the enclosing haplotype, $\sigma \sqrt{s} / x$ is mis-phrased: presumably this should be a statement on the distribution (expected size?) of the introgressing block length at distance $x$, as a lucky block can travel many sigmas in one generation?
 \end{point}
 
 \reply
-\alisa{I don't think this is misphrased?}
-\plr{peter will rephrase: it is stochastic}
+Good point, it was meant to be a statement about an order of magnitude bound to a stochastic quantity rather than a precise bound; it's been rephrased.
 
 \begin{point}{Discussion:}
-It is important to make the reader aware that even neutral clines do not just keep flattening -- genetic drift leads to a finite cline width even for neutral clines. Despite the occasional mention of genetic drift, the MS does not clearly state that the parameter space is chosen such that genetic drift is weak and does not indicate when this is a reasonable assumption (see comment on l. 299).
+    It is important to make the reader aware that even neutral clines do not just keep flattening -- genetic drift leads to a finite cline width even for neutral clines. Despite the occasional mention of genetic drift, the MS does not clearly state that the parameter space is chosen such that genetic drift is weak and does not indicate when this is a reasonable assumption (see comment above [about \revreffull{2}{6}]).
 \end{point}
 
 \reply
@@ -345,13 +349,12 @@ It is important to make the reader aware that even neutral clines do not just ke
 
 \alisa{We should add a line or two in the discussion about drift. However, IBD is perhaps not relevant over the timescales we are considering and is not necessarily ancestry informative, and since we are not interested in the equilibrium state, it is not clear that we need to worry about this limit. }
 
-\begin{point}{p.27 rates, e.g. Eq. (7,8):}
+\begin{point}{rates at \revref, e.g. Eq. (7,8):}
  I find the explanation of the rates a bit unclear. I understand that the recombinant AB can arise either by A reproducing at rate $s_A$ and recombining with B, or B reproducing at rate $s_B$ and recombining with A -- such that the neutral locus of the type A is kept. Or alternatively, the BA recombinant arises, where the neutral locus at B is kept. Which one of the two happens has a probability of 1/2.
 \end{point}
 
 \reply
-\alisa{We'll work on making this more understandable.}
-\plr{peter to do this}
+Right; we've added more discussion of this.
 
 \begin{point}{}
 The ``Data Accessibility section'' is missing. The folder at \href{http://github.com_petrelharp_clinal-lineages}  appears to be a working folder with lots of other files and the r-scripts hidden under a `sim' directory. The README file appears insufficient to allow orientation in the scripts, and worryingly, it has an `oh, wrong recombination distance' note to it.
