@@ -18,6 +18,8 @@ get_simparams <- function (fname) {
 
 positions = seq(0.2,0.8,0.01)
 positions = seq(0.48,0.52,0.001)
+positions = c(0,0.01,0.02,0.05,0.1,0.2,0.3)
+#cols = c(2,3,6,11,21,31)
 
 sel.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums.Robj"
 sel.params <- get_simparams( sel.sim.file )
@@ -25,7 +27,7 @@ sel.params <- get_simparams( sel.sim.file )
 neutral.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0_tau100_run2016-01-15_simsums.Robj"
 neu.params <- get_simparams( neutral.sim.file )
 
-if (!file.exists("plot_frequency_clines.Robj")) {
+if (!file.exists("plot_frequency_clines_revised.Robj")) {
     load(sel.sim.file)
     #CHUNKS_SEL = get.chunks.at.positions(positions,CHR=1)
 
@@ -34,7 +36,7 @@ if (!file.exists("plot_frequency_clines.Robj")) {
     B_freq = get.ancestry.freqs(
             IND_DATA=sims.sums[[1]]$ind.ancest, 
             demeID=demeID, 
-            VECTOR_OF_POS=positions, 
+            VECTOR_OF_POS=0.5-positions, 
             CHR=1, 
             ndemes=sel.params$ndemes)
 
@@ -47,13 +49,13 @@ if (!file.exists("plot_frequency_clines.Robj")) {
     B_neu = get.ancestry.freqs(
             IND_DATA=sims.sums[[1]]$ind.ancest, 
             demeID=demeID, 
-            VECTOR_OF_POS=positions, 
+            VECTOR_OF_POS=seq(0.2,0.8,0.01), 
             CHR=1, 
             ndemes=neu.params$ndemes)
 
-    save(B_freq, B_neu, file="plot_frequency_clines.Robj")
+    save(B_freq, B_neu, file="plot_frequency_clines_revised.Robj")
 } else {
-    load("plot_frequency_clines.Robj")
+    load("plot_frequency_clines_revised.Robj")
 }
 
 
@@ -92,10 +94,10 @@ fwds.neutral.soln <- forwards_pde(s=0, times=tt, grid=fgrid, sigma=theory.params
 
 # compare.k <- 1+(0:(floor(length(positions)/5)-1))*5 
 # compare.k <- compare.k[ positions[compare.k]>=0.5 ]
-compare.k <- 31+c(0,1,2,3,5,8,13,21) 
-compare.positions <- positions[ compare.k ]
-compare.rvals <- compare.positions - 0.5
-
+compare.k <- 31+c(0,1,2,3,5,8,13,20,30) 
+#compare.positions <- positions[ compare.k ]
+#compare.rvals <- compare.positions - 0.5
+compare.rvals <- positions
 linked.solns <- lapply( compare.rvals, function (r) {
         forwards_backwards_pde(s=theory.params$s, times=tt, grid=xgrid, r=r, 
                            sigma=theory.params$sigma, fwds.soln=fwds.soln, log.p=TRUE)
@@ -110,10 +112,12 @@ linked.neutral.solns <- lapply( compare.rvals, function (r) {
 linked.neutral.clines <- lapply( linked.neutral.solns, cline_from_soln, grid=xgrid )
 neutral.tfreqs <- sapply( linked.neutral.clines, function (lnc) { lnc[nrow(lnc),-1] } )
 
-pdf(file="alleleFrequencies_sim_comparison.pdf", width=6, height=8, pointsize=10)
+pdf(file="/home/alisa/alleleFrequencies_sim_comparison_revision.pdf", width=6, height=8, pointsize=10)
 layout((1:2))
 par(mar=c(3.5,3.5,0.5,0.5))
 
+#COLORS=c("red",sapply(1:30,function(i){(rainbow(43))[32-i]}),sapply(30:1,function(i){(rainbow(43))[32-i]}))
+COLORS=c("red",rainbow(43)[c(2,3,6,11,21,31)])
     # Neutral comparison
     matplot( xx, B_neu/(2*neu.params$ninds/neu.params$ndemes),
             xlab="",ylab="",type="l",lty=1,col="grey",lwd=0.5 )
@@ -124,16 +128,16 @@ par(mar=c(3.5,3.5,0.5,0.5))
 
     # selected comparision
     r.cols <- rainbow(ncol(B_freq)+10)
-    matplot( xx, B_freq[,compare.k]/(2*sel.params$ninds/sel.params$ndemes),
+    matplot( xx, B_freq/(2*sel.params$ninds/sel.params$ndemes),
             xlab="",ylab="",type="l",lty=1,lwd=0.75,
-            col=r.cols[1+floor(abs(ncol(B_freq)/2+0.5-1:ncol(B_freq)))][compare.k] )
+            col=COLORS )
     matlines(xgrid$x.mid, 1-tfreqs, lty=2, lwd=2, 
-            col=r.cols[1+floor(abs(ncol(B_freq)/2+0.5-1:ncol(B_freq)))][compare.k] )
+            col=COLORS)
 
         mtext("Geographic position",side=1,line=2)
         mtext(expression(p[B]),side=2,line=2.5)
 
-    legend("bottomright",legend = c("r=0","r=0.05","r=0.1","r=0.2","r=0.3","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
+    legend("bottomright",legend = c("r=0.01","r=0.05","r=0.1","r=0.2","r=0.3","no seln."),col=c(COLORS[c(2,4,5,6,7)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
 
 dev.off()
 

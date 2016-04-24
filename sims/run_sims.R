@@ -2,14 +2,14 @@
 
 source("sim-fns.R")
 
-#PARAMS for simulation:
+# Parameters for simulation:
 
 params = list(
-    SIGMA = 3,
-    ndemes = 100,
-    deme_size = 50,
-    S = 0.05,
-    zone_age = 10
+    SIGMA = 3,        # sigma for dispersal, in deme spacings
+    ndemes = 100,     # number of demes
+    deme_size = 50,   # number of diploid individuals per deme
+    S = 0.05,         # selection coefficient, s
+    zone_age = 10     # number of generations to run simulation for
 )
 params$ninds = params$ndemes * params$deme_size
 

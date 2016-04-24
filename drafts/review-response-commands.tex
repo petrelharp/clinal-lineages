@@ -38,7 +38,7 @@
 % e.g. \revpoint{1}{3} for reviewer 1, point 3
 \newcommand{\revpoint}[2]{\linelabel{rr:rev#1:#2}}
 % and this one to refer to such a location, e.g. \revreffull{1}{3}
-\newcommand{\revreffull}[2]{{ (p.\ \pageref{rr:rev#1:#2}, l.\ \lineref{rr:rev#1:#2}) }}
+\newcommand{\revreffull}[2]{{(p.\ \pageref{rr:rev#1:#2}, l.\ \lineref{rr:rev#1:#2})}}
 % but this version fills in reviewer and point automatically if called in the appropriate part of the reviews
 \newcommand{\revref}{\revreffull{\thereviewer}{\thepoint}}
 
