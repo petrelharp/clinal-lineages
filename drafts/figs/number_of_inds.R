@@ -1,3 +1,6 @@
+start_coordinate=0.49
+end_coordinate=0.51
+
 load("simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_run2016-01-27_rawoutput.Robj")	#output is: a list with hierarchy: [[zone_age]][[c("inds","sp.ids","deme","pars","QTL")]]
 		#where:
 			#"inds" is a list of length ninds, such that [[ind]][[chr]][[X1/X2]][[data.frame where col1 = coordinates of rec., col2 = ancestor ID]]
@@ -35,8 +38,8 @@ ancestry.at.position = function(IND=1,DATA=sims.s0.1,POS = 0.5,CHROM="chr1",SP="
 
 ninds=25000
 
-selected_chromsome_ancestor_bydeme = lapply(seq(0.495,0.505,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr1",SP="B")})})
-unlinked_chromsome_ancestor_bydeme = lapply(seq(0.495,0.505,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr2",SP="B")})})
+selected_chromsome_ancestor_bydeme = lapply(seq(start_coordinate,end_coordinate,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr1",SP="B")})})
+unlinked_chromsome_ancestor_bydeme = lapply(seq(start_coordinate,end_coordinate,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr2",SP="B")})})
 
 selected_locus_AncB_ancestors = lapply(selected_chromsome_ancestor_bydeme,function(POS){
 	lapply(POS,function(X){table_of_inds=do.call(rbind,lapply(X,function(Z){
@@ -48,7 +51,7 @@ unlinked_locus_AncB_ancestors = lapply(unlinked_chromsome_ancestor_bydeme,functi
 
 
 load("simulation_SIGMA1_Ninds25000_ndemes50_s0_tau1000_rawoutput.Robj")
-neutral_chromsome_ancestor_bydeme = lapply(seq(0.495,0.505,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr1",SP="B")})})
+neutral_chromsome_ancestor_bydeme = lapply(seq(start_coordinate,end_coordinate,0.00025),function(P){tapply(1:ninds,sims.s0.1[[1]][["deme"]],function(X){lapply(X,ancestry.at.position,DATA=sims.s0.1,POS=P,CHROM="chr1",SP="B")})})
 
 neutral_locus_AncB_ancestors = lapply(neutral_chromsome_ancestor_bydeme,function(POS){
 	lapply(POS,function(X){table_of_inds=do.call(rbind,lapply(X,function(Z){
@@ -58,7 +61,7 @@ neutral_locus_AncB_ancestors = lapply(neutral_chromsome_ancestor_bydeme,function
 
 number_of_ancestors = list(neutral_locus_AncB_ancestors,unlinked_locus_AncB_ancestors,selected_locus_AncB_ancestors)
 
-save(number_of_ancestors,file="number_of_ancestors_tau1000.Robj")
+save(number_of_ancestors,file="number_of_ancestors_tau1000_revision.Robj")
 
 
 

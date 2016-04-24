@@ -27,7 +27,7 @@ sel.params <- get_simparams( sel.sim.file )
 neutral.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0_tau100_run2016-01-15_simsums.Robj"
 neu.params <- get_simparams( neutral.sim.file )
 
-if (!file.exists("plot_frequency_clines_revised.Robj")) {
+if (!file.exists("plot_frequency_clines_revision.Robj")) {
     load(sel.sim.file)
     #CHUNKS_SEL = get.chunks.at.positions(positions,CHR=1)
 
@@ -53,9 +53,9 @@ if (!file.exists("plot_frequency_clines_revised.Robj")) {
             CHR=1, 
             ndemes=neu.params$ndemes)
 
-    save(B_freq, B_neu, file="plot_frequency_clines_revised.Robj")
+    save(B_freq, B_neu, file="plot_frequency_clines_revision.Robj")
 } else {
-    load("plot_frequency_clines_revised.Robj")
+    load("plot_frequency_clines_revision.Robj")
 }
 
 
