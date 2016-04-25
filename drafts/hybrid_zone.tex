@@ -540,7 +540,7 @@ and where $\grad$ is the gradient, and $\Delta$ is the Laplacian.
 The three terms in these equations come from Brownian movement of a linages (i.e. the smoothing action of local dispersal),
 the tendency of a lineage to inherit from regions where its type is more common (i.e. the net flux induced by reduced fitness in the hybrid zone),
 and recombination between selected backgrounds, respectively. \alisa{I think the first and second terms may have been switched??}
-\yb{We note that because recombination occurs within a deme, the recombination terms in equation \eqref{eqn:q_pde} are quite standard  \citep{HartlClark}}
+\yb{We note that because recombination occurs within a deme, the recombination terms in equation \eqref{eqn:q_pde} are quite standard \citep{HartlClark}.} \revpoint{1}{4}
 %\alisa{this is fwd-in-time notation. should we change it to bwd-in-time?}
 %\plr{This equation should be forwards in time, since it's the Kolmogorov backward equation
 %applied to a backwards-time process!}
@@ -878,7 +878,7 @@ peaking quite sharply around the location of the selected site.
 
 \alisa{To provide some intuition about the physical scale of this signal, we note that}
 genomic regions are inherited from ancestors $T$ generations ago
-in blocks of size roughly $1/T$.
+in blocks of size roughly $1/T$. \revpoint{1}{6}
 There will be a long segment of $A$ ancestry
 if many such adjacent blocks are all inherited from the $A$ side.
 Ancestries of neighboring blocks are correlated,
@@ -989,7 +989,7 @@ which will have smaller families.
 
 \section*{Discussion}
 
-Using a combination of theory and simulations, we present a description of the process of cline formation and haplotype structure in a relatively young (i.e. non-equilibrium) hybrid zone.
+Using a combination of theory and simulations, we present a description of the process of cline formation and haplotype structure in a relatively young (i.e. non-equilibrium) hybrid zone. \linelabel{ll:discussion_summary}
 We show that clines establish over time $1/s$, and that lineages of selected loci tend to move back towards their `ancestral home' when in a geographic region where they  are unfit. 
 This occurs at speed $\sigma\sqrt{s}$. Based on this we predict, and observe in simulations, that blocks of ancestry surrounding these selected loci are longer, especially when distant from the center of the cline, than those surrounding neutral loci. 
 This extends previous theoretical work on hybrid zones, which has primarily focused on stable clines in allele frequency. 
@@ -1042,7 +1042,12 @@ and with hundreds of individuals per dispersal distance.
 Here we review the assumptions we made and their likely impact.
 
 \paragraph{The nature of selection}
-Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, we believe that this is unlikely to drastically influence our findings, as previous studies have demonstrated that underdominant loci share similar properties with more realistic models (e.g., ecological selection \citep{Barton1989,Barton1993}). 
+Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, 
+we believe that this is unlikely to drastically influence our findings, 
+as previous studies have demonstrated that models of underdominant selection 
+share similar properties with more realistic models (e.g., ecological selection \citep{Barton1989,Barton1993}). 
+\revpoint{1}{1}
+\plr{(more detail here or reference intro. would like to say `indistinguishable'; who can we cite?)}
 
 Our assumption of a single selected locus may have greater consequences. Our model is most relevant to scenarios with few targets of selection scattered throughout the genome, and therefore, our predictions may differ significantly from situations in which the density of selected sites is higher. 
 Having numerous selected sites within one ancestry block increases the strength of selection \citep{barton1986barrier}, 
