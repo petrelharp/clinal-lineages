@@ -30,7 +30,11 @@ This deals with both:
      shows discontinuous freqs at barriers to dispersal
      AND observes that het disadvantage leads to steeper clines,
      so maybe environment determines location of cline; het disadvantage the shape
-* May1975 : spatial resolution of adaptation; also does het disadvantage
+* may1975gene (with Endler, McMutrie) : spatial resolution of adaptation; also does het disadvantage;
+     reviews Slatkin and Endler's recent papers;
+     writes down time-evolution and does space-time scaling argument for environmental cline;
+     says that behavior of het disadvantage and environmental clines have "exactly the same scaling" properties, 
+    and "the clines differ only in numerical details".
 * Polechova2011 and Barton, genetic drift widens the expected cline but narrows individual clines; 
      somewhat different answers for environmental step-clines and for tension zones
 
