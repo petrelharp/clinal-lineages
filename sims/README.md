@@ -15,6 +15,29 @@ params = list(
 It will create files in the format `simulation_SIGMA%s_Ninds%s_ndemes%s_s%s_dir/tau%s_dir/results_`,
 including some useful plots.
 
+# To make more plots, e.g. of haplotypes, of the results
+
+Many plots can be produced by `haplotype-plots.R`;
+this runs on the `sims.sums` object saved out by the script in the file `results_runid_%s_simsums.Robj`.
+For instance, to run this, we could do as follows:
+```
+get_simparams <- function (fname) {
+    strings <- c( SIGMA="SIGMA", ninds="Ninds", ndemes="ndemes", S="s", tau="tau", run.id="runid_" )
+    out <- lapply( strings, function (x) { as.numeric(gsub(sprintf(".*[/_]%s([0-9.]+)_.*",x),"\\1",fname)) } )
+    out$zone_age <- out$tau
+    out$deme_size <- out$ninds/out$ndemes
+    return(out)
+}
+
+simdir <- "simulation_SIGMA3_Ninds250000_ndemes500_s0.05_dir/tau100_dir"
+simsum.files <- list.files(simdir, ".*simsums.Robj", full.names=TRUE)
+for (k in seq_along(simsum.files)) {
+sapply( simsum.files, function (fname) {
+        params <- get_simparams(fname)
+        load(fname)
+        source("haplotype-plots.R")
+    } )
+```
 
 # To create the "comparison to theory" document
 
