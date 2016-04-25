@@ -19,7 +19,8 @@ including some useful plots.
 
 Many plots can be produced by `haplotype-plots.R`;
 this runs on the `sims.sums` object saved out by the script in the file `results_runid_%s_simsums.Robj`.
-For instance, to run this, we could do as follows:
+The script `make-plots.R` will load the required things and run `haplotype-plots.R`;
+it works as follows:
 ```
 get_simparams <- function (fname) {
     strings <- c( SIGMA="SIGMA", ninds="Ninds", ndemes="ndemes", S="s", tau="tau", run.id="runid_" )
@@ -31,7 +32,6 @@ get_simparams <- function (fname) {
 
 simdir <- "simulation_SIGMA3_Ninds250000_ndemes500_s0.05_dir/tau100_dir"
 simsum.files <- list.files(simdir, ".*simsums.Robj", full.names=TRUE)
-for (k in seq_along(simsum.files)) {
 sapply( simsum.files, function (fname) {
         params <- get_simparams(fname)
         load(fname)
