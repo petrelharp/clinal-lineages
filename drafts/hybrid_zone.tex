@@ -141,17 +141,71 @@ However, when formerly isolated populations come into contact before reproductiv
 Interbreeding and migration between such populations  
 % YB It seems like the fact that such ancestry can be labeled is more important later, but probably shouldn't be a focus here. 
 creates a gradient of alleles derived from the two populations across geographic space, %YB removed `assignments' as it seems like it is the ancestry, not its assignment, that is of interest
-centered on their point of contact \citep[reviewed in][]{Barton1985}. 
+centered on their point of contact \citep[reviewed by][]{Barton1985}. 
 If the populations are sufficiently diverged, 
 this process leaves a distinct pattern of variation across the genome, 
 in which long tracts of divergent haplotypes from each ancestral population  
 are broken up by historical recombination events,
 forming chromosomal {junctions} in ancestry \citep{Fisher1954, Chapman2002, baird2003distribution}. 
 % Limited opportunities for recombination in recent hybrid zones generates substantial correlations in ancestry (and hence, genotype) between distant markers, and
-These
-patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,sedghifar2015spatial}.  
-\yb{We show that selection against hybrid incompatibility loci changes the extent of correlated ancestry --- that is, 
+These patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,sedghifar2015spatial}.  
+
+The mixing of genomes across space, combined with selection, results in the formation of genetic clines. These patterns have been the traditional focus of both empirical and theoretical studies into hybrid zones. While here we focus on hybrid zones maintained by selection against hybrids -- \emph{tension zones} --
+as in \citet{Bazykin1969}, reviewed in \citet{Barton1985}, clines may also be differential selection across environmental gradients \citep{Haldane1948,fisher1950frequencies}, generating \emph{ecotones}. Although these are, in principle different, theoretical analyses consistently show ecotones and tension zones have very similar properties \citep{Slatkin1973, barton1986barrier,Kruuk1999}, with the primary difference being that the center of a tension zone fluctuates over time \citep{Barton1979a} because stochastic changes in allele frequency can shit the cline center, while centers of ecotones do not change unless the environmental gradient changes. 
+
+Our work here builds on the large body of theory describing tension zones. While much of the previous work describes equilibrium states of genetic clines, we focus on \emph{transient} patterns after the initial formation of a tension zone, in particular describing \emph{haplotype} patterns. Although the selected allele frequency cline establishes quickly, transient patterns can persist for quite some time, and  haplotypes can potentially carry substantial information about the formation of recent zones.
+To do this, we take the reverse-time perspective,
+understanding the temporal dynamics of the system by describing properties of the \emph{lineages} tracing back from the zone.
+This is particularly suited to understanding transient patterns.  
+
+
+The arrangement of segments of genome inherited from particular ancestral populations
+is shaped by the number of recombination events that have taken place between ancestral genotypes. 
+Therefore the length distribution of such segments contains clues concerning the age of the hybrid zone and the relative strength of selection affecting subsets of the genome. 
+The distribution of ancestry tract length in admixed or hybridizing populations has been used to infer the extent of hybridization and timing of secondary contact both in single populations and in hybrid zones \citep{Price2009, Gravel2012,sedghifar2015spatial}. In addition to allowing researchers to interpret non-equilibrium patterns of diversity in hybrid zones, 
+the length distribution of ancestry tracts could reveal the impact of ongoing selection on the mixing of ancestral genomes. %and, consequently, the maintenance of species distinctness. 
+%In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
+%If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has been used to infer the extent %of hybridization and timing of secondary contact \citep{Price2009, Gravel2012}. 
+\yb{We show here that heterogeneous patterns of the ancestry length distribution across the genome may help identify putative targets of selection in hybridizing populations, providing another source of information in addition to gradients in allele frequencies  used in current approaches \citep[e.g. ][]{Porter1997, Gompert2012}. Specifically, we find that selection against hybrid incompatibility loci changes the extent of correlated ancestry --- that is, 
 because selection rapidly removes incompatible alleles from heterospecific genomes, hybrid incompatibilities will be surrounded by disproportionately long ancestry blocks.}
+
+
+Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
+as they relate to hybrid zone age, genetic distance from selected locus and geographic distance from hybrid zone center. 
+In \citet{sedghifar2015spatial} we described how lineages move across a neutral zone of secondary contact,
+obtaining predictions for distributions of lengths of blocks of ancestry, which we fit to several datasets.
+In this work, we extend the same framework to the case of selection against heterozygotes at a single locus,
+by describing how lineages move conditional on the frequencies of the selected allele
+and allowing lineages to recombine between selected background 
+(analogous to the structured coalescent applied to selection, as in \citet{hudson1988coalescent}).
+
+
+If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected allele will be removed rapidly from the population, preventing introgression of surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
+as many ancestors of the locally common type as do neutral haplotypes. \alisa{This reasoning is applicable to instances of both tension zones generated by intrinsic genetic incompatibilities, and ecotone models of extrinsic ecological selection (e.g. local adaptation).}
+%\plr{(ecological what?)}
+
+\yb{Because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002continuous},
+incorporating genetic drift is not straightforward, and we therefore neglect genetic drift in our analytical results.   
+This approach} is common to nearly all studies is the use of the
+reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
+or the discrete analogues \citep{hanson1966effects}. There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,barton2008effect,Polechova2011},
+and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000}.
+\plr{Need to cite Durrett and Cox's stuff here, especially \citet{durrett2007width}.}
+\yb{While we cannot analytically derive expectations for finite populations, our simulation results (below) suggest that genetic drift does not substantially influence our conclusions, perhaps because of the short time-scales that we examine.} \alisa{Our results present a possible approach for identifying genomic regions experiencing selection in hybrid zones.}
+
+%\citet{Slatkin1973} pointed out, in a far-reaching general analysis,
+%that while the environment may determine the location of a cline,
+%the fitness of the heterozygote will likely determine the shape of the cline,
+%and \citet{barton1986barrier} show that \alisa{clines under several different forms of selection are similar in shape.}
+%\plr{(What forms of selection?)}
+
+   
+
+
+
+
+
+
 
 
 % YB REMOVED
@@ -164,34 +218,12 @@ because selection rapidly removes incompatible alleles from heterospecific genom
 %makes it now possible to use patterns of the block length distribution
 %to better understand the processes operating in hybrid zones.
 
-\yb{Our work builds on the large body of theory on genetic clines. Specifically,  
-we focus on genetic clines maintained} by selection against hybrids -- \emph{tension zones} --
-as in \citet{Bazykin1969}, reviewed in \citet{Barton1985}. 
-\yb{Clines may also be maintained by differential selection across environmental gradients \citep{Haldane1948,fisher1950frequencies}, generating \emph{ecotones}. 
-Although these are, in principle different, theoretical analyses consistently show ecotones and tension zones have very similar properties \citep{Slatkin1973, barton1986barrier,Kruuk1999}, with the primary difference being that the center of a tension zone wobbles over time \citep{Barton1979a} because stochastic changes in allele frequency can shit the cline center, while centers of ecotones do not change unless the environmental gradient changes. } 
-%\citet{Slatkin1973} pointed out, in a far-reaching general analysis,
-%that while the environment may determine the location of a cline,
-%the fitness of the heterozygote will likely determine the shape of the cline,
-%and \citet{barton1986barrier} show that \alisa{clines under several different forms of selection are similar in shape.}
-%\plr{(What forms of selection?)}
-There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,barton2008effect,Polechova2011},
-and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000} \alisa{and much of this focuses on equilibrium states}.
 
-In this work, we focus on \emph{transient} patterns after the initial formation of a tension zone,
-in particular describing haplotype patterns.
-Although the selected allele frequency cline establishes quickly, transient patterns can persist for quite some time,
-and  haplotypes can potentially carry substantial information about the formation of recent zones.
-To do this, we take the reverse-time perspective,
-understanding the temporal dynamics of the system by describing properties of the \emph{lineages} tracing back from the zone.
-This is particularly suited to understanding transient patterns.  
-\yb{However, because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002continuous},
-incorporating genetic drift is not straightforward, and we therefore neglect genetic drift in our analytical results.   
-This approach} is common to nearly all studies is the use of the
-reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
-or the discrete analogues \citep{hanson1966effects}.
 
-\plr{Need to cite Durrett and Cox's stuff here, especially \citet{durrett2007width}.}
-\yb{While we cannot analytically derive expectations for finite populations, our simulation results (below) suggest that genetic drift does not substantially influence our conclusions, perhaps because of the short time-scales that we examine.}   
+
+
+
+
 
 % \alisa{
 % Population genetic modeling of hybrid zones has focused largely on the 
@@ -204,28 +236,9 @@ or the discrete analogues \citep{hanson1966effects}.
 % This provides some expectation for how selection shapes covariance in ancestry at a single locus over geographic space.
 % Our aim here is to extend this to include expectations for how selection shapes covariance in ancestry across the genome.}
 
-The arrangement of segments of genome inherited from particular ancestral populations
-is shaped by the number of recombination events that have taken place between ancestral genotypes. 
-Therefore the length distribution of such segments contains clues concerning the age of the hybrid zone and the relative strength of selection affecting subsets of the genome. % too much `provides information'
-The distribution of ancestry tract length in admixed or hybridizing populations has been used to infer the extent of hybridization and timing of secondary contact \citep{Price2009, Gravel2012,sedghifar2015spatial}. 
-In addition to allowing researchers to interpret non-equilibrium patterns of diversity in hybrid zones, 
-the length distribution of ancestry tracts could reveal the impact of ongoing selection on the mixing of ancestral genomes. %and, consequently, the maintenance of species distinctness. 
-%In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
-%If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has been used to infer the extent %of hybridization and timing of secondary contact \citep{Price2009, Gravel2012}. 
-\yb{We show that heterogeneous patterns of the ancestry length distribution across the genome may help identify putative targets of selection in hybridizing populations, providing another source of information in addition to gradients in allele frequencies  used in current approaches \citep[e.g. ][]{Porter1997, Gompert2012}. }
 
-If hybrid ancestry at a given locus is disfavored, migrant haplotypes containing the selected allele will be removed rapidly from the population, preventing introgression of surrounding genomic regions. We therefore expect a deficit of short blocks of foreign ancestry surrounding the selected locus, with this effect becoming more pronounced further away from the center of a hybrid zone. As a corollary to this, conditional on having the ancestry that is at lower frequency (that is, being on the `wrong' side of the hybrid zone), the length of unbroken ancestry surrounding the selected locus is expected to be relatively long when far away from the zone center.  This is because an unfit haplotype is more likely to have been recently inherited from the other side of the hybrid zone, and therefore will not have
-as many ancestors of the locally common type as do neutral haplotypes. \alisa{This reasoning is applicable to instances of both tension zones generated by intrinsic genetic incompatibilities, and ecotones generated by extrinsic ecological selection (e.g. local adaptation).}
-%\plr{(ecological what?)}
 
-Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
-as they relate to hybrid zone age, genetic distance from selected locus and geographic distance from hybrid zone center. 
-In \citet{sedghifar2015spatial} we described how lineages move across a neutral zone of secondary contact,
-obtaining predictions for distributions of lengths of blocks of ancestry, which we fit to several datasets.
-In this work, we extend the same framework to the case of selection against heterozygotes at a single locus,
-by describing how lineages move conditional on the frequencies of the selected allele
-and allowing lineages to recombine between selected background 
-(analogous to the structured coalescent applied to selection, as in \citet{hudson1988coalescent}).
+
 
 
 
