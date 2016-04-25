@@ -527,6 +527,7 @@ and where $\grad$ is the gradient, and $\Delta$ is the Laplacian.
 The three terms in these equations come from Brownian movement of a linages (i.e. the smoothing action of local dispersal),
 the tendency of a lineage to inherit from regions where its type is more common (i.e. the net flux induced by reduced fitness in the hybrid zone),
 and recombination between selected backgrounds, respectively. \alisa{I think the first and second terms may have been switched??}
+\yb{We note that because recombination occurs within a deme, the recombination terms in equation \eqref{eqn:q_pde} are quite standard  \citep{HartlClark}}
 %\alisa{this is fwd-in-time notation. should we change it to bwd-in-time?}
 %\plr{This equation should be forwards in time, since it's the Kolmogorov backward equation
 %applied to a backwards-time process!}
@@ -785,8 +786,8 @@ Figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau
 show this comparison with a lower population density than in Figure \ref{alleleFreq_tau100},
 and separating linked clines based on the identity of the linked selected allele.
 The agreement is good over hundreds of generations, but by $T=1280$ generations,
-stochasticity has substantially moved allele frequencies range-wide
-\citep[which is unsurprising, as the total population size is only 5,000 diploids:][]{Polechova2011}.
+stochasticity has substantially moved allele frequencies range-wide, \yb{which is in accordance with previous theory showing that tension zones wobble at a rate proportional $\sqrt{T}$ \citep{Barton1979a}. }
+%\citep[which is unsurprising, as the total population size is only 5,000 diploids:][]{Polechova2011}.
 \revpoint{2}{6}
 
 \plr{(This next bit is one of these scaling arguments that Reviewer 2 wants clarified.  Again, I don't know who's described how the cline relaxes, do you?  I think at least the "speed of a lineage" bit is new, but don't want to make a big deal out of it.  Not sure how to signpost this.}

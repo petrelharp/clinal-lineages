@@ -138,7 +138,7 @@ Fixed.
 \end{point}
 
 \reply
-Well, we hope to mean ``reality'', but perhaps ``verify that theory matches reality'' is too strong; we've adjusted the wording.
+Well, we hope to mean ``reality'', but perhaps ``verify that theory matches reality'' is too strong; we've adjusted the wording to say ``\emph{realistic, individual-based models.}''.
 %\alisa{I think we do mean ``reality" here, but alternate opinions welcome}
 %\plr{I changed to ``realistic, individual-based models''.}
 
@@ -147,8 +147,10 @@ Well, we hope to mean ``reality'', but perhaps ``verify that theory matches real
 \end{point}
 
 \reply
-\alisa{Our decision to keep the derivations in appendices was with consideration for the readership of Molecular Ecology. One of our concerns is that the math would be largely overlooked if moved into the supplement. Having consulted a number of non-theoretician biologists, we decided that it would be helpful to have even the fairly standard derivations easily accessible.}
-\plr{good start...}
+\alisa{Our decision to keep the derivations in appendices was with consideration for the readership of Molecular Ecology. 
+Thus, while some results are fairly standard, they might not be familiar to our readership.  
+One of our concerns is that the math would be largely overlooked if moved into the supplement (which is not automatically printed with the main document) and this could create a barrier to understanding among the readers.}
+
 
 
 %%%%%%%%%%%%%%
@@ -175,20 +177,23 @@ Well, we hope to mean ``reality'', but perhaps ``verify that theory matches real
 \end{point}
 
 \reply
-\alisa{This is a point we have considered ourselves. We present these equations as a way of building our model up to address haplotype lengths. Both analytical expressions and simulations are presented so that they each support the conclusions of the other.}
+\alisa{This is a point we have considered ourselves. We present these equations as a way of building our model up to address haplotype lengths. Both analytical expressions and simulations are presented so that they each support the conclusions of the other.} \yb{However, we also believe that analytical results can allow for a deeper understanding than simulation output. 
+To aid our readers in developing this understanding, we have gone through considerable pains to map terms in our equations to the biological processes of migration, selection and recombination. 
+We believe that our efforts will help build a better mechanistic understanding in our readers in addition to making them aware of our results.}
 
 \begin{point}{}
     While reading the manuscript, I found it difficult to distinguish the most important observations from more tangential observations. The manuscript reads like a long list of observations, and would benefit from more focus on the main findings and more structure.
 \end{point}
 
 \reply
+\yb{We agree that a long set of theoretical results can be tedious. We have therefore reshaped the introduction to highlight our major question ``How does selection against incompatibilities in a hybrid zone influence the length distribution of ancestry tracts'' and result ``'It shortens them''.}
 
 \begin{point}{}
 Since the recombination-based terms in Eqs 4 and 5 do not depend on the spatially explicit part of the model or on the selection term, I would be surprised if they had not been derived somewhere.
 \end{point}
 
 \reply
-\plr{yaniv doing that}
+\yb{We agree that this representation has likely been derived many times. We turned to Hartl and Clark and found a similar derivation. We therefore signpost that this is a standard result by pointing readers to that text.}   
 
 \begin{point}{Eq.\ref{eqn:g_pde}}
 If $a<b<\theta<0$, then I interpret $g(\theta,b) = 0$. If correct, this should be specified.  Alternately, the bounds of the integral could be modified to account for this situation.
@@ -324,8 +329,9 @@ Total population size is irrelevant when predicting the effects of genetic drift
 \end{point}
 
 \reply
-\alisa{We are concerned here with linked loci, so the $N\sigma\sqrt{s}$ rule of thumb does not necessarily apply here? Also, within demes, population size is much smaller (500?)}
-\plr{I agree: they are probably thinking of selected loci, not linked ones. We're talking about global drift not local drift. Yaniv to investigate.}
+\yb{Thanks for spotting this. Because we do nothing quantitative with respect to drift here, we simply state the our observed wobble of the center of the tension zone is consistent with previous theory. However, more broadly throughout the manuscript we are not sure about  relying on $N \sigma \sqrt{s}$ as we are concerned with loci linked to the selected site, and we are not aware of results extending this rule to an unlinked locus.}
+%\alisa{We are concerned here with linked loci, so the $N\sigma\sqrt{s}$ rule of thumb does not necessarily apply here? Also, within demes, population size is much smaller (500?)}
+%\plr{I agree: they are probably thinking of selected loci, not linked ones. We're talking about global drift not local drift. Yaniv to investigate.}
 
 \begin{point}{Scaling arguments, p. 14, 15:}
  Please give a citation with the known scaling, and take more care with the novel ones.  
