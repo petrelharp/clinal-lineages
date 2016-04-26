@@ -89,7 +89,7 @@
      $T=100$ generations after secondary contact,
     and with $s=0.01$.
     The simulated zone had 50 demes, each with a population size of 500 diploid individuals.
-    Each line represents a locus some distance $r$ away from the true target of selection 
+    Each line represents a locus some distance $r$ away from the true target of selection, 
     and $r=0$ represents the locus that is under selection. Grey lines represent the same positions from a simulation with
     identical parameters except that $s=0$.
 }\label{alleleFreq_tau100_weaker_s}
@@ -110,7 +110,7 @@
 \end{figure}
 
 \begin{figure}
-   \includegraphics{{figs/polydiv_by_coverage_SD2-12}.pdf}
+    \includegraphics{{figs/alleleFrequencies_sim_SIGMA3_Ninds250000_ndemes500_s0.01_tau100}.pdf}
 \caption{
     Frequency of ancestry $B$,
     across geography and at several physical positions on the genome, simulated for a hybrid zone
@@ -133,7 +133,7 @@
 
 
 \begin{figure}
-    %\includegraphics{{figs/simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_blocksAlongChromAncBConditioning_nonnormalized}}
+    \includegraphics{{figs/simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_blocksAlongChromAncBConditioning_nonnormalized}.pdf}
     \caption{
         \textbf{Mean haplotype lengths of $B$ haplotypes}, $l_B(x,m)$,
         across the genome (horizontal axis) and at different spatial locations (colored lines),
@@ -142,7 +142,7 @@
 \end{figure}
 
 \begin{figure}
-%\includegraphics[width=\textwidth]{{figs/results_runid_753324_chr1_start0.48_stop0.52_by0.001_blocksAlongChromNoConditioning_nonnormalized}.pdf}
+\includegraphics[width=\textwidth]{{figs/results_runid_753324_chr1_start0.48_stop0.52_by0.001_blocksAlongChromNoConditioning_nonnormalized}.pdf}
 \caption{
     \textbf{Mean enclosing block length $l(m,x)$}, across the genome (horizontal axis)
     and at different geographic positions (different colored lines).
@@ -177,30 +177,30 @@
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromNoConditioning.pdf}
-\caption{Mean block length $l(m)$, not conditioning on ancestry, surrounding a given position along the genome with a single underdominant site with parameters as for Fig.~\ref{Fig:blockLengths} ($s=0.01, T=1000, \sigma=1$). }\label{Supp:blockLengthNoAnc}
+\caption{Mean block length $l(m)$, without conditioning on ancestry, surrounding a given position along the genome with a single underdominant site with parameters as for Fig~\ref{Fig:blockLengths}. ($s=0.01, T=1000, \sigma=1$). }\label{Supp:blockLengthNoAnc}
 \end{figure}
 
 \begin{figure}
 \includegraphics{figs/blocksAlongChromHeatmap.pdf}
-\caption{Heatmap of mean block length $l(m)$ (i.e. no conditioning on ancestry) along a simulated chromosome with a single underdominant site with parameters as for Fig.~\ref{Fig:blockLengths}($s=0.01, T=1000, \sigma=1$) }\label{Supp:blockLengthHeatmapNoAnc}
+\caption{Heatmap of mean block length $l(m)$, without conditioning on ancestry, along a simulated chromosome with a single underdominant site, with parameters as for Fig~\ref{Fig:blockLengths} ($s=0.01, T=1000, \sigma=1$) }\label{Supp:blockLengthHeatmapNoAnc}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/adjacentBlocksAlongChromAncBConditioning.pdf}
-\caption{Mean block length of $l_A(m\pm)$ across chromosome with single under dominant site, conditioning on ancestry $B$ at the selected locus and with parameters as for Fig.~\ref{Fig:blockLengths} ($s=0.01, T=1000, \sigma=1$)}\label{Supp:adjacentBlocks}
+\caption{Mean block length of $l_A(m\pm)$ across chromosome with single under dominant site, conditioning on ancestry $B$ at the selected locus, with parameters as for Fig~\ref{Fig:blockLengths} ($s=0.01, T=1000, \sigma=1$)}\label{Supp:adjacentBlocks}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/s0point01_ratioAdjacentBlocksAlongChromAncBConditioningHighRes.pdf}
-    \caption{The statistic $\bar C(m,x)$: the normalized ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and mean adjacent block lengths across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme. This  simulation corresponds to that represented in Figure~\ref{Fig:blockLengthsZoom}; note the difference in y-axis scale.}\label{Supp:ratioBlockAdjacent}
+    \caption{The normalized statistic $\bar C(m,x)$: the ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and mean adjacent block lengths across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme. This  simulation corresponds to that represented in Figure~\ref{Fig:blockLengthsZoom}; note the difference in y-axis scale.}\label{Supp:ratioBlockAdjacent}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf}
-    \caption{Heatmap of $C(m,x)=\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000, \sigma=1$). }\label{Supp:ratioBlockAdjacentHeatmap}
+    \caption{Heatmap of $C(m,x)=\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site and parameters as for Fig.~\ref{Fig:blockLengths} ($s=0.01, T=1000, \sigma=1$). }\label{Supp:ratioBlockAdjacentHeatmap}
 \end{figure}
 
 
@@ -244,7 +244,7 @@
     \includegraphics{figs/s001_adjacentBlocksAlongChromAncBConditioning}
     \includegraphics{figs/s001_adjacentBlocksAlongChromNoConditioningHighRes}
         \caption{
-     Block lengths along chromosome under $s=0.001$, conditioning on ancestry B (top) and without conditioning (bottom) and with parameters as for Fig.~\ref{Fig:blockLengths} } \label{sfig:blockLengthPlot_t1000_s0.001}
+     Block lengths along chromosome under $s=0.001$ and other parameters as for Fig.~\ref{Fig:blockLengths}, conditioning on ancestry B (top) and without conditioning (bottom) } \label{sfig:blockLengthPlot_t1000_s0.001}
 \end{figure}
 
 
