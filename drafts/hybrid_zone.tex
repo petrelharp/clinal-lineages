@@ -101,7 +101,7 @@
 Hybrid zones formed between recently diverged populations offer an opportunity 
 to study the mechanisms underlying reproductive isolation and the process of speciation.
 Here, we use a combination of analytical theory and explicit forward simulations
-to show how selection against hybrid genotypes impacts patterns of introgression
+to describe how selection against hybrid genotypes impacts patterns of introgression
 across genomic and geographic space. 
 By understanding how lineages move across the hybrid zone, in a model without coalescence, 
 we describe how clines form and how parental haplotypes are broken up during introgression.
@@ -150,23 +150,44 @@ forming chromosomal {junctions} in ancestry \citep{Fisher1954, Chapman2002, bair
 % Limited opportunities for recombination in recent hybrid zones generates substantial correlations in ancestry (and hence, genotype) between distant markers, and
 These patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,sedghifar2015spatial}.  
 
-The mixing of genomes across space, combined with selection, results in the formation of genetic clines. These patterns have been the traditional focus of both empirical and theoretical studies into hybrid zones. While here we focus on hybrid zones maintained by selection against hybrids -- \emph{tension zones} --
-as in \citet{Bazykin1969}, reviewed in \citet{Barton1985}, clines may also be differential selection across environmental gradients \citep{Haldane1948,fisher1950frequencies}, generating \emph{ecotones}. Although these are, in principle different, theoretical analyses consistently show ecotones and tension zones have very similar properties \citep{Slatkin1973, barton1986barrier,Kruuk1999}, with the primary difference being that the center of a tension zone fluctuates over time \citep{Barton1979a} because stochastic changes in allele frequency can shit the cline center, while centers of ecotones do not change unless the environmental gradient changes. 
+The mixing of genomes across space, combined with selection, results in the formation of genetic clines. 
+These patterns have been the traditional focus of both empirical and theoretical studies into hybrid zones. 
+While here we focus on hybrid zones maintained by selection against hybrids 
+-- \emph{tension zones}, as reviewed in \citet{Barton1985} --  % removed \citet{Bazykin1969}, it's cited later
+clines may also be due to differential selection across environmental gradients \citep{Haldane1948,fisher1950frequencies,hanson1966effects},
+% generating \emph{ecotones}.  % I think ecotone means something somewhat different: see Barton & Hewitt 1985, p. 132, for instance
+Although these are in principle different,  \linelabel{ll:all_clines_are_the_same}
+theoretical and simulation studies show that
+genomic clines seen in the two situations are effectively indistinguishable without additional information \citep{may1975gene,Barton1993,Kruuk1999},
+with their shape determined mostly by the mean fitness of the heterozygote \citep{Slatkin1973}.
+% consistently show ecotones and tension zones have very similar properties \citep{Slatkin1973, barton1986barrier,Kruuk1999}, 
+% \plr{(I can't find discussion of similarity of different types of clines in \citet{barton1986barrier}: put the citation back in if I missed it.)}
+%% don't think we need this next bit
+% The primary difference being that the center of a tension zone fluctuates over time \citep{barton1979dynamics} 
+% because stochastic changes in allele frequency can shit the cline center, 
+% while centers of ecotones do not change unless the environmental gradient changes. 
 
-Our work here builds on the large body of theory describing tension zones. While much of the previous work describes equilibrium states of genetic clines, we focus on \emph{transient} patterns after the initial formation of a tension zone, in particular describing \emph{haplotype} patterns. Although the selected allele frequency cline establishes quickly, transient patterns can persist for quite some time, and  haplotypes can potentially carry substantial information about the formation of recent zones.
+
+Our work here builds on the large body of theory describing tension zones. 
+While much of this previous work describes equilibrium states of genetic clines, 
+we focus on \emph{transients}, in particular describing haplotype patterns. 
+Although the cline in selected allele frequency establishes quickly, transient patterns can persist for quite some time, 
+and haplotypes can potentially carry substantial information about the formation of recent zones.
 To do this, we take the reverse-time perspective,
-understanding the temporal dynamics of the system by describing properties of the \emph{lineages} tracing back from the zone.
-This is particularly suited to understanding transient patterns.  
+understanding the temporal dynamics of the system by describing properties of the lineages tracing back from the zone.
+% This is particularly suited to understanding transient patterns.  
 
 
-The arrangement of segments of genome inherited from particular ancestral populations
+The arrangement of segments of genome inherited from particular ancestral populations,
+which may be identifiable as distinct haplotypes,
 is shaped by the number of recombination events that have taken place between ancestral genotypes. 
 Therefore the length distribution of such segments contains clues concerning the age of the hybrid zone and the relative strength of selection affecting subsets of the genome. 
 The distribution of ancestry tract length in admixed or hybridizing populations has been used to infer the extent of hybridization and timing of secondary contact both in single populations and in hybrid zones \citep{Price2009, Gravel2012,sedghifar2015spatial}. In addition to allowing researchers to interpret non-equilibrium patterns of diversity in hybrid zones, 
 the length distribution of ancestry tracts could reveal the impact of ongoing selection on the mixing of ancestral genomes. %and, consequently, the maintenance of species distinctness. 
 %In the extreme case of zero fitness in first-generation hybrids, for example, parental genomes will never mix and the stable hybrid zone will resemble a recently formed one. 
 %If hybrids have non-zero fitness, some amount of introgression can occur, and the distribution of ancestry tract length in such populations has been used to infer the extent %of hybridization and timing of secondary contact \citep{Price2009, Gravel2012}. 
-\yb{We show here that heterogeneous patterns of the ancestry length distribution across the genome may help identify putative targets of selection in hybridizing populations, providing another source of information in addition to gradients in allele frequencies  used in current approaches \citep[e.g. ][]{Porter1997, Gompert2012}. Specifically, we find that selection against hybrid incompatibility loci changes the extent of correlated ancestry --- that is, 
+
+\yb{We show here that heterogeneous patterns of the ancestry length distribution across the genome may help identify putative targets of selection in hybridizing populations, providing another source of information in addition to gradients in allele frequencies  used in current approaches \citep[e.g.,][]{Porter1997, Gompert2012}. Specifically, we find that selection against hybrid incompatibility loci changes the extent of correlated ancestry --- that is, 
 because selection rapidly removes incompatible alleles from heterospecific genomes, hybrid incompatibilities will be surrounded by disproportionately long ancestry blocks.}
 
 
@@ -185,28 +206,29 @@ as many ancestors of the locally common type as do neutral haplotypes. \alisa{Th
 %\plr{(ecological what?)}
 
 \yb{Because of the well-known problems with spatial coalescence \citep{felsenstein1975pain,barton2002continuous},
-incorporating genetic drift is not straightforward, and we therefore neglect genetic drift in our analytical results.   
-This approach} is common to nearly all studies is the use of the
-reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
-or the discrete analogues \citep{hanson1966effects}. There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,barton2008effect,Polechova2011},
+incorporating genetic drift is not straightforward, and we therefore neglect genetic drift in our analytical results.}
+This approach is common to nearly all theoretical work,
+that study the reaction-diffusion equations that govern the deterministic, high-density limit \citep[as in][]{Nagylaki1975},
+or the discrete analogues \citep{hanson1966effects}. 
+There is substantial work on how clines are affected by genetic drift \citep{Slatkin1975,felsenstein1975genetic,durrett2007width,barton2008effect,Polechova2011},
 and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,Barton1989,Barton1993,Barton2000}.
-\plr{Need to cite Durrett and Cox's stuff here, especially \citet{durrett2007width}.}
-\yb{While we cannot analytically derive expectations for finite populations, our simulation results (below) suggest that genetic drift does not substantially influence our conclusions, perhaps because of the short time-scales that we examine.} \alisa{Our results present a possible approach for identifying genomic regions experiencing selection in hybrid zones.}
+\plr{(why are references to 'barrier to gene flow' in the paragraph on drift? perhaps move to discussion?)}
+While we do not attempt to account for finite population size in our analytic results,
+our simulation results (below) suggest that although genetic drift strongly affects local noisiness of the system,
+it does not substantially influence our conclusions at moderate population densities
+(hundreds within one dispersal distance),
+perhaps because of the short time-scales that we examine.
+\plr{(maybe remove this next sentence? but want to say something about the very low densities we don't examine.)}
+At much lower population densities, local extinction and recolonization are expected to have a stronger effect.
+
+\plr{(nice wrap-up sentence shouldn't be at the end of paragraph on drift:)}
+\alisa{Our results present a possible approach for identifying genomic regions experiencing selection in hybrid zones.}
 
 %\citet{Slatkin1973} pointed out, in a far-reaching general analysis,
 %that while the environment may determine the location of a cline,
 %the fitness of the heterozygote will likely determine the shape of the cline,
 %and \citet{barton1986barrier} show that \alisa{clines under several different forms of selection are similar in shape.}
 %\plr{(What forms of selection?)}
-
-   
-
-
-
-
-
-
-
 
 % YB REMOVED
 %While for much of the genome, gene flow will eventually erase 
@@ -218,13 +240,6 @@ and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,
 %makes it now possible to use patterns of the block length distribution
 %to better understand the processes operating in hybrid zones.
 
-
-
-
-
-
-
-
 % \alisa{
 % Population genetic modeling of hybrid zones has focused largely on the 
 % equilibrium states of clines at selected loci \citep{Nagylaki1975,barton1979dynamics,barton1986barrier,Slatkin1973,Slatkin1975,may1975gene,Haldane1948}.  
@@ -235,10 +250,6 @@ and quantifying the barrier to gene flow caused by clines \citep{barton1979gene,
 % In particular \citet{barton1979gene,barton1986barrier} have described patterns of clinal variation at loci linked to targets of selection.  
 % This provides some expectation for how selection shapes covariance in ancestry at a single locus over geographic space.
 % Our aim here is to extend this to include expectations for how selection shapes covariance in ancestry across the genome.}
-
-
-
-
 
 
 
@@ -1166,7 +1177,9 @@ our model \alisa{provides some rough expectation on how quickly this should happ
 %Doing so requires an understanding of how positive selection shapes ancestry block lengths in these cases. 
 
 \section*{Acknowledgements}
-We thank Graham Coop, Nancy Chen, Emily Josephs, Kristin Lee, Nick Barton and two anonymous reviewers for helpful feedback and suggestions. \alisa{More info here}
+We thank Graham Coop, Nancy Chen, Emily Josephs, Kristin Lee, Nick Barton and two anonymous reviewers for helpful feedback and suggestions.
+PR was supported in part by NSF grant DBI-1262645 and a Sloan Research Fellowship.
+\alisa{More info here}
 
 \bibliographystyle{molecularEcology}
 \bibliography{library,references}
