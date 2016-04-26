@@ -176,11 +176,11 @@ xx = (1:long.params$ndemes)-0.5-long.params$ndemes/2
 
 pdf(file="alleleFrequencies_sim_SIGMA3_Ninds250000_ndemes500_s0.01_tau100.pdf",height=4,width=6,pointsize=10)
 par(mar=c(3.5,3.5,0.5,0.5))
-    matplot(xx, B_long_neu/1000, xlab="", ylab="", type="l", lty=1, col="grey", lwd=0.5, ylim=c(0,1))
+    matplot(xx, B_long_neu[,1:30]/1000, xlab="", ylab="", type="l", lty=1, col="grey", lwd=0.5, ylim=c(0,1))
     for(i in 1:30){
-        matpoints(xx, B_long[,c(i,62-i)]/1000, type="l", col=(rainbow(43))[32-i], lty=1, lwd=0.75 )
+        matlines(xx, B_long[,i]/1000, col=(rainbow(43))[32-i], lty=1, lwd=0.75 )
     }
-    points(xx, B_long[,31]/1000, col="red", lwd=2, type="l" )
+    lines(xx, B_long[,31]/1000, col="red", lwd=2 )
     mtext("Geographic position",side=1,line=2)
     mtext(expression(p[B]),side=2,line=2.5)
     legend("bottomright",legend = c("r=0","r=0.005","r=0.01","r=0.02","r=0.03","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
