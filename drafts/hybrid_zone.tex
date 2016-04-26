@@ -148,12 +148,12 @@ in which long tracts of divergent haplotypes from each ancestral population
 are broken up by historical recombination events,
 forming chromosomal {junctions} in ancestry \citep{Fisher1954, Chapman2002, baird2003distribution}. 
 % Limited opportunities for recombination in recent hybrid zones generates substantial correlations in ancestry (and hence, genotype) between distant markers, and
-These patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,Harris2014,sedghifar2015spatial}.  
+These patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture \citep[e.g.][]{Gravel2012,Hellenthal2014,Harris2013,sedghifar2015spatial}.  
 
 %The mixing of genomes across space, combined with selection, results in the formation of genetic clines. 
 %These patterns have been the traditional focus of both empirical and theoretical studies into hybrid zones. 
 %While here we focus on hybrid zones maintained by selection against hybrids 
--%- \emph{tension zones}, as reviewed in \citet{Barton1985} --  % removed \citet{Bazykin1969}, it's cited later
+%-- \emph{tension zones}, as reviewed in \citet{Barton1985} --  % removed \citet{Bazykin1969}, it's cited later
 %clines may also be due to differential selection across environmental gradients \citep{Haldane1948,fisher1950frequencies,hanson1966effects},
 %% generating \emph{ecotones}.  % I think ecotone means something somewhat different: see Barton & Hewitt 1985, p. 132, for instance
 %Although these are in principle different,  \linelabel{ll:all_clines_are_the_same}
@@ -192,7 +192,7 @@ because selection rapidly removes incompatible alleles from heterospecific genom
 
 Using a combination of theory and simulated hybrid zones, we describe genome-wide patterns of coancestry 
 as they relate to hybrid zone age, genetic distance from selected locus and geographic distance from hybrid zone center. 
-\alisa{We extend the framework presented by \cite{Sedghifar2015} to describe how lineages move across a zone of secondary contact. We consider the influence of selection against heterozygotes at a single locus on the movement of lineages across space, conditioning on the frequencies of the selected allele and allowing lineages to recombine between selected background } (analogous to the structured coalescent applied to selection, as in \citet{hudson1988coalescent}).
+\alisa{We extend the framework presented by \cite{sedghifar2015spatial} to describe how lineages move across a zone of secondary contact. We consider the influence of selection against heterozygotes at a single locus on the movement of lineages across space, conditioning on the frequencies of the selected allele and allowing lineages to recombine between selected background } (analogous to the structured coalescent applied to selection, as in \citet{hudson1988coalescent}).
 %In \citet{sedghifar2015spatial} we described how lineages move across a neutral zone of secondary contact,
 %obtaining predictions for distributions of lengths of blocks of ancestry, which we fit to several datasets.
 %In this work, we extend the same framework to the case of selection against heterozygotes at a single locus,
@@ -485,11 +485,11 @@ If $X_\tau$ is the geographic location of its ancestor $\tau$ generations ago,
 then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$ 
 (as described for a selected allele in equation \eqref{eqn:cline_pde}).
 Following this lineage back in time, the identity of the selected allele that ancestor carried at time $\tau$, $Z_\tau$, 
- jumps between $A$ and $B$ with recombination events between the neutral and selected locus (with frequency $r$), that result in a change in the  selected background.    
+jumps between $A$ and $B$ with recombination events between the neutral and selected locus (with frequency $r$), that result in a change in the  selected background.    
 Thus, by the assumption of locally random assortment of alleles, $Z$ shifts from $A$ to $B$  at rate $r (1-p)$, and $B$ to $A$ at rate $r p$ 
 (see Appendix \ref{apx:lineage_derivation} for a more precise description).}
 
-We can describe this process formally in It\^o notation:
+We can describe this Markov process formally in It\^o notation:
 with $B_\tau$ a standard Brownian motion,
 $T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise for $T_A$,
 \begin{align}
@@ -498,10 +498,12 @@ $T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise f
             \sigma^2 \frac{d}{dx} \log(p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = A \\
              \sigma^2 \frac{d}{dx} \log(1-p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = B 
         \end{cases} \\
-        % \P\{ Z_{\tau+\epsilon} = B \given Z_\tau = A \} &= \epsilon r (1-p(X_\tau,\tau)) + O(\epsilon^2) \\
-        % \P\{ Z_{\tau+\epsilon} = A \given Z_\tau = B \} &= \epsilon r p(X_\tau,\tau) + O(\epsilon^2)  .
-        \P\{ T_B(\tau) &> \tau+u \given Z_\tau = A \} = \exp\left( - r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \right) \\
-        \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
+        \P\{ Z_{\tau+\epsilon} = B \given Z_\tau = A, \; X_\tau=x \} &= \epsilon r (1-p(x,\tau)) + O(\epsilon^2) \\
+        \P\{ Z_{\tau+\epsilon} = A \given Z_\tau = B, \; X_\tau=x \} &= \epsilon r p(x,\tau) + O(\epsilon^2)  .
+        % \P\{ T_B(\tau) &> \tau+u \given Z_\tau = A \} = \exp\left( - r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \right) \\
+        % \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
+        % \E[ T_B(\tau) &> \tau+u \given Z_\tau = A ] = r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \\
+        % \E[ T_A(\tau) &> \tau+u \given Z_\tau = B ] = r \int_\tau^{\tau+u} p(X_s,s) ds .
     \end{aligned}
 \end{align}
 In the first expression, giving the distribution of how the lineage location changes,
@@ -510,16 +512,22 @@ and the second is the mean displacement, which moves the lineage ``downhill'' to
 depending on which selected allele the lineage is linked to.
 (In two dimensions, $d/dx$ is replaced by the gradient.)
 \plr{
-The second expression gives the probability that a lineage on the $A$ background at time $\tau$
-does not switch to the $B$ background across $u$ generations,
-i.e., the probability that there was no recombination between the lineage and the selected site in those $u$ generations.
-Since the rate of recombination between the two is $r$,
-and the probability the lineage is in a heterozygote at time $s$ 
-is equal to the local proportion of $B$ alleles, $1-p(X_s,s)$,
-the mean number of recombinations in heterozygotes across that time period is $r \int_\tau^{\tau+u} (1-p(X_s,s)) ds$;
-assuming recombinations are Poisson, the probability of no such recombinations is the expression given.
-The third expression is the same, except for switching $B$ to $A$.
+The second expression says that the probability a lineage on the $A$ background at $x$
+recombines onto the $B$ background
+is equal to the recombination rate, $r$, multiplied by the local proportion of $B$ alleles, $(1-p(x,\tau))$,
+per generation.
 }
+% \plr{
+% The second expression gives the probability that a lineage on the $A$ background at time $\tau$
+% does not switch to the $B$ background across $u$ generations,
+% i.e., the probability that there was no recombination between the lineage and the selected site in those $u$ generations.
+% Since the rate of recombination between the two is $r$,
+% and the probability the lineage is in a heterozygote at time $s$ 
+% is equal to the local proportion of $B$ alleles, $1-p(X_s,s)$,
+% the mean number of recombinations in heterozygotes across that time period is $r \int_\tau^{\tau+u} (1-p(X_s,s)) ds$;
+% assuming recombinations are Poisson, the probability of no such recombinations is the expression given.
+% The third expression is the same, except for switching $B$ to $A$.
+% }
 % gives the rate at which a lineage switches from an $A$ to $B$ background as a result of recombination,
 % which occurs at rate $r$ multiplied by the local proportion of $B$ alleles, which is $(1-p)$.
 % The third expression is the corresponding rate for switching from $B$ to $A$.
