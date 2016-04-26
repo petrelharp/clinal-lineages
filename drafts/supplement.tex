@@ -74,7 +74,7 @@
     Each line represents a locus some distance $r$ away from the true target of selection with colors corresponding to different values of $r$, transitioning from red (tight linkage to selected site) to blue (distantly linked).
     Grey lines represent the same positions from a simulation with
     identical parameters except that $s=0$. 
-    Corresponding theoretical quantities are shown juxtaposed in Figure \ref{sfig:alleleFreq_tau100_comparison};
+    Corresponding theoretical quantities are shown juxtaposed in Figure \ref{fig:alleleFreq_tau100_comparison};
     the same plot is shown with weaker selection in Figure \ref{alleleFreq_tau100_weaker_s} and at a longer time in Figure \ref{alleleFreq_tau1000}.
 }\label{alleleFreq_tau100}
 \end{figure}
@@ -122,7 +122,7 @@
     \includegraphics{{figs/simulation_SIGMA1_Ninds25000_ndemes50_s0.01_tau1000_blocksAlongChromAncBConditioning_nonnormalized}.pdf}
     \caption{
         \textbf{Mean haplotype lengths of $B$ haplotypes}, $l_B(x,m)$,
-        across the genome (horizontal axis) and at differntial spatial locations (colored lines),
+        across the genome (horizontal axis) and at different spatial locations (colored lines),
         from a simulation with 50 demes having 500 individuals each, $s=0.01$, $\sigma=1$, and after $T=1000$ generations.
     } \label{sfig:blocksAlongChromAncBConditioning_nonnormalized}
 \end{figure}
@@ -141,7 +141,7 @@
 \begin{figure}
 \includegraphics{figs/blocksAlongChromAncBConditioning.pdf}
 \caption{
-    \textbf{Normalized mean enclosing block length}, $l_B(m,x)$, after $T=1000$ generations,
+    \textbf{Normalized mean enclosing block length}, $\bar l_B(m,x)$, after $T=1000$ generations,
     against position relative to the selected locus (horizontal axis)
     located in the center of a 1M chromosome.
     Each line shows the mean block length at that spatial and genomic position
@@ -179,13 +179,13 @@
 
 \begin{figure}
 \includegraphics{figs/ratioAdjacentBlocksAlongChromAncBConditioning.pdf}
-\caption{Ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and adjacent block lengths across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme.}\label{Supp:ratioBlockAdjacent}
+    \caption{The statistic $\bar C(m,x)$: the ratio $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ of mean block length and mean adjacent block lengths across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$).  Each line represents a deme and is normalized by mean block length across the chromosome in the deme.}\label{Supp:ratioBlockAdjacent}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics{figs/ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf}
-\caption{Heatmap of $\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$). }\label{Supp:ratioBlockAdjacentHeatmap}
+    \caption{Heatmap of $C(m,x)=\frac{2\sum{l_B(m_i)}}{\sum{l_A(m_i-)+I_A(m_i+)}}$ across a simulated chromosome with a single underdominant site and conditioning on ancestry $B$ at the selected site ($s=0.01, T=1000$). }\label{Supp:ratioBlockAdjacentHeatmap}
 \end{figure}
 
 

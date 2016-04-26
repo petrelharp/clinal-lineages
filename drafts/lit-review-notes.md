@@ -64,7 +64,7 @@ Other:
     - show that the interface spreads out by diffusion in the neutral case
 
 * durrett2007 and Zahle, "On the width of hybrid zones"
-    - study the cline in an environmental step cline, showing its
+    - study the cline in an environmental step cline, showing (in low population density) it's
     - of width 1/s in d=1
     - of width sqrt( log(1/s) / s ) in d=2
     - of width 1/sqrt(s) in d>2

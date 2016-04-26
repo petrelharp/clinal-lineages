@@ -115,7 +115,8 @@ However, there is some approximation here, and the approach will fail if $\sigma
 \end{point}
 
 \reply
-There might be some confusion about our use of the floor function, which we now explicitly explain.
+There might have been some confusion about our use of the floor function?
+We now describe the dispersal distribution in a more straightforward way \revref.
 It's a good point more generally that if $\sigma$ is smaller than the deme spacing this scheme won't get dispersal with $\sigma$ close to the $\sigma$ that we plug into the Gaussian;
 it's for this reason that we compute numerically what $\sigma$ actually is when comparing simulation to theory.
 
@@ -192,6 +193,8 @@ as for instance the intuitive discussion at \llname{ll:discussion_summary},
 which mostly derives from the analytical model.
 To aid our readers in developing this understanding, we have gone through considerable pains to map terms in our equations to the biological processes of migration, selection and recombination. 
 We believe that our efforts will help build a better mechanistic understanding in our readers in addition to making them aware of our results.
+
+Furthermore, as noted at \llname{ll:ld_comps}, the equations can be used to generate expectations for LD much more efficiently than forward-time simulation.
 
 \begin{point}{}
     While reading the manuscript, I found it difficult to distinguish the most important observations from more tangential observations. The manuscript reads like a long list of observations, and would benefit from more focus on the main findings and more structure.
@@ -293,10 +296,8 @@ Reference issues
 \alisa{Our hope was that the simulations and theory would provide qualitative support for one another. Some predictions made by the theory e.g. time and spatial scales do seem to correspond. We will try to do a better job of signposting our unique contributions??}
 
 The rescaling arguments we provide  are of a standard sort in the literature;
-we've inserted comments to this effect, at \llname{ll:rescaling} \plr{and elsewhere?}.
-\plr{cite \citet{may1975gene} for the time-scaling}
+we've inserted comments to this effect, at \llname{ll:rescaling} and \llname{ll:may_citation}.
 
-\plr{alisa to see if we can add any more from what we've done}
 
 \begin{point}{}
     The authors also aim to characterize the movement of the genomic block that contains a selected locus through a hybrid zone. Yet, the size of the simulated habitat barely covers the cline width, and the simulation results may be sensitive to the boundaries.
@@ -342,7 +343,10 @@ Total population size is irrelevant when predicting the effects of genetic drift
 \end{point}
 
 \reply
-\yb{Thanks for spotting this. Because we do nothing quantitative with respect to drift here, we simply state the our observed wobble of the center of the tension zone is consistent with previous theory. However, more broadly throughout the manuscript we are not sure about  relying on $N \sigma \sqrt{s}$ as we are concerned with loci linked to the selected site, and we are not aware of results extending this rule to an unlinked locus.}
+\plr{We meant that the allele frequencies in the \emph{entire population} had shifted, which is determined by the total (effective) population size.  
+However, we decied to }
+% \yb{Thanks for spotting this. Because we do nothing quantitative with respect to drift here, we}
+\yb{simply state the our observed wobble of the center of the tension zone is consistent with previous theory. However, more broadly throughout the manuscript we are not sure about relying on $N \sigma \sqrt{s}$ as we are concerned with loci linked to the selected site, and we are not aware of results extending this rule to an unlinked locus.}
 \plr{(Do you mean "linked locus"?)}
 %\alisa{We are concerned here with linked loci, so the $N\sigma\sqrt{s}$ rule of thumb does not necessarily apply here? Also, within demes, population size is much smaller (500?)}
 %\plr{I agree: they are probably thinking of selected loci, not linked ones. We're talking about global drift not local drift. Yaniv to investigate.}
@@ -352,7 +356,8 @@ Total population size is irrelevant when predicting the effects of genetic drift
 \end{point}
 
 \reply
-\plr{see above}
+As noted above, we have provided some citations to similar arguments in the literature
+(although such arguments are often used without citation; see, for instance, \citet{durrett2007width}).
 
 \begin{point}{\revref}
  I think the sentence about the maximum length of the enclosing haplotype, $\sigma \sqrt{s} / x$ is mis-phrased: presumably this should be a statement on the distribution (expected size?) of the introgressing block length at distance $x$, as a lucky block can travel many sigmas in one generation?
@@ -366,8 +371,9 @@ Good point, it was meant to be a statement about an order of magnitude bound to 
 \end{point}
 
 \reply
-\plr{see above; add something to discussion.}
+We now have much more discussion about drift, in particular at \revref.
 
+\plr{I don't understand this:}
 \alisa{We should add a line or two in the discussion about drift. However, IBD is perhaps not relevant over the timescales we are considering and is not necessarily ancestry informative, and since we are not interested in the equilibrium state, it is not clear that we need to worry about this limit. }
 
 \begin{point}{rates at \revref, e.g. Eq. (7,8):}
