@@ -16,9 +16,9 @@ get_simparams <- function (fname) {
 }
 
 
-# positions = seq(0.2,0.8,0.01)
+positions = seq(0.2,0.8,0.01)
 # positions = seq(0.48,0.52,0.001)
-positions = c(0,0.01,0.02,0.05,0.1,0.2,0.3)
+# positions = c(0,0.01,0.02,0.05,0.1,0.2,0.3)
 #cols = c(2,3,6,11,21,31)
 
 sel.sim.file <- "../../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums.Robj"
@@ -56,6 +56,12 @@ if (!file.exists("plot_frequency_clines_revision.Robj")) {
             CHR=1, 
             ndemes=neu.params$ndemes)
 
+    save(B_freq, B_neu, file="plot_frequency_clines_revision.Robj")
+} else {
+    load("plot_frequency_clines_revision.Robj")
+}
+
+if (!file.exists("plot_frequency_clines_long_revision.Robj")) {
 
     load(long.sim.file)
     # get frequencies for simulation on wider range
@@ -75,9 +81,9 @@ if (!file.exists("plot_frequency_clines_revision.Robj")) {
 
 
 
-    save(B_freq, B_neu, B_long, B_long_neu, file="plot_frequency_clines_revision.Robj")
+    save(B_long, B_long_neu, file="plot_frequency_clines_long_revision.Robj")
 } else {
-    load("plot_frequency_clines_revision.Robj")
+    load("plot_frequency_clines_long_revision.Robj")
 }
 
 
@@ -170,11 +176,11 @@ xx = (1:long.params$ndemes)-0.5-long.params$ndemes/2
 
 pdf(file="alleleFrequencies_sim_SIGMA3_Ninds250000_ndemes500_s0.01_tau100.pdf",height=4,width=6,pointsize=10)
 par(mar=c(3.5,3.5,0.5,0.5))
-    matplot(xx, 1-B_long_neu/1000, xlab="", ylab="", type="l", lty=1, col="grey", lwd=0.5, ylim=c(0,1))
+    matplot(xx, B_long_neu[,1:30]/1000, xlab="", ylab="", type="l", lty=1, col="grey", lwd=0.5, ylim=c(0,1))
     for(i in 1:30){
-        matpoints(xx, 1-B_long[,c(i,62-i)]/1000, type="l", col=(rainbow(43))[32-i], lty=1, lwd=0.75 )
+        matlines(xx, B_long[,i]/1000, col=(rainbow(43))[32-i], lty=1, lwd=0.75 )
     }
-    points(xx, 1-B_long[,31]/1000, col="red", lwd=2, type="l" )
+    lines(xx, B_long[,31]/1000, col="red", lwd=2 )
     mtext("Geographic position",side=1,line=2)
     mtext(expression(p[B]),side=2,line=2.5)
     legend("bottomright",legend = c("r=0","r=0.005","r=0.01","r=0.02","r=0.03","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
