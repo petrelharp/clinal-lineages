@@ -467,8 +467,8 @@ $T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise f
             \sigma^2 \frac{d}{dx} \log(p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = A \\
              \sigma^2 \frac{d}{dx} \log(1-p(X_\tau,\tau)) d\tau \qquad & \text{if } Z_\tau = B 
         \end{cases} \\
-        \P\{ Z_{\tau+\epsilon} = B \given Z_\tau = A, \; X_\tau=x \} &= \epsilon r (1-p(x,\tau)) + O(\epsilon^2) \\
-        \P\{ Z_{\tau+\epsilon} = A \given Z_\tau = B, \; X_\tau=x \} &= \epsilon r p(x,\tau) + O(\epsilon^2)  .
+        \P\{ Z_{\tau+\epsilon} = B &\given Z_\tau = A, \; X_\tau=x \} = \epsilon r (1-p(x,\tau)) + O(\epsilon^2) \\
+        \P\{ Z_{\tau+\epsilon} = A &\given Z_\tau = B, \; X_\tau=x \} = \epsilon r p(x,\tau) + O(\epsilon^2)  .
         % \P\{ T_B(\tau) &> \tau+u \given Z_\tau = A \} = \exp\left( - r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \right) \\
         % \P\{ T_A(\tau) &> \tau+u \given Z_\tau = B \} = \exp\left( - r \int_\tau^{\tau+u} p(X_s,s) ds \right) .
         % \E[ T_B(\tau) &> \tau+u \given Z_\tau = A ] = r \int_\tau^{\tau+u} (1-p(X_s,s)) ds \\
