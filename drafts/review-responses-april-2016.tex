@@ -324,11 +324,16 @@ Overall, this MS presents some interesting insights, and the formalization of th
 
 \reply
 Although most of the simulations shown in the main text have high population densities,
-we have run simulations with considerably lower densities, 
+we have run simulations with lower densities, 
 as shown for instance in figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau320_comparison}, and \ref{sfig:condAlleleFreq_tau1280_comparison}.
 Demes are never empty for very large populations, but
 we did encounter empty demes in some simulations with smaller population sizes.
-\plr{add reference to more low pop density figures if added}
+We don't examine the parameter regime with neighborhood size on the order of ten individuals,
+where we expect different dynamics to be at play,
+and have a note to this effect \llname{ll:much_lower_densities}.
+
+As for the width of the range, we had indeed also run additional simulations (and numerical solutions) on wider ranges to check for boundary effects;
+we now have a note to this effect at \llname{ll:narrow_sims}.
 
 \begin{point}{Figure 3:}
 What are the replicate lines for the same $r$? Why re the lines for $r = 0$ all slightly displaced to the right? Also, it would appear that the color scheme in associated Figure S2 (bottom) is mismatched with the legend, shifted to the red part of the spectrum. After fixing this, I think that the Figure S2 should be in the main text instead of Fig. 3.
