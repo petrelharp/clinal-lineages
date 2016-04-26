@@ -1,10 +1,10 @@
 
-source("../sims/sim-fns.R",chdir=TRUE)
+source("../../sims/sim-fns.R",chdir=TRUE)
 library(ReacTran)
 library(Matrix)
-source("../notes/tran.1D.R",chdir=TRUE) # fix for log.A
-source("../notes/cline-fns.R",chdir=TRUE)
-source("../sims/chunks_fns.R",chdir=TRUE)
+source("../../notes/tran.1D.R",chdir=TRUE) # fix for log.A
+source("../../notes/cline-fns.R",chdir=TRUE)
+source("../../sims/chunks_fns.R",chdir=TRUE)
 
 
 ###
@@ -16,16 +16,19 @@ get_simparams <- function (fname) {
 }
 
 
-positions = seq(0.2,0.8,0.01)
-positions = seq(0.48,0.52,0.001)
+# positions = seq(0.2,0.8,0.01)
+# positions = seq(0.48,0.52,0.001)
 positions = c(0,0.01,0.02,0.05,0.1,0.2,0.3)
 #cols = c(2,3,6,11,21,31)
 
-sel.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums.Robj"
+sel.sim.file <- "../../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau100_run2016-01-11_simsums.Robj"
 sel.params <- get_simparams( sel.sim.file )
 
-neutral.sim.file <- "../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0_tau100_run2016-01-15_simsums.Robj"
+neutral.sim.file <- "../../../sims/simulation_SIGMA1_Ninds25000_ndemes50_s0_tau100_run2016-01-15_simsums.Robj"
 neu.params <- get_simparams( neutral.sim.file )
+
+long.sim.file <- "../../../sims/simulation_SIGMA3_Ninds250000_ndemes500_s0.01_dir/tau100_dir/results_runid_552675_simsums.Robj"
+long.params <- get_simparams(long.sim.file)
 
 if (!file.exists("plot_frequency_clines_revision.Robj")) {
     load(sel.sim.file)
@@ -53,7 +56,26 @@ if (!file.exists("plot_frequency_clines_revision.Robj")) {
             CHR=1, 
             ndemes=neu.params$ndemes)
 
-    save(B_freq, B_neu, file="plot_frequency_clines_revision.Robj")
+
+    load(long.sim.file)
+    # get frequencies for simulation on wider range
+    demeID = rep(1:long.params$ndemes, each=long.params$ninds/long.params$ndemes)
+    B_long = get.ancestry.freqs(
+            IND_DATA=sims.sums[[1]]$ind.ancest, 
+            demeID=demeID, 
+            VECTOR_OF_POS=0.5-positions, 
+            CHR=1, 
+            ndemes=long.params$ndemes)
+    B_long_neu = get.ancestry.freqs(
+            IND_DATA=sims.sums[[1]]$ind.ancest, 
+            demeID=demeID, 
+            VECTOR_OF_POS=0.5-positions, 
+            CHR=2, 
+            ndemes=long.params$ndemes)
+
+
+
+    save(B_freq, B_neu, B_long, B_long_neu, file="plot_frequency_clines_revision.Robj")
 } else {
     load("plot_frequency_clines_revision.Robj")
 }
@@ -139,5 +161,22 @@ COLORS=c("red",rainbow(43)[c(2,3,6,11,21,31)])
 
     legend("bottomright",legend = c("r=0.01","r=0.05","r=0.1","r=0.2","r=0.3","no seln."),col=c(COLORS[c(2,4,5,6,7)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
 
+dev.off()
+
+###
+## longer region
+
+xx = (1:long.params$ndemes)-0.5-long.params$ndemes/2
+
+pdf(file="alleleFrequencies_sim_SIGMA3_Ninds250000_ndemes500_s0.01_tau100.pdf",height=4,width=6,pointsize=10)
+par(mar=c(3.5,3.5,0.5,0.5))
+    matplot(xx, 1-B_long_neu/1000, xlab="", ylab="", type="l", lty=1, col="grey", lwd=0.5, ylim=c(0,1))
+    for(i in 1:30){
+        matpoints(xx, 1-B_long[,c(i,62-i)]/1000, type="l", col=(rainbow(43))[32-i], lty=1, lwd=0.75 )
+    }
+    points(xx, 1-B_long[,31]/1000, col="red", lwd=2, type="l" )
+    mtext("Geographic position",side=1,line=2)
+    mtext(expression(p[B]),side=2,line=2.5)
+    legend("bottomright",legend = c("r=0","r=0.005","r=0.01","r=0.02","r=0.03","no seln."),col=c("red",rainbow(43)[c(6,11,21,31)],"darkgrey"),lwd=c(2,rep(0.75,4),0.5),cex=0.8)
 dev.off()
 
