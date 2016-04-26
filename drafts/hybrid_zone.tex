@@ -145,7 +145,7 @@ in which long tracts of divergent haplotypes from each ancestral population
 are broken up by historical recombination events,
 forming chromosomal {junctions} in ancestry \citep{Fisher1954, Chapman2002, baird2003distribution}. 
 These patterns of correlated ancestry in admixed populations have been previously used to infer histories of hybridization and admixture 
-\citep[e.g.][]{Gravel2012,Hellenthal2014,Harris2013,sedghifar2015spatial}.
+\citep[e.g.,][]{Gravel2012,Hellenthal2014,Harris2013,sedghifar2015spatial}.
 
 %The distribution of ancestry tract length in admixed or hybridizing populations has been used to infer the extent of hybridization and timing of secondary contact both in single populations and in hybrid zones \citep{Price2009, Gravel2012,sedghifar2015spatial}. In addition to allowing researchers to interpret non-equilibrium patterns of diversity in hybrid zones, 
 %the length distribution of ancestry tracts could reveal the impact of ongoing selection on the mixing of ancestral genomes. %and, consequently, the maintenance of species distinctness. 
@@ -245,10 +245,8 @@ at this locus, there are two alleles, one corresponding to each of the ancestral
 Individuals who are heterozygous at this locus produce on average $1-s$ times as many offspring than either homozygote.
 Although most selection in hybrid zones is likely more complex than this simple situation, 
 previous work has shown that such models generate clines that are very similar to models of ecological selection or epistatic systems \citep{Kruuk1999,barton2000epistasis}, 
-\yb{because selection on an allele depends on its marginal effect on fitness.  }
-Exceptionally strong epistatic selection which acts more quickly than free recombination may therefore, yield results that differ slightly from ours. 
-Likewise, while we do not model ecological selection, theoretical and simulation studies show that clines formed by underdominant selection and extrinsic selection are effectively indistinguishable without additional information \citep{may1975gene,Barton1993,Kruuk1999}, especially over short time scales \citep{Barton1979a}, \linelabel{ll:all_clines_are_the_same}
-with their shape determined mostly by the mean fitness of the heterozygote \citep{Slatkin1973}. 
+because selection on an allele depends on its marginal effect on fitness.
+(More discussion of this point in the Discussion.) \linelabel{ll:all_clines_are_the_same}
 
 
 
@@ -280,8 +278,7 @@ a key factor in these models is the density and fecundity of heterozygotes.
     At the time of sampling ($\tau=0$), the segment contains the $B$ allele at the selected locus.
     Paths traced by lineages across space are depicted by blue and yellow lines. 
     Branching events occur when there was a recombination event within the sampled segment.
-    The \alisa{rightmost} blue line represents the path of the selected locus. 
-   % \plr{(All lines look the same width: no thick and thin.)}
+    The rightmost blue line represents the path of the selected locus. 
     The colors of the other paths indicate the identity at the linked selected locus 
     (blue: linked to allele $B$; yellow: linked to allele $A$). 
     The center of the hybrid zone is at geographic position $x=0$; in the region $x<0$, ancestry $B$ is less common,
@@ -312,7 +309,7 @@ the two alleles at the selected locus will form a stable cline,
 affecting neighboring loci as well \citep{barton1979gene, barton1986barrier}.
 First, we turn our attention to how the cline at the selected locus itself is formed.
 %% we don't need to cite these here, since we cite Bazykin for the equation
-% \alisa{Equations describing the forward-time establishment of the cline have been previously described \cite[e.g.][]{Slatkin1973,may1975gene,Nagylaki1975}}
+% \alisa{Equations describing the forward-time establishment of the cline have been previously described \cite[e.g.,][]{Slatkin1973,may1975gene,Nagylaki1975}}
 Write $p(x,t)$ for the frequency of the $A$ allele at spatial location $x$ and time $t$.  
 Suppose that secondary contact occurred at time $t=0$, 
 and the $A$ allele is initially fixed on the left, so
@@ -329,17 +326,16 @@ and (iii) population density is large,
 then as in \citet{Bazykin1969},
 the commonly-used equation that $p$ approximately solves is
 \begin{align} \label{eqn:cline_pde}
-    \frac{d}{dt} p = \frac{\sigma^2}{2} \frac{d^2}{dx^2} p +  2 p (1-p)  \times s (\frac{p}{2} - 1), %YB Rearranged this equation to allow for cleaner description
+    \frac{d}{dt} p = \frac{\sigma^2}{2} \frac{d^2}{dx^2} p +  2 p (1-p)  \times s (\frac{p}{2} - 1).
     %    \frac{d}{dt} p = \frac{\sigma^2}{2} \frac{d}{dx^2} p + s p (1-p) (2p-1) ,
 \end{align}
-where $ \frac{d}{dt} p$ is the local rate of change of the frequency of $A$.
+Here the frequency $p=p(x,t)$ varies across time and space,
+and so $ \frac{d}{dt} p$ is the local rate of change of the frequency of $A$.
 The first term, $\frac{\sigma^2}{2} \frac{d^2}{dx^2} p$, describes the net rate at which $A$ alleles arrive by local dispersal.
 The second term % ,  $2 p (1-p)  s (p/2-1)$,  % only need this term in the sentence once?
-describes the impact of selection on local allele frequency as the product of local genotypic variance, 
-$2 p (1-p)$, and selection on allele $A$, $s (p/2-1)$. 
-\plr{ I don't think 'genotypic variance' is the right interpretation?  Let me try again: 
-The second term is the product of the local frequency of heterozygotes, $2p(1-p)$,
-and the strength of selection on allele $A$, $s (p/2-1)$.  }
+describes the impact of selection on local allele frequency as the product of local genotypic variance, $2p(1-p)$
+(equivalently, the local frequency of heterozygotes), 
+and selection on allele $A$, $s (p/2-1)$. 
 The term $s (p/2-1)$ describes underdominance -- $A$ is favored when common ($p>1/2$) and disfavored when rare ($p<1/2$).
 %YB: Pardon the extreme changes here, I tried to make things more obvious to a biologist
 %and a logistic term proportional to the difference in reproductive rate between $A$ and $a$ alleles
@@ -360,7 +356,7 @@ $\lim_{t \to \infty} p(x,t) = (1+\tanh(-2x\sqrt{s}/\sigma))/2$ \citep{Bazykin196
 This relies on several approximations, but the general conclusions should be quite robust: 
 the stable cline has width of order $\sigma/\sqrt{s}$, and decays exponentially. 
 
-As noted by others \citep[e.g.][]{Slatkin1973,may1975gene}, \linelabel{ll:rescaling}
+As noted by others \citep[e.g.,][]{Slatkin1973,may1975gene}, \linelabel{ll:rescaling}
 rescaling space and time by $\sigma/\sqrt{s}$ and $1/s$ respectively in equation \eqref{eqn:cline_pde} 
 results in a dimensionless equation,
 implying that the cline establishes over a timescale of the order $1/s$. 
@@ -373,8 +369,8 @@ For simplicity we mostly work with one-dimensional clines,
 but the mathematics applies as well to two-dimensional systems with some modifications:
 for instance, if the hybrid zone is a straight line, 
 the description above applies to motion of a lineage transverse to the hybrid zone.  \revpoint{AE}{4}
-In this case, $d^2/dx^2$ should be replaced by the Laplacian operator,
-and $d/dx$ by the gradient.
+In this case, $d^2/dx^2$ should be replaced by the Laplacian operator.
+% and $d/dx$ by the gradient.
 In fact, if the landscape is heterogeneous or dispersal is non-Gaussian,
 the theory still holds replacing the Laplacian by the appropriate operator.
 Note, however, that with low population densities, 
@@ -398,11 +394,11 @@ but biased towards locations where the selected allele they carry is at higher f
 
 Making the same assumptions as for equation \eqref{eqn:cline_pde}, the derivation in Appendix \ref{apx:lineage_derivation} shows 
 that the lineage of an $A$ allele at position $x$ moves as Brownian motion driven by dispersal
-with mean displacement proportional to the derivative of $\log p$.
+with mean displacement proportional to the spatial derivative of $\log p$.
 This has the effect of pulling $A$ lineages towards regions where they are more common, i.e., the left side of the range.   
 % with speed $\sigma$
 % with bias $\sigma^2 \grad \log p(x,t)$, where $\grad$ is the gradient
-(the analogous physical system is a particle that moves at speed $\sigma^2$ in the potential $-\log p$). 
+(The analogous physical system is a particle that moves at speed $\sigma^2$ in the potential $-\log p$). 
 %\alisa{What does potential here mean?}
 %\plr{(It means like a gravity well.  Clear now that it says ``particle''?)}
 To see why this is true, note that the probability that the parent of an $A$ allele found at $x$
@@ -431,7 +427,7 @@ which depends only on $\sigma/\sqrt{s}$.
 Here we see that lineages with $\sigma=10$ and $s=.16$ move much faster
 than lineages with $\sigma=1$ and $s=.0016$,
 reflecting strong differences in selection against heterozygotes,
-even though the stable clines have the same form, and therefore have additional information about the hybrid zone.
+even though the stable clines have the same form.
 Even though a rescaling of space and time as described above can make the models equivalent,
 this difference in lineage speed can be seen through the action of recombination, which we explore next.
 \revpoint{AE}{3}
@@ -447,20 +443,21 @@ However, with sufficient time in the hybrid zone, recombination allows this link
 to have been inherited from a $B$-carrying individual,
 whose ancestors will tend to be more from the right.
 
-\yb{Suppose we sample an allele today $r$ Morgans from the selected site, and  
+Suppose we sample an allele today $r$ Morgans from the selected site, and  
 follow its lineage back through time, using $\tau$ to denote ``generations ago''
 (reserving $t$ for time measured in the forward direction).
 If $X_\tau$ is the geographic location of its ancestor $\tau$ generations ago,
 then we say that $X$ moves as a diffusion pushed by either $\log(p)$ or $\log(1-p)$ 
-(as described for a selected allele in equation \eqref{eqn:cline_pde}).
+(as described for a selected allele in the previous section).
 Following this lineage back in time, the identity of the selected allele that ancestor carried at time $\tau$, $Z_\tau$, 
-jumps between $A$ and $B$ with recombination events between the neutral and selected locus (with frequency $r$), that result in a change in the  selected background.    
+jumps between $A$ and $B$ with each recombination event that occurs between the focal locus and the selected locus (with frequency $r$), 
+that results in a change in the  selected background.    
 Thus, by the assumption of locally random assortment of alleles, $Z$ shifts from $A$ to $B$  at rate $r (1-p)$, and $B$ to $A$ at rate $r p$ 
-(see Appendix \ref{apx:lineage_derivation} for a more precise description).}
+(see Appendix \ref{apx:lineage_derivation} for a more precise description).
 
 We can describe this Markov process formally in It\^o notation:
 with $B_\tau$ a standard Brownian motion,
-$T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise for $T_A$,
+$T_B(\tau)$ the most recent time before $\tau$ that $Z_\tau = B$, and likewise for $T_A(\tau)$,
 \begin{align}
     \begin{aligned} \label{eqn:lineage_motion}
         dX_\tau &= \sigma dB_\tau + \begin{cases}
@@ -480,12 +477,10 @@ the first term ($\sigma dB_\tau$) is Brownian noise driven by dispersal,
 and the second is the mean displacement, which moves the lineage ``downhill'' towards its selected allele's ancestral range on either $-\log p$ or $-\log (1-p)$,
 depending on which selected allele the lineage is linked to.
 (In two dimensions, $d/dx$ is replaced by the gradient.)
-\plr{
 The second expression says that the probability a lineage on the $A$ background at $x$
 recombines onto the $B$ background
 is equal to the recombination rate, $r$, multiplied by the local proportion of $B$ alleles, $(1-p(x,\tau))$,
 per generation.
-}
 % \plr{
 % The second expression gives the probability that a lineage on the $A$ background at time $\tau$
 % does not switch to the $B$ background across $u$ generations,
@@ -564,17 +559,28 @@ The three terms in these equations come from Brownian movement of a linages
 (i.e., the smoothing action of local dispersal),
 the tendency of a lineage to inherit from regions where its type is more common 
 (i.e., the net flux induced by reduced fitness in the hybrid zone),
-and recombination between selected backgrounds, respectively. \alisa{I think the first and second terms may have been switched??}
-\yb{We note that because recombination occurs within a deme, the recombination terms in equation \eqref{eqn:q_pde} are quite standard \citep{HartlClark}.} \revpoint{1}{4}
+and recombination between selected backgrounds, respectively.
+We note that because recombination occurs within a deme, the recombination terms in equation \eqref{eqn:q_pde} are quite standard \citep{HartlClark}. \revpoint{1}{4}
 %\alisa{this is fwd-in-time notation. should we change it to bwd-in-time?}
 %\plr{This equation should be forwards in time, since it's the Kolmogorov backward equation
 %applied to a backwards-time process!}
 
 We will have more use for the differential operators on the right-hand sides of these equations,
 so define these as
-$G^A = \sigma^2 \frac{d}{dx} \log(p(x,t)) \cdot \frac{d}{dx} + (\sigma^2/2) \frac{d}{dx^2}$
+$
+G^A = 
+(\sigma^2/2) \frac{d}{dx^2}
++ 
+\sigma^2 \frac{d}{dx} \log(p(x,t)) \cdot \frac{d}{dx} 
+$
 and
-$G^B = \sigma^2 \frac{d}{dx} \log(1-p(x,t)) \cdot \frac{d}{dx} + (\sigma^2/2) \frac{d}{dx^2}$,
+$
+G^B = 
+(\sigma^2/2) \frac{d}{dx^2}
++ 
+\sigma^2 \frac{d}{dx} \log(1-p(x,t)) \cdot \frac{d}{dx} 
+$
+,
 so that equation \eqref{eqn:q_pde} can be written more compactly as
 \begin{align*}
     \frac{d}{dt} q_A &= G^A q_A + r (1-p) (q_B-q_A) \\
@@ -620,7 +626,7 @@ The lineage of a segment of genome moves as a linked locus described in equation
 with recombination distance $r$ equal to the rate at which the segment recombines away from the selected site.
 (If the selected site lies inside the segment, $r=0$.)
 Additionally, at rate equal to the genetic length of the segment,
-recombination occurs, at which point the segment splits in two at a uniformly chosen location between $a$ and $b$,
+recombination occurs within the segment, at which point it splits in two at a uniformly chosen location between $a$ and $b$,
 each of which proceeds as before, independently. 
 In this description,
 $g_z(x,T;a,b)$ is then the probability that all branches are found on the $A$ side of the hybrid zone
@@ -649,17 +655,19 @@ which is written (omitting the $(x,t)$ for conciseness):
 \end{align}
 Here the first term ($G^A g_A$) represents spatial mixing,
 and the second term results from recombinations \emph{between} the block and the selected site 
-in heterozygotes, which switch the identity of the linked, selected locus \alisa{without splitting the block}
+in heterozygotes, which switch the identity of the linked, selected locus without splitting the block
 (the factor $(1-p)$ is the probability that the block, initially linked to an $A$ allele, encounters a $B$ allele
 under the assumption of locally random mating).
-In the integrals, $\theta$ is the genomic position of the recombination event occuring \emph{inside} the block.
+In the integrals, $\theta$ is the genomic position of the recombination event.
 The third term accounts for such recombinations in a heterozygote: 
 the portion of the block nearest the selected site remains linked to an $A$ allele, 
-and the remaining portion becomes linked to a $B$ allele (as is the case in the most recent recombination event shown in Fig.~\ref{Fig:schematic}).
+and the remaining portion becomes linked to a $B$ allele 
+(e.g., the lower recombination event shown in Fig.~\ref{Fig:schematic}).
 To account for cases where the selected locus lies outside the interval [a,b],
 we say that the integral $\int_a^{\min(0,b)}$ is zero if  $a>0$ 
 and likewise $\int_{\max(0,a)}^b$ is zero if $b<0$.
-The last integral results from recombination inside the block in homozygotes for $A$ (as is the case for the second recombination event in Fig.~\ref{Fig:schematic}),
+The last integral results from recombination inside the block in homozygotes for $A$ 
+(e.g., the upper recombination event in Fig.~\ref{Fig:schematic}),
 and the final term balances the outflux due to all recombinations.
 The equation for $g_B(x,t;a,b)$ is identical after exchanging $A \leftrightarrow B$ and
 $p \leftrightarrow (1-p)$.
@@ -669,7 +677,7 @@ The boundary conditions are $g_A(x,0;a,b)=1$ and $g_B(x,0;a,b)=0$.
 Notice that equations \eqref{eqn:g_pde}
 are hierarchical in $(a,b)$:
 the equation for haplotype identity probabilities on a segment $(a,b)$ depends only on those probabilities for segments contained in $(a,b)$.
-This allows for numerical solutions, %`efficient` may be an overstatement
+This is useful for numerical solutions, %`efficient` may be an overstatement
 described in more detail in Appendix \ref{apx:haplotype_calcs}.
 
 
@@ -696,7 +704,7 @@ then dispersing to the nearest deme. \revpoint{AE}{5}
 % where $Z$ is a Gaussian random variable with mean zero and variance $\sigma^2$.
 % (Here $\lfloor z \rfloor$ is the largest integer less than or equal to $z$,
 % so this equivalently takes a centered Gaussian displacement and assigns it to the nearest deme. 
-(The mean displacement is zero, and when comparing to theory we compute $\sigma$ as the standard deviation of this distribution.)
+(The mean displacement is zero, and when comparing to theory we compute $\sigma$ as the standard deviation of this discrete distribution.)
 Migrants past either end of the range remain at the terminal demes.
 Then, 
 fitnesses are computed (heterozygotes at the selected locus have fitness $1-s$; homozygotes have fitness 1),
@@ -717,9 +725,10 @@ the chromosome inherited that genomic region.
 We then assigned ancestry at individual loci by looking up which side of the zone the ancestor lived on.
 
 For efficiency, in most simulations the number of demes was only 3--5 times wider than the stable cline width. \linelabel{ll:narrow_sims}
-We verified that the size of the simulated region was not affecting dynamics in the center of the zone
+We verified that the size of the simulated region did not affect dynamics in the center of the zone
 by running additional simulations on wider regions
-(as we did for numerical solutions of PDE).
+(as we did for numerical solutions of PDE);
+an example is shown in Figure \ref{sfig:extra_long_cline}.
 
 The simulations were executed in R, with scripts available at
 \url{https://github.com/petrelharp/clinal-lineages}.
@@ -728,15 +737,21 @@ The simulations were executed in R, with scripts available at
 \includegraphics{figs/alleleFrequencies_sim_comparison_revision_original.pdf}
     \caption{
         \textbf{Comparison of simulated to theoretical clines:}
-        As in Figure \ref{alleleFreq_tau100},
-        frequency of ancestry $B$,
-        across geography and at several physical positions on the genome,
-        at $T=100$ generations after secondary contact,
-        and at $s=0.1$.
+        Frequency of ancestry $B$,
+        across geography at different physical positions on the genome, simulated for a hybrid zone
+        $T=100$ generations after secondary contact, with $s=0.1$,
+        using 50 demes, each with 500 diploid individuals and $\sigma=1$.
+        In each figure,
+        each line represents a locus some distance $r$ away from the true target of selection, 
+        and $r=0$ represents the locus that is under selection. 
         Dotted lines are expected frequencies of $B$ ancestry $1-q(x,t,r)$
         (unconditional on the ancestry of the linked allele), computed numerically.
-        Each line represents a locus some distance $r$ away from the true target of selection, 
-        and $r=0$ represents the locus that is under selection. Colors correspond to different values of $r$, transitioning from red (tight linkage to selected site) to blue (distantly linked).
+        \textbf{Top:}
+        loci across a chromosome unlinked to the selected locus.
+        \textbf{Bottom:}
+        loci across the chromosome carrying the selected locus,
+        with colors corresponding to different values of $r$, from red (tight linkage to selected site) to blue (distantly linked).
+        The two sets of clines are shown superimposed in Figure \ref{alleleFreq_tau100}.
     }\label{fig:alleleFreq_tau100_comparison}
 \end{figure}
 
@@ -761,8 +776,6 @@ motivating us to define the statistic
 where $m_i$ is the block length in individual $i$, and the sum is over individuals at location $x$.
 The statistic $C$ is the mean block length around $m$ in the population, 
 divided by the mean lengths of the two blocks directly flanking the block containing $m$. 
-
-\plr{Below we use $l_B$ to mean the normalized version also.  I am defining consistent notation, $\bar l_B$.}
 
 To identify regions of the genome with abnormal distributions of block lengths, 
 we compute $l_B(m,x)$ and $C(m,x)$ at a grid of positions across geography and across the genome. 
@@ -834,8 +847,8 @@ This is seen in Figure \ref{fig:alleleFreq_tau100_comparison},
 and supplementary figures \ref{alleleFreq_tau100}, \ref{alleleFreq_tau100_weaker_s} and \ref{alleleFreq_tau1000}. 
 Clines in ancestry frequency matched expected values found from deterministic theory
 up to stochasticity due to genetic drift, which is more pronounced at lower population densities.
-Figure \ref{fig:alleleFreq_tau100_comparison} shows that expected clines computed from equation \eqref{eqn:q_pde}
-match simulated clines in Figure \ref{alleleFreq_tau100} quite well.
+For instance, figure \ref{fig:alleleFreq_tau100_comparison} shows that expected clines computed from equation \eqref{eqn:q_pde}
+match simulated clines quite well.
 Figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau320_comparison}, and \ref{sfig:condAlleleFreq_tau1280_comparison}
 show this comparison with a lower population density than in Figure \ref{alleleFreq_tau100},
 and separating linked clines based on the identity of the linked selected allele.
@@ -1058,7 +1071,7 @@ Popular approaches to identifying loci under selection in hybrid zones
 involve identifying alleles that are exceptional in terms of frequency across space, or genome-wide admixture proportion \citep{Porter1997,Gompert2012}.  
 The availability of genomic data has made it possible to use local ancestry as an additional source of information. 
 In particular, ancestry deconvolution facilitated by programs such as  hapMIX \citep{Price2009}, LAMP \citep{Sankararaman2008} and fineSTRUCTURE \citep{Lawson2012} 
-can inform the demographic history of hybridization/admixture from present day samples \citep[e.g.][]{Hellenthal2014}. 
+can inform the demographic history of hybridization/admixture from present day samples \citep[e.g.,][]{Hellenthal2014}. 
 We described how selection against hybrid incompatibilities  
 results in long contiguous blocks of ancestry around these loci. 
 This is because regions surrounding selected loci do not readily introgress, 
@@ -1100,12 +1113,10 @@ Here we review the assumptions we made and their likely impact.
 
 \paragraph{The nature of selection}
 Although our assumed scenario of selection against heterozygotes at a single locus is uncommon in nature, 
-we believe that this is unlikely to drastically influence our findings.
-As discussed in the Introduction,
-previous studies have demonstrated that models of underdominant selection 
-share similar properties with more realistic models, e.g.,
-selection on an ecological gradient or multilocus, epistatic selection
-\citep{Slatkin1973,Barton1993,Kruuk1999}.
+theoretical and simulation studies show that clines formed by underdominant selection and extrinsic selection 
+are effectively indistinguishable without additional information \citep{may1975gene,Barton1993,Kruuk1999}, 
+especially over short time scales \citep{Barton1979a},
+and their shape is determined mostly by the mean fitness of the heterozygote \citep{Slatkin1973}. 
 \revpoint{1}{1}
 
 Our assumption of a single selected locus may have greater consequences. Our model is most relevant to scenarios with few targets of selection scattered throughout the genome, and therefore, our predictions may differ significantly from situations in which the density of selected sites is higher. 
@@ -1113,7 +1124,6 @@ Having numerous selected sites within one ancestry block increases the strength 
 and the relatively short map distances between linked incompatibilities generates a longer unit which is not readily broken up by recombination \citep{barton1986effects}. 
 Both factors are expected to result in regions that are surrounded by even longer segments of unbroken ancestry, 
 and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection \citep{Slatkin1975b,Barton1983}. 
- 
 
 To speed calculations and simulations, we assumed a homogeneous, one-dimensional geographical range.
 Our analytical results further assumed a large population density, 
@@ -1183,7 +1193,7 @@ If however the correlation in ancestry, rather than the block-length distributio
 
 %One major assumption of our model is that selection acts against heterozygotes -- i.e., that loci are underdominant. 
 %Under dominance is quite rare in nature, because underdominant loci cannot invade when rare, and thus our major assumption is likely rarely met. 
-%We believe, however, that this assumption is unlikely to drastically influence our results --- previous research has found that under dominant loci  have similar proprrties in hybrid zones as more realistic genetic models, such as ecological selection \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}. 
+%We believe, however, that this assumption is unlikely to drastically influence our results --- previous research has found that under dominant loci  have similar properties in hybrid zones as more realistic genetic models, such as ecological selection \yb{(CITE: (BARTON and HEWITT 1989; BARTON and GALE 1993)}. 
 %An additional assumption of our analytical model is that we ignore coalescence.  
 %The broad agreement between our analytical and theoretical results suggests that this assumption will also have negligible effect on our results. 
 
