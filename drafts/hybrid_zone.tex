@@ -514,7 +514,7 @@ per generation.
         on the ancestry at the selected site,
         at different distances from the selected site ($r=.01$, .04, and 0.5 Morgans),
         as described in the text (see definition of $q_z(x,t,r)$).
-        See figure \ref{sfig:linked_cline_heatmaps_longtime}
+        See Figure \ref{sfig:linked_cline_heatmaps_longtime}
         for the same figure over a longer period of time.
     }
     \label{fig:linked_cline_heatmaps}
@@ -844,10 +844,10 @@ As expected, clines in simulations form and begin to flatten,
 with ancestry frequencies at the selected site maintaining a stable shape,
 and tightly linked sites flattening more slowly than distant sites.
 This is seen in Figure \ref{fig:alleleFreq_tau100_comparison},
-and supplementary figures \ref{alleleFreq_tau100}, \ref{alleleFreq_tau100_weaker_s} and \ref{alleleFreq_tau1000}. 
+and supplementary Figures \ref{alleleFreq_tau100}, \ref{alleleFreq_tau100_weaker_s} and \ref{alleleFreq_tau1000}. 
 Clines in ancestry frequency matched expected values found from deterministic theory
 up to stochasticity due to genetic drift, which is more pronounced at lower population densities.
-For instance, figure \ref{fig:alleleFreq_tau100_comparison} shows that expected clines computed from equation \eqref{eqn:q_pde}
+For instance, Figure \ref{fig:alleleFreq_tau100_comparison} shows that expected clines computed from equation \eqref{eqn:q_pde}
 match simulated clines quite well.
 Figures \ref{sfig:condAlleleFreq_tau80_comparison}, \ref{sfig:condAlleleFreq_tau320_comparison}, and \ref{sfig:condAlleleFreq_tau1280_comparison}
 show this comparison with a lower population density than in Figure \ref{alleleFreq_tau100},
@@ -862,7 +862,7 @@ although as the clines flatten they are seen to wobble
 % %\citep[which is unsurprising, as the total population size is only 5,000 diploids:][]{Polechova2011}.
 % \plr{(With effective population size only thousands, once you get to 1,280 generations, it doesn't matter that you're simulating a spatial population;
 % drift will kick in and move frequencies \emph{range-wide}.
-% We see that in figure \ref{sfig:condAlleleFreq_tau1280_comparison}.
+% We see that in Figure \ref{sfig:condAlleleFreq_tau1280_comparison}.
 % That's what I was trying to say here.
 % Total population size is not irrelevant.)}
 
@@ -930,7 +930,7 @@ This implies the scale on which $A$ haplotypes are found surrounding the locus s
 %\plr{(check predicted decay of mean length $1/x$ in simulations?)}
 
 \paragraph{Identifying selected loci}
-The statistic $C(m,x)$ shows promise for identifying selected loci under some circumstances.
+The statistics $\bar l(m,x)$ and $C(m,x)$ show promise for identifying selected loci under some circumstances.
 As expected, regions surrounding a locus under selection are more resistant to introgression,
 as seen in Figures~\ref{Fig:resistanceToIntrogression1000g} and \ref{Fig:resistanceToIntrogression100g}.
 When present, we expect haplotypes that contain the locally less common allele
@@ -941,9 +941,9 @@ the mean length of such haplotype blocks is up to three times longer
 than the average for that geographic location,
 peaking quite sharply around the location of the selected site.
 
-\alisa{To provide some intuition about the physical scale of this signal, we note that}
-genomic regions are inherited from ancestors $T$ generations ago
-in blocks of size roughly $1/T$. \revpoint{1}{6}
+Using the fact that genomic regions are inherited from ancestors $T$ generations ago
+in blocks of size roughly $1/T$, \revpoint{1}{6}
+we can provide some intuition about the physical scale of the expected signal.
 There will be a long segment of $A$ ancestry
 if many such adjacent blocks are all inherited from the $A$ side.
 Ancestries of neighboring blocks are correlated,
