@@ -180,11 +180,26 @@ This will generate an R object file **with what?**
 
 # To create a "comparison to theory" document for a given simulation
 
-First `devtools::install_github("petrelharp/templater")` and then run e.g.
+There is an Rmarkdown file, `compare-to-theory.Rmd`, that can be used to create plots
+comparing the results of a given simulation
+to predictions from numerical integration of the PDEs,
+using the tools in [notes/](../notes/).
+
+To create it,
+install the minimal package [templater](https://github.com/petrelharp/templater) (e.g. by `devtools::install_github("petrelharp/templater")`)
+define `simchunks.file`, and then compile the Rmarkdown file, for instance:
+```
+library(templater)
+simchunks.file <- "simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_simsums_chunks.Robj"
+output.file <- gsub("_simsums_chunks.Robj", "_comparison-to-theory.html", simchunks.file)
+render_template('compare-to-theory.Rmd',output=output.file)
+```
+
+If you have `make`, you can do:
 ```
 make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_comparison-to-theory.html
 ```
-or even
+or, to run it for all simulation results in a directory, do
 ```
 SIMDIR=simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/
 for x in $(find $SIMDIR -name "*_simsums_chunks.Robj")
@@ -193,3 +208,4 @@ do
     make $y
 done
 ```
+

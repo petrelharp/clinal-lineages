@@ -1,6 +1,6 @@
 library(Rcpp)
 
-# see test-unifprod.R for more details.
+# see tests/test-unifprod.R for more details.
 
 # Discretization of u(a,b) -> \int_a^b (u(a,t) u(t,b) - u(a,b)) dt
 #  so output is y[i,k] = sum( x[i,i:(k-1)]*x[(i+1):k,k] ) - (k-1)*x[i,k]
