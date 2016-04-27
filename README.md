@@ -1,4 +1,4 @@
-# [Beyond clines: lineages and haplotype blocks in hybrid zones]
+# Beyond clines: lineages and haplotype blocks in hybrid zones
 
 by [Alisa Sedghifar](https://github.com/asedghifar), [Yaniv Brandvain](https://brandvainlab.wordpress.com/), and [Peter Ralph](https://github.com/petrelharp)
 
@@ -21,16 +21,19 @@ Here's the important parts:
 
 - [notes/](tree/master/notes/) : implementation of numerical solutions to the PDE, and documents describing development of the theory
 
-    - [notes/README.md](tree/master/notes/) : describes the relevant files in this directory
+    - [notes/README.md](tree/master/notes/README.md) : describes the relevant files in this directory
 
 - [drafts/](tree/master/drafts/) : the writeup, in LaTeX. 
 
-    - [drafts/figs/hybrid_zone.tex](tree/master/drafts/hybrid_zone.tex) : the LaTeX for the document
+    - [drafts/hybrid_zone.tex](tree/master/drafts/hybrid_zone.tex) : the LaTeX for the document
     - [drafts/figs/](tree/master/drafts/figs/) : figures for the paper, and the code to make them.
-        *If you want to see how a given figure was produced, try looking in the LaTeX source to find the filename, 
+    - [drafts/figs/README.md](tree/master/drafts/figs/README.md) : describes some of the R scripts that produce the figures
+        *If you want to see how a given figure was produced, and it doesn't say here,
+        try looking in the LaTeX source to find the filename, 
         then search for that string in the scripts in `figs/`.*
 
 - [resources/](tree/master/resources/) : scripts to help out with making html reports from Rmarkdown, using [templater](https://github.com/petrelharp/templater).
+    You can ignore this directory.
 
 
 We also have produced a fairly large number of pdfs of simulation results under various parameter combinations.
