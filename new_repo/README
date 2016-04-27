@@ -47,7 +47,7 @@ Additionally, sims-fns.R will generate a slew of summary figures for mainly diag
 	*chunks_mean.pdf; chunk lengths across simulated chromosome
 	
 
-To ge the family size of lineages, run number_of_inds.R, editing the file directly to specify the simulation to be analyzed. This will generate an R object file 
+To get the family size of lineages, run number_of_inds.R, editing the file directly to specify the simulation to be analyzed. This will generate an R object file 
 
 
 
@@ -55,18 +55,17 @@ NUMERICAL:
 Most of these files can be found in the "notes" directory.
 To compare numerical solution for allele frequency clines:
 First `devtools::install_github("petrelharp/templater")` and then run e.g.
-```
+
 make simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/tau500_dir/results_comparison-to-theory.html
-```
+
 or even
-```
+
 SIMDIR=simulation_SIGMA1_Ninds5000_ndemes100_s0.1_dir/
 for x in $(find $SIMDIR -name "*_simsums_chunks.Robj")
 do 
     y=$(echo $x | sed -e 's/_simsums_chunks.Robj/_comparison-to-theory.html/') 
     make $y
 done
-```
 
 
 FIGURES:
