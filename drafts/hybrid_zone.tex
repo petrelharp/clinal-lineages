@@ -1127,6 +1127,7 @@ and the relatively short map distances between linked incompatibilities generate
 Both factors are expected to result in regions that are surrounded by even longer segments of unbroken ancestry, 
 and will impact expectations of genome-wide pattens of clines and block lengths, as well as the resolution to which one could detect targets of selection \citep{Slatkin1975b,Barton1983}. 
 
+\paragraph{Geography}
 To speed calculations and simulations, we assumed a homogeneous, one-dimensional geographical range.
 Our analytical results further assumed a large population density, 
 effectively working with a deterministic model that ignores coalescence and associated stochasticity.
@@ -1135,6 +1136,7 @@ In reality, populations may be patchily connected, especially at the edges of sp
 The degree to which inhomogeneous geography would affect the predictions depends on how patchy the zone is;
 the differential equations provide a way to evaluate this in specific circumstances.
 
+\paragraph{Coalescence}
 %It is particularly unfortunate 
 %that our analytic calculations do not capture stochasticity arising from coalescence/pedigree structure. 
 Extending our analytical results to capture stochasticity arising from coalescence/pedigree structure represents an important future direction.  
@@ -1144,7 +1146,9 @@ and simulations at lower density show larger fluctuations than those at higher d
 Furthermore, ignoring pedigree structure can result in an underestimate of covariance in ancestry, as we have ignored additional sharing of ancestry through shared genealogy \citep{liang2014lengths};
 but there is nonetheless good agreement between analytic predictions and simulations (which include an explicit pedigree structure).
 % suggests that this assumption does not have a severe impact on our major results when population densities are moderately high.
-
+It could be particularly important for applications to understand to what degree drift within an old, stable hybrid zone
+can mimic the haplotype patterns seen in a recently formed zone, \linelabel{ll:old_drift}
+in the same way that drift can produce clines at neutral loci in old hybrid zones.
 
 
 \subsection*{Theory and simulation}
@@ -1239,8 +1243,8 @@ our model provides some rough expectation on how quickly this should happen.
 
 \section*{Acknowledgements}
 We thank Graham Coop, Nancy Chen, Emily Josephs, Kristin Lee, Nick Barton and two anonymous reviewers for helpful feedback and suggestions.
-PR was supported in part by NSF grant DBI-1262645 and a Sloan Research Fellowship.
-% \alisa{More info here}
+This work was supported by National Institute of Food and Agriculture (NIFA) project \#1007008 to YB
+and by National Science Foundation grant DBI-1262645 and a Sloan Research Fellowship to PR.
 
 \bibliographystyle{molecularEcology}
 \bibliography{library,references}
@@ -1249,7 +1253,7 @@ PR was supported in part by NSF grant DBI-1262645 and a Sloan Research Fellowshi
 
 All scripts used in production of this paper are available at 
 \url{https://github.com/petrelharp/clinal-lineages}
-under the GPLv3 software license
+under the GPLv3 software license.
 
 \appendix
 \setcounter{table}{0}

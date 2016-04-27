@@ -41,6 +41,7 @@
 \newcommand{\revreffull}[2]{{(p.\ \pageref{rr:rev#1:#2}, l.\ \lineref{rr:rev#1:#2})}}
 % but this version fills in reviewer and point automatically if called in the appropriate part of the reviews
 \newcommand{\revref}{\revreffull{\thereviewer}{\thepoint}}
+% NOTE: should call \revref{} with empty brackets after to get a space afterwards if desired: http://tex.stackexchange.com/questions/31091/space-after-latex-commands
 
 % or, this one to refer to a named linelabel
 % e.g. if in the text there is a \linelabel{approx_eqn_point}

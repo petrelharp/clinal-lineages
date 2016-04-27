@@ -17,11 +17,9 @@
 \end{minipage}
 \hfill
 \begin{minipage}[b]{2.5in}
-    Lewis-Sigler institute for integrative genomics\\
-    Princeton University\\
-    Yaniv's address\\
-    \emph{and} Molecular and Computational Biology\\
-    University of Southern California \\
+    Alisa Sedghifar \\
+    Yaniv Brandvain \\
+    \emph{and} Peter Ralph \\
   \today
 \end{minipage}
  
@@ -32,20 +30,17 @@
  
 \vskip 1em
 
+We are pleased to submit a revision of our Manuscript, `Beyond clines: lineages and haplotype blocks in hybrid zones' (MEC-16-0266) for the special issue 'Genomics of Hybridization'. 
+We believe that this version is much improved by changes we have made to address reviewer and AE comments. 
+Below we provide a point-by-point response to reviewer and AE comments, describing how we addressed concerns raised by our readers. 
 
-\yb{We are pleased to submit a revision of our Manuscript, `Beyond clines: lineages and haplotype blocks in hybrid zones' (MEC-16-0266) for the special issue 'Genomics of Hybridization'. We believe that this version is much improved by changes we have made to address reviewer and AE comments. Below we provide a point-by-point response to reviewer and AE comments, describing how we addressed concerns raised by our readers. The major themes of our changes are (\emph{1}) Attempting to make our mathematical derivations more accessible for Molecular Ecology'€™s wide audience  (\emph{2}) Additional justification for using a genetic model of under dominance to model hybrid incompatibilities, in which we make heavy reference to the historical theory justifying this approach, and (\emph{3}) Additional simulations to show that our results are not driven by boundaries imposed in a defined range, and (\emph{4})  A streamlined introduction that makes clear our major goals and provides a stronger structure for our manuscript. }
+The major themes of our changes are 
+(\textbf{1}) Attempting to make our mathematical derivations more accessible for Molecular Ecology's wide audience  
+(\textbf{2}) Additional justification for using a genetic model of underdominance to model hybrid incompatibilities, in which we make heavy reference to the historical theory justifying this approach, 
+(\textbf{3}) Additional simulations to show that our results are not driven by boundaries imposed in a defined range, and 
+(\textbf{4})  A streamlined introduction that makes clear our major goals and provides a stronger structure for our manuscript. 
 
-\begin{quote}
-Reviewer 1 would like to see development of the finding that ancestral blocks are longer around a selected locus into a practical test.  I think that this would be a substantial project for the future, and that it is valuable to first explain and understand the theoretical prediction, as is done here.  Those analysing actual data can of course look for this pattern without needing an already implemented test.
-\end{quote}
-
-\begin{quote}
-Rev. 1 is also concerned that only under dominance is simulated.  However, it is clear that any form of selection that gives the same marginal selection coefficient will give essentially the same effect: a large body of work on clines shows that different selective mechanisms are indistinguishable, and it is reasonable for the authors to rely on that.  The other main concern was about the novelty of Eqs 4, 5; these are indeed standard (which I think the authors intended by referring to them as the Kolmogorov backward equations).  I don't know of a reference where they have been written in exactly this form, but the recombination terms and the diffusion terms in Eq. 4 both go back a long way.
-\end{quote}
-
-\begin{quote}
-Reviewer 2 is mainly concerned about the fit between theory and simulations.  I am not worried about this, since the deterministic mathematics stands independently, and the numerical computations are straightforward.  The stochastic simulations are useful mainly as illustrations of the process.  Theory and simulations are compared in the supplementary material; it should be stated more clearly how closely these match. (A precise fit is not expected anyway because there is substantial drift).  Rev. 2 also worries that the simulations are over a rather narrow range; I suspect that the authors should have results that address sensitivity to the boundaries.  Regarding specific point 1, I don't know of a previous derivation of exactly these equations, but similar equations have been used widely, and I don't think that the authors suggest otherwise.
-\end{quote}
+Thanks to both reviewers and the AE for the useful (and prompt) feedback.
 
 \noindent \hspace{4em}
 \begin{minipage}{3in}
@@ -63,14 +58,40 @@ Peter Ralph
 
 \vskip 4em
 
+\pagebreak
 
 %%%%%%%%%%%%%%
 \reviewersection{AE}
 
+\begin{quote}
+Reviewer 1 would like to see development of the finding that ancestral blocks are longer around a selected locus into a practical test.  I think that this would be a substantial project for the future, and that it is valuable to first explain and understand the theoretical prediction, as is done here.  Those analysing actual data can of course look for this pattern without needing an already implemented test.
+\end{quote}
+
+We would also like very much to develop a practical test,
+but agree that falls outside of the scope of this paper.
+
+\begin{quote}
+Reviewer 1 is also concerned that only under dominance is simulated.  However, it is clear that any form of selection that gives the same marginal selection coefficient will give essentially the same effect: a large body of work on clines shows that different selective mechanisms are indistinguishable, and it is reasonable for the authors to rely on that.  The other main concern was about the novelty of Eqs 4, 5; these are indeed standard (which I think the authors intended by referring to them as the Kolmogorov backward equations).  I don't know of a reference where they have been written in exactly this form, but the recombination terms and the diffusion terms in Eq. 4 both go back a long way.
+\end{quote}
+
+As discussed in more detail below,
+we now provide citations to the literature showing that different underlying mechanims give similar clines,
+and have put in some citations to the literature making similar arguments (which we did indeed think of as standard).
+
+\begin{quote}
+Reviewer 2 is mainly concerned about the fit between theory and simulations.  I am not worried about this, since the deterministic mathematics stands independently, and the numerical computations are straightforward.  The stochastic simulations are useful mainly as illustrations of the process.  Theory and simulations are compared in the supplementary material; it should be stated more clearly how closely these match. (A precise fit is not expected anyway because there is substantial drift).  Rev. 2 also worries that the simulations are over a rather narrow range; I suspect that the authors should have results that address sensitivity to the boundaries.  Regarding specific point 1, I don't know of a previous derivation of exactly these equations, but similar equations have been used widely, and I don't think that the authors suggest otherwise.
+\end{quote}
+
+We have added more discussion in this direction, as described below.
+We had indeed run many more simulations than are shown in the text,
+including checking that the boundaries were not affecting things substantially (for both simulations and PDE solutions);
+now we have a statement to that effect.
 
 \begin{quote}
 This is a nice analysis of how neutral genome introgresses past a cline maintained by selection against heterozygotes.  There has been a good deal of work on related problems, but mostly assuming equilibrium, and mostly on the forwards evolution of allele frequencies, rather than tracing back the ancestry of blocks of genome.  The theory presented here is therefore new, and directly relevant to interpreting genomes sampled from hybrid zones.
 \end{quote}
+
+Thanks for the encouraging words!
 
 \begin{point}{Fig 1 caption}
 ``alelle''
@@ -114,7 +135,7 @@ However, there is some approximation here, and the approach will fail if $\sigma
 \end{point}
 
 \reply
-There might have been some confusion about our use of the floor function?
+There might have been some confusion about our undocumented use of the floor function?
 We now describe the dispersal distribution in a more straightforward way \revref.
 It's a good point more generally that if $\sigma$ is smaller than the deme spacing this scheme won't get dispersal with $\sigma$ close to the $\sigma$ that we plug into the Gaussian;
 it's for this reason that we compute numerically what $\sigma$ actually is when comparing simulation to theory.
@@ -138,7 +159,7 @@ Fixed.
 \end{point}
 
 \reply
-Well, we hoped to mean ``reality'', but perhaps ``verify that theory matches reality'' is too strong; we've adjusted this to say ``realistic, individual-based models.''.
+Well, we hope to mean ``reality'', but you're right, ``verify that theory matches reality'' is too strong; we've changed this to say ``realistic, individual-based models.''.
 %\alisa{I think we do mean ``reality" here, but alternate opinions welcome}
 %\plr{I changed to ``realistic, individual-based models''.}
 
@@ -164,6 +185,9 @@ that falls in the domain of attraction that we discuss here.
 
     The idea of using the lengths of ancestry blocks to detect selection in hybrid zones is interesting, and I had not encountered it before. This article will likely be of most interest to theorists, however, as the discussion of the practical confounders of the selection test is limited. 
 \end{quote}
+
+We also hope to at least stimulate more exploration with real datasets
+(and collection of datasets this can be done on).
 
 \begin{point}{\revref}
     A serious limitation of the test is that it only detects selection against heterozygotes. They claim that this would not affect results, [previously at] l.453-456:
@@ -191,7 +215,7 @@ We believe that analytical results can allow for a deeper understanding than sim
 as for instance the intuitive discussion at \llname{ll:discussion_summary},
 which mostly derives from the analytical model.
 To aid our readers in developing this understanding, we have gone through considerable pains to map terms in our equations to the biological processes of migration, selection and recombination. 
-We believe that our efforts will help build a better mechanistic understanding in our readers in addition to making them aware of our results.
+We hope that our efforts will help readers to build a better mechanistic understanding of the underlying process.
 
 Furthermore, as noted at \llname{ll:ld_comps}, the equations can be used to generate expectations for LD much more efficiently than forward-time simulation.
 
@@ -200,9 +224,7 @@ Furthermore, as noted at \llname{ll:ld_comps}, the equations can be used to gene
 \end{point}
 
 \reply
-\yb{
     We agree that a long set of theoretical results can be tedious. We have therefore reshaped the introduction to highlight our major question ``How does selection against incompatibilities in a hybrid zone influence the length distribution of ancestry tracts?'' 
-}
 
 \begin{point}{}
 Since the recombination-based terms in Eqs 4 and 5 do not depend on the spatially explicit part of the model or on the selection term, I would be surprised if they had not been derived somewhere.
@@ -224,12 +246,12 @@ As an example of a section that felt unstructured, consider the discussion start
 \end{point}
 
 \reply
-\plr{(comment is more general than that particular location; say something about this)}
-We added an introductory sentence at \revref to provide some structure. 
-We have also gone through to clarify other sections that felt unclear.
+We added an introductory sentence at \revref{} 
+to provide some structure. 
+We have also attempted to clarify other sections that felt unclear.
 
 \begin{point}{\revref}
-``In the notation above, $q_z(x, t, r) = P^x{Z_t = A}$.''
+``In the notation above, $q_z(x, t, r) = P^x\{Z_t = A\}$.''
 I did not see the notation $P^x$ above, and the RHS does not depend on small z.
 \end{point}
 
@@ -263,7 +285,7 @@ Reference issues
 \end{point}
 
 \reply
-\alisa{This is a reference that is expected to appear in the same issue, so we do not have page numbers. The hope is that this can be filled in during final proofs for the issue}
+This is a reference that is expected to appear in the same issue, so we do not have page numbers. The hope is that this can be filled in during final proofs for the issue.
 
 
 
@@ -281,21 +303,24 @@ Reference issues
 %%%%%%%%%%%%%%
 \reviewersection{2}
 
-\begin{quote}
-    In this paper, the authors extend previous work on the diffusion of neutral alleles in a secondary-contact zone to include selection against hybrids. Building on the classic diffusion model for the dynamics of a cline at a selected locus, they formalize the dynamics of linked neutral loci and investigate the distribution of ancestry block-lengths around the selected locus.
-
-    The authors obtain numerical results for the flattening of the cline at a neutral locus linked to an under-dominant selected locus in the absence of genetic drift. They also outline scaling arguments for the rates of movement and length of the introgressing blocks around the selected locus. Simulations are set up to test the theoretical predictions and illustrate other interesting patterns such as the distribution of haplotype (ancestry block?) lengths.
-\end{quote}
+% \begin{quote}
+%     In this paper, the authors extend previous work on the diffusion of neutral alleles in a secondary-contact zone to include selection against hybrids. Building on the classic diffusion model for the dynamics of a cline at a selected locus, they formalize the dynamics of linked neutral loci and investigate the distribution of ancestry block-lengths around the selected locus.
+% 
+%     The authors obtain numerical results for the flattening of the cline at a neutral locus linked to an under-dominant selected locus in the absence of genetic drift. They also outline scaling arguments for the rates of movement and length of the introgressing blocks around the selected locus. Simulations are set up to test the theoretical predictions and illustrate other interesting patterns such as the distribution of haplotype (ancestry block?) lengths.
+% \end{quote}
 
 \begin{point}{}
     Unfortunately, the fit of the theoretical predictions to simulations is largely not shown, and those comparisons in the manuscript are limited to the frequency dynamics of the neutral alleles (Figure S3). The predictive theoretical results are based on scaling arguments - but it is not clear which of these results are uniquely derived in this paper.
 \end{point}
 
 \reply
-\alisa{Our hope was that the simulations and theory would provide qualitative support for one another. Some predictions made by the theory e.g. time and spatial scales do seem to correspond. We will try to do a better job of signposting our unique contributions??}
+We have aimed to compare theoretical predictions to simulation everywhere that we have quantitative predictions.
+Unfortunately, expressions for mean lengths of haplotype blocks are only order-of-magnitude (but roughly agree, as we discuss),
+and obtaining numerical predictions from the PDE for these is rather daunting.
+Given the very good fit for linked clines, we are not concerned, however.
 
-The rescaling arguments we provide  are of a standard sort in the literature;
-we've inserted comments to this effect, at \llname{ll:rescaling} and \llname{ll:may_citation}.
+The rescaling arguments we provide are of a standard sort in the literature;
+we've inserted comments to this effect in several places, including at \llname{ll:rescaling} and \llname{ll:may_citation}.
 
 
 \begin{point}{}
@@ -305,10 +330,11 @@ Overall, this MS presents some interesting insights, and the formalization of th
 \end{point}
 
 \reply
-\alisa{Should we be running more sims? Nick seems to think we have done this, but I don't think we have.}
-\plr{run sims with longer range}
-\plr{also run sims in part of param range where nothing's supposed to happen?}
-
+As mentioned above, we had, indeed, run more simulations on longer habitats, to check the range was sufficient.
+As expected, the boundaries were not impacting dynamics in the center of the zone, as there isn't enough time for this to happen.
+Over longer periods, with small population densities, the total size of the range will affect rangewide drift,
+as perhaps seen in Figure \ref{sfig:condAlleleFreq_tau1280_comparison}; 
+but this is a relatively minor point.
 
 \begin{point}{Figure 1}
  Plotting the haplotypes to the side of the plot would help.
@@ -336,24 +362,20 @@ As for the width of the range, we had indeed also run additional simulations (an
 we now have a note to this effect at \llname{ll:narrow_sims}.
 
 \begin{point}{Figure 3:}
-What are the replicate lines for the same $r$? Why re the lines for $r = 0$ all slightly displaced to the right? Also, it would appear that the color scheme in associated Figure S2 (bottom) is mismatched with the legend, shifted to the red part of the spectrum. After fixing this, I think that the Figure S2 should be in the main text instead of Fig. 3.
+What are the replicate lines for the same $r$? Why are the lines for $r = 0$ all slightly displaced to the right? Also, it would appear that the color scheme in associated Figure S2 (bottom) is mismatched with the legend, shifted to the red part of the spectrum. After fixing this, I think that the Figure S2 should be in the main text instead of Fig. 3.
 \end{point}
 
 \reply
-\alisa{We have switched figures S2 and 3 and fixed the colors. The colored lines are not all represented in the legend which seems to have caused some confusion and we have tried to address this in the figure legends. We don't interpret the mismatch as a displacement to the right, as translating the lines horizontally will not improve the overall fit, and attribute this to drift in the simulations.}
+We have switched figures S2 and 3 and fixed the colors. The colored lines are not all represented in the legend which seems to have caused some confusion and we have tried to address this in the figure legends. We don't interpret the mismatch as a displacement to the right, as translating the lines horizontally will not improve the overall fit, and attribute this to drift in the simulations.
 
 \begin{point}{\revref}
 Total population size is irrelevant when predicting the effects of genetic drift (besides, some simulations only have 50 demes across, not 100). In a one-dimensional habitat, one uses $N \sigma \sqrt{s}$ to judge whether the effect of genetic drift is likely to be negligible.
 \end{point}
 
 \reply
-\plr{We meant that the allele frequencies in the \emph{entire population} had shifted, which is determined by the total (effective) population size.  
-However, we decied to }
-% \yb{Thanks for spotting this. Because we do nothing quantitative with respect to drift here, we}
-\yb{simply state the our observed wobble of the center of the tension zone is consistent with previous theory. However, more broadly throughout the manuscript we are not sure about relying on $N \sigma \sqrt{s}$ as we are concerned with loci linked to the selected site, and we are not aware of results extending this rule to an unlinked locus.}
-\plr{(Do you mean "linked locus"?)}
-%\alisa{We are concerned here with linked loci, so the $N\sigma\sqrt{s}$ rule of thumb does not necessarily apply here? Also, within demes, population size is much smaller (500?)}
-%\plr{I agree: they are probably thinking of selected loci, not linked ones. We're talking about global drift not local drift. Yaniv to investigate.}
+We meant that the allele frequencies in the \emph{entire population} had shifted, which is determined by the total (effective) population size.  
+However, we decied to 
+simply state the our observed wobble of the center of the tension zone is consistent with previous theory. However, more broadly throughout the manuscript we are not sure about relying on $N \sigma \sqrt{s}$ as we are concerned with loci linked to the selected site, and we are not aware of results extending this rule to a linked locus.
 
 \begin{point}{Scaling arguments, p. 14, 15:}
  Please give a citation with the known scaling, and take more care with the novel ones.  
@@ -361,7 +383,7 @@ However, we decied to }
 
 \reply
 As noted above, we have provided some citations to similar arguments in the literature
-(although such arguments are often used without citation; see, for instance, \citet{durrett2007width}).
+(although such arguments are often used without citation).
 
 \begin{point}{\revref}
  I think the sentence about the maximum length of the enclosing haplotype, $\sigma \sqrt{s} / x$ is mis-phrased: presumably this should be a statement on the distribution (expected size?) of the introgressing block length at distance $x$, as a lucky block can travel many sigmas in one generation?
@@ -375,24 +397,30 @@ Good point, it was meant to be a statement about an order of magnitude bound to 
 \end{point}
 
 \reply
-We now have much more discussion about drift, in particular at \revref.
-
-\plr{I don't understand this:}
-\alisa{We should add a line or two in the discussion about drift. However, IBD is perhaps not relevant over the timescales we are considering and is not necessarily ancestry informative, and since we are not interested in the equilibrium state, it is not clear that we need to worry about this limit. }
+We agree this is an important point, and now have much more discussion about drift, in particular at \revref{}
+and a note about drift maintaining certain clines in old zones at \llname{ll:old_drift}.
+We would like to explore this more, but it seems beyond the scope of the paper.
 
 \begin{point}{rates at \revref, e.g. Eq. (7,8):}
  I find the explanation of the rates a bit unclear. I understand that the recombinant AB can arise either by A reproducing at rate $s_A$ and recombining with B, or B reproducing at rate $s_B$ and recombining with A -- such that the neutral locus of the type A is kept. Or alternatively, the BA recombinant arises, where the neutral locus at B is kept. Which one of the two happens has a probability of 1/2.
 \end{point}
 
 \reply
-Right; we've added more discussion of this.
+That's correct; we've rewritten the explanation.
 
 \begin{point}{}
 The ``Data Accessibility section'' is missing. The folder at \href{http://github.com_petrelharp_clinal-lineages}  appears to be a working folder with lots of other files and the r-scripts hidden under a `sim' directory. The README file appears insufficient to allow orientation in the scripts, and worryingly, it has an `oh, wrong recombination distance' note to it.
 \end{point}
 
 \reply
-\alisa{We have created a new repository with minimally required scripts and a descriptive README file}
+We have created the Data Accessibility section, and have written improved READMEs.
+We readily admit that many of the scripts are not terribly user-friendly,
+but there is an easy interface that will run a simulation,
+and sufficient documentation about the resulting files that users can recreate our results.
+In particular, we would like to have scripts that can quickly reproduce all figures from scratch,
+but this would require far too much computation time for the user, or storage space for us.
+The worrisome note should have been reassuring: `oh, wrong recombination distance' was the commit message for the last commit the README was changed;
+this indicates that we found and fixed a problem having to do with recombination distance.
 
 \begin{point}{}
 The Acknowledgements section is missing.
