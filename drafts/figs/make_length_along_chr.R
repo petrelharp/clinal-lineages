@@ -1,6 +1,7 @@
 load("simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_chr1_start0.48_stop0.52_by0.001_intervalSizes_allAncs.Robj")
 load("simulation_SIGMA1_Ninds25000_ndemes50_s0.1_tau1000_chr1_start0.48_stop0.52_by0.001_intervalSizes.Robj")
 
+Ninds =25000
 Ndemes=50
 deme_ID = do.call(c,lapply(1:Ndemes,function(X){rep(X,Ninds/Ndemes)}))
 
@@ -191,11 +192,4 @@ par(mar=c(0.5,3.5,2,0.5))
 	mtext("Distance from selected locus (M)",side=1,line=2.5)
 	mtext("Distance from HZ center",side=2,line=2.5)
 dev.off()
-
-
-
-#########################
-##########NOW DO NEUTRAL:
-#########################
-
 

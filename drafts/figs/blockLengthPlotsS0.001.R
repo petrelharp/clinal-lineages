@@ -28,7 +28,7 @@ dev.off()
 
 
 
-pdf(height=4, width=6.25,file="s0.001_ adjacentBlocksAlongChromAncBConditioningHighRes.pdf")
+pdf(height=4, width=6.25,file="s0.001_adjacentBlocksAlongChromAncBConditioningHighRes.pdf")
 par(mar=c(3.5,3.5,0.5,0.5))
 flanking.blocks.deme.matrix.AncB = do.call(rbind,lapply(1:50,function(DEME){sapply(flanking.blocks.by.ind.AncB,function(POS){mean(POS[[DEME]])})}))
 
@@ -144,7 +144,7 @@ dev.off()
 
 
 
-pdf(height=4, width=6.25,file="s0.001_adjacentBlocksAlongChromNoConditioning.pdf")
+pdf(height=4, width=6.25,file="s0.001_BlocksAlongChromNoConditioningHighRes.pdf")
 
 par(mar=c(3.5,3.5,0.5,0.5))
 mean_per_deme = do.call(rbind, lapply(intervalSizes_allAncs,function(P){tapply(1:25000,deme_ID,function(Z){mean(P[Z,])})}))
@@ -158,7 +158,7 @@ legend("topright",title="distance from center:",legend = rev(c(seq(-25,-5,5),seq
 dev.off()
 
 
-pdf(height=4, width=6.25,file="s0.001_adjacentBlocksAlongChromAncBConditioning.pdf")
+pdf(height=4, width=6.25,file="s0.001_BlocksAlongChromAncBConditioningHighRes.pdf")
 
 par(mar=c(3.5,3.5,0.5,0.5))
 mean_per_deme_AncB = do.call(rbind, lapply(intervalSizes,function(P){tapply(1:25000,deme_ID,function(Z){all_sites = P[Z,]; mean(all_sites[which(all_sites>0)])})}))
@@ -172,7 +172,7 @@ legend("topright",title="distance from center:",legend = rev(c(seq(-25,-5,5),seq
 dev.off()
 
 
-pdf(height=4, width=6.25,file="s0.001_ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf")
+pdf(height=4, width=6.25,file="s0.001_BlocksAlongChromHeatmapNoConditioning.pdf")
 layout(c(1,2),heights=c(1,4))
 par(mar=c(0.5,3.5,2,0.5))
 	BREAKS = seq(0.004,0.013,0.0005)
@@ -196,7 +196,7 @@ dev.off()
 
 
 
-pdf(height=4, width=6.25,file="s0.001_ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf")
+pdf(height=4, width=6.25,file="s0.001_BlocksAlongChromHeatmapAncBConditioning.pdf")
 layout(c(1,2),heights=c(1,4))
 par(mar=c(0.5,3.5,2,0.5))
 
