@@ -101,23 +101,35 @@ The plots that are produced by `run_sims.R` are (with the run-specific string pr
 - `LD.pdf`
 
 
-The plots produced by `haplotype-plots.R`, run on the output (see below) are:
+The plots produced by `haplotype-plots.R`, run on the output (see below) are as follows.
+Many plots show genomic position on the x-axis, with the selected site in the center;
+these come in two types: line plots, with one line per spatial location,
+and heatmaps, with one row per spatial location.
+As in the text, "normalized" means the statistic is divided by the mean value of the statistic across all loci at that geographic location.
 
-- `ratioAdjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf`
-- `blocksAlongChromNoConditioning_nonnormalized.pdf`
-- `blocksAlongChromAncBConditioning_nonnormalized.pdf`
-- `adjacentBlocksAlongChromNoConditioning_nonnormalized.pdf`
-- `adjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf`
-- `ratioAdjacentBlocksAlongChromNoConditioning.pdf`
-- `ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf`
-- `ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf`
-- `ratioAdjacentBlocksAlongChromAncBConditioning.pdf`
-- `blocksAlongChromNoConditioning.pdf`
-- `blocksAlongChromHeatmap.pdf`
-- `blocksAlongChromHeatmapAncBConditioning.pdf`
-- `blocksAlongChromAncBConditioning.pdf`
-- `adjacentBlocksAlongChromNoConditioning.pdf`
-- `adjacentBlocksAlongChromAncBConditioning.pdf`
+Mean block lengths:
+
+- `blocksAlongChromHeatmap.pdf` : the $\bar l$ statistic, *normalized* mean block length surrounding the site.
+- `blocksAlongChromAncBConditioning.pdf` : the $\bar l_B$ statistic, *normalized* mean block length surrounding the site *of only blocks of ancestry B* (so, no B ancestry leads to missing data)
+- `blocksAlongChromHeatmapAncBConditioning.pdf` : heatmap of the same
+- `blocksAlongChromNoConditioning_nonnormalized.pdf` : the $l$ statistic, mean block length surrounding the site
+- `blocksAlongChromNoConditioning.pdf` : the $\bar l$ statistic, *normalized* mean length of enclosing block
+- `blocksAlongChromAncBConditioning_nonnormalized.pdf` : the $l_B$ statistic, mean block length *of only blocks of ancestry B* (so, no B ancestry leads to missing data)
+
+Mean adjacent block lengths:
+
+- `adjacentBlocksAlongChromNoConditioning_nonnormalized.pdf` : mean *flanking* block length; i.e., mean length of the two blocks flanking the block covering the given position.
+- `adjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf` : mean *flanking* block length *of only blocks of ancestry B* (so, flanking blocks will be of ancestry A)
+- `adjacentBlocksAlongChromNoConditioning.pdf` : *normalized* mean *flanking* block lngth
+- `adjacentBlocksAlongChromAncBConditioning.pdf` : *normalized* mean *flanking* block length  *of only blocks of ancestry B* (so, flanking blocks will be of ancestry A)
+
+Radio of mean block lengths to mean adjacent block lengths:
+
+- `ratioAdjacentBlocksAlongChromNoConditioning.pdf` : the $C$ statistic.
+- `ratioAdjacentBlocksAlongChromHeatmapNoConditioning.pdf` : heatmap of the same.
+- `ratioAdjacentBlocksAlongChromAncBConditioning_nonnormalized.pdf` : the $C$ statistic, for *only blocks of ancestry B*
+- `ratioAdjacentBlocksAlongChromAncBConditioning.pdf` : the $\bar C$ statistic, (i.e., $C$ divided by the mean across all loci), *only for blocks of ancestry $B$*
+- `ratioAdjacentBlocksAlongChromHeatmapAncBConditioning.pdf` : heatmap of the same.
 
 ## Making these plots
 
@@ -145,10 +157,12 @@ sapply( simsum.files, function (fname) {
 
 This script also saves out some time-consuming intermediate steps, namely:
 
-	- `intervalSizes.Robj` :
-	- `intervalSizes_allAncs.Robj` :
-	- `flanking.blocks.by.ind.Robj` : 
-	- `flanking.blocks.by.ind.AncB.Robj` :
+- `intervalSizes.Robj` :
+- `intervalSizes_allAncs.Robj` :
+- `flanking.blocks.by.ind.Robj` : 
+- `flanking.blocks.by.ind.AncB.Robj` :
+
+See the code for how these are used.
 
 
 ## To compile the resulting figures across time points at the same parameter values
